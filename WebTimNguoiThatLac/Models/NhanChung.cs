@@ -31,7 +31,7 @@ namespace WebTimNguoiThatLac.Models
         public string? FileDinhKem { get; set; } // Đường dẫn tới file ảnh/video
 
         [Required]
-        public int NguoiMatTichId { get; set; } // Liên kết với bảng NguoiMatTich
+        public int TimNguoiId { get; set; } // Liên kết với bảng NguoiMatTich
 
         [ForeignKey("Id")]
         public TimNguoi TimNguoi { get; set; } // Thông tin người mất tích liên quan

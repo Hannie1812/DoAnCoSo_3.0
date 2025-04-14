@@ -1,0 +1,148 @@
+﻿@model WebTimNguoiThatLac.Models.NhanChung
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h4 mb-0">Gửi Thông Tin Nhân Chứng</h2>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <!-- Thông tin cá nhân -->
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="HoTen" class="form-label fw-bold">Họ tên</label>
+                                <input asp-for="HoTen" class="form-control" placeholder="Nhập họ và tên" />
+                                <span asp-validation-for="HoTen" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Email" class="form-label fw-bold">Email</label>
+                                <input asp-for="Email" class="form-control" placeholder="Nhập email" />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="SoDienThoai" class="form-label fw-bold">Số điện thoại</label>
+                                <input asp-for="SoDienThoai" class="form-control" placeholder="Nhập số điện thoại" />
+                                <span asp-validation-for="SoDienThoai" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Thông tin nhìn thấy -->
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="ThoiGian" class="form-label fw-bold">Thời gian nhìn thấy</label>
+                                <input asp-for="ThoiGian" type="datetime-local" class="form-control" />
+                                <span asp-validation-for="ThoiGian" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DiaDiem" class="form-label fw-bold">Địa điểm nhìn thấy</label>
+                                <input asp-for="DiaDiem" class="form-control" placeholder="Nhập địa điểm" />
+                                <span asp-validation-for="DiaDiem" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Mô tả manh mối -->
+                        <div class="mb-4">
+                            <label asp-for="MoTaManhMoi" class="form-label fw-bold">Mô tả manh mối</label>
+                            <textarea asp-for="MoTaManhMoi" class="form-control" rows="4"
+                                      placeholder="Mô tả chi tiết những gì bạn đã nhìn thấy..."></textarea>
+                            <span asp-validation-for="MoTaManhMoi" class="text-danger small"></span>
+                        </div>
+
+                        <!-- File đính kèm -->
+                        <div class="mb-4">
+                            <label asp-for="FileDinhKem" class="form-label fw-bold">Tệp đính kèm (ảnh/video)</label>
+                            <input asp-for="FileDinhKem" type="file" class="form-control" />
+                            <div class="form-text">Chấp nhận file ảnh (jpg, png) hoặc video (mp4) với kích thước tối đa 5MB</div>
+                            <span asp-validation-for="FileDinhKem" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Người mất tích liên quan -->
+                        <div class="mb-4">
+                            <label asp-for="Id" class="form-label fw-bold">Người mất tích liên quan</label>
+                            <select asp-for="Id" class="form-select">
+                                <option value="">-- Chọn người mất tích --</option>
+                                @if (ViewBag.TimNguois != null)
+                                {
+                                    foreach (var TimNguoi in (List<WebTimNguoiThatLac.Models.TimNguoi>)ViewBag.TimNguois)
+                                    {
+                                        <option value="@TimNguoi.Id">@TimNguoi.HoTen</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="">Không có dữ liệu</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Id" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Nút gửi -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i> Gửi thông tin
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Thông báo pháp lý -->
+            <div class="mt-3 text-muted small">
+                <p>Thông tin bạn cung cấp sẽ được bảo mật và chỉ sử dụng cho mục đích tìm kiếm người mất tích.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <!-- Thêm Font Awesome nếu chưa có -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+    <script>
+        // Tùy chỉnh validation message
+        $(document).ready(function() {
+            // Thêm class is-invalid cho các trường không hợp lệ
+            $("input, select, textarea").on("change", function() {
+                if ($(this).hasClass("input-validation-error")) {
+                    $(this).addClass("is-invalid");
+                } else {
+                    $(this).removeClass("is-invalid");
+                }
+            });
+
+            // Hiển thị preview ảnh khi chọn file
+            $("#FileDinhKem").change(function() {
+                if (this.files && this.files[0]) {
+                    var fileType = this.files[0].type;
+                    var $preview = $("#filePreview");
+
+                    if (!$preview.length) {
+                        $preview = $('<div id="filePreview" class="mt-2"></div>');
+                        $(this).after($preview);
+                    }
+
+                    $preview.empty();
+
+                    if (fileType.startsWith("image/")) {
+                        var reader = new FileReader();
+                        reader.onload = function(e) {
+                            $preview.append('<img src="' + e.target.result + '" class="img-thumbnail" style="max-height: 200px;">');
+                        }
+                        reader.readAsDataURL(this.files[0]);
+                    } else if (fileType.startsWith("video/")) {
+                        $preview.append('<div class="alert alert-info"><i class="fas fa-video me-2"></i>File video đã được chọn</div>');
+                    }
+                }
+            });
+        });
+    </script>
+}

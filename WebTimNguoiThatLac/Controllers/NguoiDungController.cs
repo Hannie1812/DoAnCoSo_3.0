@@ -1,9 +1,11 @@
 ﻿using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using WebTimNguoiThatLac.Data;
 using WebTimNguoiThatLac.Models;
@@ -13,11 +15,13 @@ namespace WebTimNguoiThatLac.Controllers
 {
     public class NguoiDungController : Controller
     {
-        private UserManager<ApplicationUser> userManager;
+        private UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private ApplicationDbContext db;
-        public NguoiDungController(UserManager<ApplicationUser> userManager, ApplicationDbContext db)
+        public NguoiDungController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ApplicationDbContext db)
         {
-            this.userManager = userManager;
+            _userManager = userManager;
+            _signInManager = signInManager;
             this.db = db;
         }
         public async Task<IActionResult> Index(string TimKiem = "", int Page = 1)
@@ -67,7 +71,7 @@ namespace WebTimNguoiThatLac.Controllers
         }
         public async Task<IActionResult> ThongTinCaNhan()
         {
-            ApplicationUser x = await userManager.GetUserAsync(User);
+            ApplicationUser x = await _userManager.GetUserAsync(User);
             List<TimNguoi> timNguois = await db.TimNguois.Include(u => u.AnhTimNguois).Where(i => i.IdNguoiDung == x.Id).ToListAsync();
             ViewBag.CacBaiDang = timNguois;
             return View(x);
@@ -75,11 +79,65 @@ namespace WebTimNguoiThatLac.Controllers
         }
         public async Task<IActionResult> EditTaiKhoan()
         {
-            ApplicationUser x = await userManager.GetUserAsync(User);
+            ApplicationUser x = await _userManager.GetUserAsync(User);
             return View(x);
         }
 
+        // Đăng nhập bằng Google/Facebook
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ExternalLogin(string provider)
+        {
+            var redirectUrl = Url.Action("ExternalLoginCallback", "TaiKhoanNguoiDung");
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            return new ChallengeResult(provider, properties);
+        }
 
-        
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ExternalLoginCallback()
+        {
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            var user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+            if (user != null)
+            {
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                return LocalRedirect("~/");
+            }
+
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            if (email == null)
+            {
+                return View("ExternalLoginFailure");
+            }
+
+            user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                user = new ApplicationUser
+                {
+                    UserName = email,
+                    Email = email,
+                    FullName = info.Principal.FindFirstValue(ClaimTypes.Name),
+                    EmailConfirmed = true
+                };
+
+                var createResult = await _userManager.CreateAsync(user);
+                if (!createResult.Succeeded)
+                {
+                    return View("ExternalLoginFailure");
+                }
+            }
+
+            await _userManager.AddLoginAsync(user, info);
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
+            return LocalRedirect("~/");
+        }
     }
 }

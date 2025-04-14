@@ -100,11 +100,13 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnGetCallbackAsync(string returnUrl = null, string remoteError = null)
         {
             returnUrl = returnUrl ?? Url.Content("~/");
+
             if (remoteError != null)
             {
                 ErrorMessage = $"Error from external provider: {remoteError}";
                 return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
             }
+
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
@@ -112,31 +114,47 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
                 return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
             }
 
-            // Sign in the user with this external login provider if the user already has a login.
-            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
-            if (result.Succeeded)
+            // Kiểm tra xem user đã có tài khoản chưa
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            if (string.IsNullOrEmpty(email))
             {
-                _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
-                return LocalRedirect(returnUrl);
+                ErrorMessage = "Email not received from external provider.";
+                return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
             }
-            if (result.IsLockedOut)
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
             {
-                return RedirectToPage("./Lockout");
-            }
-            else
-            {
-                // If the user does not have an account, then ask the user to create an account.
-                ReturnUrl = returnUrl;
-                ProviderDisplayName = info.ProviderDisplayName;
-                if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
+                // Lấy thông tin tên từ claims
+                var fullName = info.Principal.FindFirstValue(ClaimTypes.Name) ??
+                              info.Principal.FindFirstValue("name") ??
+                              email;
+
+                // Tạo user mới
+                user = new ApplicationUser
                 {
-                    Input = new InputModel
-                    {
-                        Email = info.Principal.FindFirstValue(ClaimTypes.Email)
-                    };
+                    UserName = email,
+                    Email = email,
+                    EmailConfirmed = true,
+                    FullName = fullName, // Thêm giá trị cho trường bắt buộc
+                    Active = true,
+                    // Thêm các trường bắt buộc khác nếu có
+                    Address = "Chưa cập nhật",
+                    PhoneNumber = info.Principal.FindFirstValue(ClaimTypes.MobilePhone) ?? ""
+                };
+
+                var createResult = await _userManager.CreateAsync(user);
+                if (!createResult.Succeeded)
+                {
+                    _logger.LogError($"User creation failed: {string.Join(", ", createResult.Errors)}");
+                    ErrorMessage = "Lỗi khi tạo tài khoản mới.";
+                    return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
                 }
-                return Page();
             }
+
+            // Đăng nhập người dùng
+            await _signInManager.SignInAsync(user, isPersistent: false);
+            return LocalRedirect(returnUrl);
         }
 
         public async Task<IActionResult> OnPostConfirmationAsync(string returnUrl = null)
@@ -152,10 +170,7 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                var user = CreateUser();
-
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };
 
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
@@ -184,6 +199,7 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
                         }
 
                         await _signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
+
                         return LocalRedirect(returnUrl);
                     }
                 }

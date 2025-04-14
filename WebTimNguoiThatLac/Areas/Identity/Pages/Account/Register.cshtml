@@ -75,13 +75,28 @@
                 else
                 {
                     <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
+                        <div class="d-grid gap-3">
+                            @foreach (var provider in Model.ExternalLogins)
+                            {
+                                var btnClass = provider.Name switch
                                 {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
+                                    "Google" => "btn-danger",
+                                    "Facebook" => "btn-primary",
+                                    _ => "btn-secondary"
+                                };
+
+                                <button type="submit" class="btn @btnClass w-100 py-2" name="provider" value="@provider.Name" title="Đăng nhập bằng @provider.DisplayName">
+                                    @if (provider.Name == "Google")
+                                    {
+                                        <i class="fab fa-google me-2"></i>
+                                    }
+                                    else if (provider.Name == "Facebook")
+                                    {
+                                        <i class="fab fa-facebook-f me-2"></i>
+                                    }
+                                    Đăng nhập bằng @provider.DisplayName
+                                </button>
+                            }
                         </div>
                     </form>
                 }

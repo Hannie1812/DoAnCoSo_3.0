@@ -6,6 +6,24 @@ using WebTimNguoiThatLac.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Thêm dịch vụ xác thực
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = "Cookies"; // Sử dụng cookie để lưu trữ thông tin đăng nhập
+    options.DefaultChallengeScheme = "Google"; // Sử dụng Google làm phương thức đăng nhập mặc định
+})
+    .AddCookie("Cookies") // Sử dụng cookie để lưu trữ thông tin đăng nhập
+    .AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    })
+    .AddFacebook(options =>
+    {
+        options.AppId = builder.Configuration["Authentication:Facebook:AppId"];
+        options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
+    });
+
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<WordExportService>();// Xuất File Đăng Kí

@@ -492,6 +492,45 @@ namespace WebTimNguoiThatLac.Migrations
                     b.ToTable("NguoiThamGia");
                 });
 
+            modelBuilder.Entity("WebTimNguoiThatLac.Models.NhanChung", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("DiaDiem")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileDinhKem")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HoTen")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("MoTaManhMoi")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NguoiMatTichId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SoDienThoai")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ThoiGian")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("NhanChungs");
+                });
+
             modelBuilder.Entity("WebTimNguoiThatLac.Models.TimNguoi", b =>
                 {
                     b.Property<int>("Id")
@@ -833,6 +872,17 @@ namespace WebTimNguoiThatLac.Migrations
                     b.Navigation("ApplicationUser");
 
                     b.Navigation("HopThoai");
+                });
+
+            modelBuilder.Entity("WebTimNguoiThatLac.Models.NhanChung", b =>
+                {
+                    b.HasOne("WebTimNguoiThatLac.Models.TimNguoi", "TimNguoi")
+                        .WithMany()
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TimNguoi");
                 });
 
             modelBuilder.Entity("WebTimNguoiThatLac.Models.TimNguoi", b =>

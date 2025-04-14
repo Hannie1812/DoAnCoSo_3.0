@@ -1,0 +1,378 @@
+﻿
+@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+@model X.PagedList.IPagedList<WebTimNguoiThatLac.Models.TrungBayHinhAnh>
+
+
+@{
+    ViewData["Title"] = "Hình Ảnh Trưng Bày";
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+}
+
+@section naviHeader {
+        <!-- Left navbar links -->
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+            </li>
+            <li class="nav-item d-none d-sm-inline-block">
+                <a href="/Admin" class="nav-link ">Trang Chủ</a>
+            </li>
+            <li class="nav-item d-none d-sm-inline-block">
+                 <a href="/Admin/TrungBay" class="nav-link active">Hình Ảnh Trưng Bày</a>
+            </li>
+        </ul>
+}
+
+<!-- Thêm vào phần đầu trang -->
+<div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+<style>
+    .notification {
+        padding: 15px 20px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        color: white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        animation: slideIn 0.3s, fadeOut 0.5s 4.5s;
+        transition: all 0.3s;
+    }
+
+        .notification.success {
+            background-color: #28a745;
+        }
+
+        .notification.error {
+            background-color: #dc3545;
+        }
+
+        .notification.warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .notification.info {
+            background-color: #17a2b8;
+        }
+
+    @@keyframes slideIn {
+        from {
+            transform: translateX(100%);
+        }
+
+        to {
+            transform: translateX(0);
+        }
+    }
+
+    @@keyframes fadeOut {
+        from {
+            opacity: 1;
+        }
+
+        to {
+            opacity: 0;
+        }
+    }
+</style>
+
+
+<div class="container-fluid">
+
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <div class="row">
+                <div class="col-md-6">
+                    <form asp-area="Admin" asp-controller="TrungBay" asp-action="Index" method="get" class="form-inline">
+                        <div class="input-group">
+                            <input type="text" name="TimKiem" class="form-control" placeholder="Tìm kiếm..." value="@ViewBag.TimKiem">
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-light">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-6 text-right">
+                    <div class="btn-group">
+                        <a asp-action="Create" asp-area="Admin" asp-controller="TrungBay"
+                           class="btn btn-light">
+                            Thêm
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>STT</th>
+                            <th>Id</th>
+                            <th>Hình Ảnh</th>
+                            <th>Hoạt Động</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model == null)
+                        {
+                                <tr rowspan="5">Chưa Có Giới Thiệu Nào</tr>
+                        }
+                        else
+                        {
+                            int d = 1;
+                            @foreach (WebTimNguoiThatLac.Models.TrungBayHinhAnh i in Model)
+                            {
+                                        <tr id="Dong_ID_@i.Id">
+                                            <th scope="col" data-bs-toggle="modal" data-bs-target="#XemChiTietGioiThieu_@i.Id">@d</th>
+                                            <td scope="col" data-bs-toggle="modal" data-bs-target="#XemChiTietGioiThieu_@i.Id">@i.Id</td>
+                                            <td data-bs-toggle="modal" data-bs-target="#XemChiTietGioiThieu_@i.Id">
+                                                <img src="@i.HinhAnh" alt="Hình Ảnh" style="width: 100px; height: 100px;" />
+                                            </td>
+                                            @if (i.Active == true)
+                                            {
+                                                            <td class="trangthaiActive" id="active_id_@i.Id">
+                                                                <i class="fa-regular fa-circle-check text-success hoatdong" id="logo_@i.Id" data-check="v" data-id="@i.Id"></i>
+                                                            </td>
+                                            }
+                                            else
+                                            {
+                                                            <td class="trangthaiActive" id="active_id_@i.Id">
+                                                                <i class="fa-regular fa-circle-xmark text-danger hoatdong" id="logo_@i.Id" data-check="x" data-id="@i.Id"></i>
+                                                            </td>
+                                            }
+                                            <td>
+                                                <a asp-action="Update" asp-area="Admin" asp-controller="TrungBay" asp-route-id="@i.Id" class="btn btn-info">
+                                                    <i class="fas fa-edit"></i>
+                                                    Sửa
+                                                </a>
+
+                                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#CheckXoaGioiThieu_@i.Id">
+                                                    <i class="fas fa-trash"></i>
+                                                    Xóa
+                                                </button>
+
+                                                <!-- Modal -->
+                                                <div class="modal fade" id="CheckXoaGioiThieu_@i.Id" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel">
+                                                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h1 class="modal-title fs-5" id="staticBackdropLabel"> Bạn Có Muốn Xóa @ViewData["Title"] ?</h1>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+
+                                                               
+                                                                <div class="container">
+                                                                    <img src="@i.HinhAnh" alt="Hình Ảnh" style="width: 100%; height: 100%;" />
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col-6">
+                                                                        <strong>Trạng Thái:</strong>
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        @if (i.Active == true)
+                                                                        {
+                                                                                        <span class="badge badge-success">Hoạt Động</span>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                                        <span class="badge badge-danger">Ngừng Hoạt Động</span>
+                                                                        }
+                                                                    </div>
+                                                                </div>
+        
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Thoát</button>
+                                                                <button type="button" onclick="XoaGioiThieu('@i.Id');" class="btn btn-danger" data-bs-dismiss="modal">Xóa</button>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                            </td>
+                                        </tr>
+
+                                        <div class="modal fade" id="XemChiTietGioiThieu_@i.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Thông Tin @ViewData["Title"]</h1>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+
+
+                                                        <div class="container">
+                                                            <img src="@i.HinhAnh" alt="Hình Ảnh" style="width: 100%; height: 100%;" />
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-6">
+                                                                <strong>Trạng Thái:</strong>
+                                                            </div>
+                                                            <div class="col-6">
+                                                                @if (i.Active == true)
+                                                                {
+                                                                    <span class="badge badge-success">Hoạt Động</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span class="badge badge-danger">Ngừng Hoạt Động</span>
+                                                                }
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                d++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class=" d-flex justify-content-center  text-center">
+                <div>
+                    @Html.PagedListPager(Model, Page => Url.Action("Index", new
+                        {
+                            Page,
+                            ViewBag.TimKiem,
+                        }), new PagedListRenderOptions
+                    {
+                        LiElementClasses = new string[] { "page-item" },
+                        PageClasses = new string[] { "page-link" },
+                        Display = PagedListDisplayMode.IfNeeded
+                    })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+
+        <script>
+            // Hiển thị thông báo từ TempData
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>
+                        showNotification('success', '@Html.Raw(TempData["SuccessMessage"])');
+            </text>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>
+                        showNotification('error', '@Html.Raw(TempData["ErrorMessage"])');
+            </text>
+        }
+        @if (TempData["WarningMessage"] != null)
+        {
+            <text>
+                        showNotification('warning', '@Html.Raw(TempData["WarningMessage"])');
+            </text>
+        }
+        @if (TempData["InfoMessage"] != null)
+        {
+            <text>
+                        showNotification('info', '@Html.Raw(TempData["InfoMessage"])');
+            </text>
+        }
+
+            function showNotification(type, message) {
+                const notificationArea = document.getElementById('notification-area');
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.innerHTML = `
+                    <i class="fas ${getIconForType(type)} me-2"></i>
+                    ${message}
+                `;
+
+                notificationArea.appendChild(notification);
+
+                // Tự động xóa sau 5 giây
+                setTimeout(() => {
+                    notification.remove();
+                }, 5000);
+            }
+
+                    function getIconForType(type) {
+                switch(type) {
+                    case 'success': return 'fa-check-circle';
+                    case 'error': return 'fa-times-circle';
+                    case 'warning': return 'fa-exclamation-triangle';
+                    case 'info': return 'fa-info-circle';
+                    default: return 'fa-info-circle';
+                }
+            }
+
+            function XoaGioiThieu(id)
+            {
+                $.ajax({
+                    type :"POST",
+                    url: "/Admin/TrungBay/Delete",
+                    data:{id : id},
+                    success : function(rs)
+                    {
+                        if(rs.success){
+                            $("#Dong_ID_"+id).remove();
+                             showNotification('success', '@Html.Raw(TempData["SuccessMessage"])');
+                        }
+                        else
+                        {
+                             showNotification('error', '@Html.Raw(TempData["ErrorMessage"])');
+                        }
+                    },
+                    error : () =>
+                    {
+                         showNotification('error', 'Lỗi Hệ Thống');
+                    }
+                });
+            }
+
+            $(document).on("dblclick", ".hoatdong", function () {
+                let id = $(this).attr("data-id");
+                $.ajax({
+                    type :"POST",
+                url: "/Admin/TrungBay/HoatDong",
+                    data:{id : id},
+                    success : function(rs)
+                    {
+                        if(rs.success){
+                            let trangthai = $("#logo_"+id).attr("data-check");
+                            let s = ``;
+                            if(trangthai === 'x')
+                            {
+                                s = `<i class="fa-regular fa-circle-check text-success hoatdong" id="logo_`+id+`" data-check="v" data-id="`+id+`"></i>`;
+                                $("#logo_"+id).remove()
+                            }
+                            else
+                            {
+                                s = `<i class="fa-regular fa-circle-xmark text-danger hoatdong" id="logo_`+id+`" data-check="x" data-id="`+id+`"></i>`;
+                                $("#logo_"+id).remove();
+                            }
+                            $("#active_id_"+id).append(s);
+                            showNotification('success', rs.message);
+                        }
+                        else
+                        {
+                            showNotification('error',  rs.message);
+                            // alert("Lỗi: "+ rs.message);
+                        }
+                    },
+                    error : () =>
+                    {
+                        showNotification('error', 'Lỗi Hệ Thống');
+                        // alert("Lỗi Hệ Thống");
+                    }
+                })
+            });
+        </script>
+}   

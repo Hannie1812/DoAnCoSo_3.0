@@ -1,0 +1,95 @@
+﻿@model WebTimNguoiThatLac.Models.TinTuc
+
+
+@{
+    ViewData["Title"] = "Chi Tiết Tin Tức";
+}
+
+<!-- Hero -->
+<div class="hero-wrap" style="background-image: url('/Templet/images/bg_2.jpg');" data-stellar-background-ratio="0.5">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row no-gutters slider-text align-items-center justify-content-center" data-scrollax-parent="true">
+            <div class="col-md-7 ftco-animate text-center" data-scrollax=" properties: { translateY: '70%' }">
+                <p class="breadcrumbs" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">
+                    <span class="mr-2">
+                        <a href="/Home">Trang Chủ</a>
+                    </span> 
+                    <span class="mr-2">
+                        <a href="/TinTuc">Danh Sách Tin Tức</a>
+                    </span>
+                    <span>@ViewData["Title"]
+                    </span>
+                </p>
+                <h1 class="mb-3 bread" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">@ViewData["Title"]</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- End Hero -->
+
+<section class="ftco-section ftco-degree-bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 ftco-animate">
+                <h2 class="mb-3">@Model.TieuDe</h2>
+                <p>@Model.MoTaNgan</p>
+                <p>@Model.TacGia</p>
+                <p>
+                    <img src="@Model.HinhAnh" alt="" class="img-fluid">
+                </p>
+                <div>
+                    @Html.Raw(Model.NoiDung)
+                </div>
+
+                @*
+                <div class="about-author d-flex p-5 bg-light">
+                    <div class="bio align-self-md-center mr-5">
+                        <img src="images/person_1.jpg" alt="Image placeholder" class="img-fluid mb-4">
+                    </div>
+                    <div class="desc align-self-md-center">
+                        <h3>Lance Smith</h3>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus itaque, autem necessitatibus voluptate quod mollitia delectus aut, sunt placeat nam vero culpa sapiente consectetur similique, inventore eos fugit cupiditate numquam!</p>
+                    </div>
+                </div>
+                *@
+            </div> <!-- .col-md-8 -->
+            <div class="col-md-4 sidebar ftco-animate">
+
+                <div class="sidebar-box ftco-animate">
+                    <h3>Tin Tức Gần Đây</h3>
+                    @if (ViewBag.DSTinTucMoi != null)
+                    {
+                        foreach (WebTimNguoiThatLac.Models.TinTuc i in ViewBag.DSTinTucMoi)
+                        {
+                            <div class="block-21 mb-4 d-flex">
+                                <a class="blog-img mr-4" style="background-image: url(@i.HinhAnh);"></a>
+                                <div class="text">
+                                    <h3 class="heading"><a href="/TinTuc/Details?id=@i.Id">@i.TieuDe</a></h3>
+                                    <div class="meta">
+                                        <div><a href="/TinTuc/Details?id=@i.Id"><span class="icon-calendar"></span> @i.NgayDang.ToString("dd/MM/yyyy")</a></div>
+                                        <div><a href="/TinTuc/Details?id=@i.Id">@i.TacGia<span class="icon-chat"></span></a></div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    
+                </div>
+
+
+                <div class="sidebar-box ftco-animate">
+                    <h3>Mô tả</h3>
+                    <p>
+                        Chúng tôi xin thông báo về việc tìm kiếm những người đã mất tích trong thời gian gần đây. Những trường hợp này thường gây ra nỗi lo lắng cho gia đình và bạn bè, và chúng tôi cam kết hỗ trợ tối đa trong việc tìm kiếm họ. Nếu bạn có bất kỳ thông tin nào liên quan đến những người này, xin vui lòng liên hệ với chúng tôi ngay lập tức.
+                    </p>
+                    <p>
+                        Chúng tôi sẽ cung cấp các thông tin cần thiết và hướng dẫn để mọi người có thể tham gia vào việc tìm kiếm. Hãy cùng nhau chung tay, vì mỗi thông tin nhỏ bé có thể là manh mối quý giá giúp đoàn tụ những gia đình đang mong ngóng.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section> <!-- .section -->

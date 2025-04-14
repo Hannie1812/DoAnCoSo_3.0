@@ -1,0 +1,215 @@
+﻿@using X.PagedList
+@using X.PagedList.Mvc.Core
+@model IPagedList<BaoCaoBinhLuan>
+@{
+    ViewData["Title"] = "Quản Lý Báo Cáo Bình Luận";
+    var status = ViewBag.Status as string ?? "all";
+}
+<style>
+    .toast {
+        padding: 15px 20px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        color: white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        animation: slideIn 0.3s, fadeOut 0.5s 4.5s forwards;
+    }
+
+    .toast-success {
+        background-color: #28a745;
+    }
+
+    .toast-error {
+        background-color: #dc3545;
+    }
+
+    @@keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @@keyframes fadeOut {
+        to {
+            opacity: 0;
+        }
+    }
+</style>
+@section naviHeader {
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin" class="nav-link">Trang Chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin/BaoCaoBinhLuan" class="nav-link active">Báo Cáo Bình Luận</a>
+        </li>
+    </ul>
+}
+
+<div id="toast" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+<div class="container-fluid">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <div class="row">
+                <div class="col-md-6">
+                    <form method="get" class="form-inline">
+                        <div class="input-group">
+                            <input type="text" name="TiemKiem" class="form-control" placeholder="Tìm kiếm..." value="@ViewBag.TiemKiem">
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-light">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-6 text-right">
+                    <div class="btn-group">
+                        <a asp-action="Index" asp-route-status="all" class="btn btn-light @(status == "all" ? "active" : "")">Tất cả</a>
+                        <a asp-action="Index" asp-route-status="read" class="btn btn-light @(status == "read" ? "active" : "")">Đã đọc</a>
+                        <a asp-action="Index" asp-route-status="unread" class="btn btn-light @(status == "unread" ? "active" : "")">Chưa đọc</a>
+                        <a asp-action="Index" asp-route-status="processed" class="btn btn-light @(status == "processed" ? "active" : "")">Đã xử lý</a>
+                        <a asp-action="Index" asp-route-status="unprocessed" class="btn btn-light @(status == "unprocessed" ? "active" : "")">Chưa xử lý</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Ngày báo cáo</th>
+                            <th>Người báo cáo</th>
+                            <th>Nội dung bình luận</th>
+                            <th>Lý do</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr class="@(!item.DaDoc ? "table-warning" : "")">
+                                <td>@item.NgayBaoCao.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@item.ApplicationUser?.FullName</td>
+                                <td>
+                                    @if (item.BinhLuan != null)
+                                    {
+                                        <span title="@item.BinhLuan.NoiDung">
+                                            @(item.BinhLuan.NoiDung.Length > 50 ? item.BinhLuan.NoiDung.Substring(0, 50) + "..." : item.BinhLuan.NoiDung)
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-danger">Bình luận đã bị xóa</span>
+                                    }
+                                </td>
+                                <td>@item.LyDo</td>
+                                <td>
+                                    @if (item.DaDoc)
+                                    {
+                                        <span class="badge badge-success">Đã đọc</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-warning">Chưa đọc</span>
+                                    }
+                                    @if (item.check)
+                                    {
+                                        <span class="badge badge-info">Đã xử lý</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <form asp-action="Delete" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Bạn chắc chắn muốn xóa báo cáo này?')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                    @if (!item.DaDoc)
+                                    {
+                                        <form asp-action="MarkAsRead" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="btn btn-success btn-sm">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @Html.PagedListPager(Model, page => Url.Action("Index", new
+                {
+                    page,
+                    TiemKiem = ViewBag.TiemKiem,
+                    status
+                }), new PagedListRenderOptions
+       {
+           LiElementClasses = new string[] { "page-item" },
+           PageClasses = new string[] { "page-link" },
+           Display = PagedListDisplayMode.IfNeeded
+       })
+        </div>
+    </div>
+</div>
+
+<!-- Toast notification -->
+
+
+@section Scripts {
+    <script>
+        // Hiển thị thông báo từ TempData
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>
+                showToast('success', '@Html.Raw(TempData["SuccessMessage"])');
+            </text>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>
+                showToast('error', '@Html.Raw(TempData["ErrorMessage"])');
+            </text>
+        }
+
+        function showToast(type, message) {
+            const toast = document.getElementById('toast');
+            const toastElement = document.createElement('div');
+            toastElement.className = `toast toast-${type}`;
+            toastElement.innerHTML = `
+                <div class="toast-body">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
+                    ${message}
+                </div>
+            `;
+
+            toast.appendChild(toastElement);
+
+            setTimeout(() => {
+                toastElement.remove();
+            }, 5000);
+        }
+    </script>
+
+   
+}

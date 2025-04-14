@@ -1,0 +1,343 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model WebTimNguoiThatLac.Models.TimThayNguoiThatLac
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Xác Nhận Đã Tìm Thấy Người Thất Lạc";
+    ApplicationUser us = await UserManager.GetUserAsync(User);
+}
+
+<div class="hero-wrap" style="background-image: url('/Templet/images/bg_2.jpg');" data-stellar-background-ratio="0.5">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row no-gutters slider-text align-items-center justify-content-center" data-scrollax-parent="true">
+            <div class="col-md-7 ftco-animate text-center" data-scrollax=" properties: { translateY: '70%' }">
+                <h1 class="mb-3 bread" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">Xác Nhận Đã Tìm Thấy</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="ftco-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-success text-white">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-check-circle mr-2"></i> @ViewData["Title"]
+                        </h3>
+                    </div>
+                    <div class="card-body p-5">
+                        <form asp-action="XacNhanTimThay" asp-controller="TimNguoi" enctype="multipart/form-data" method="post">
+                            <div asp-validation-summary="All" class="alert alert-danger d-none"></div>
+
+                            <input hidden asp-for="IdNguoiLamDon" value="@us.Id">
+                            <input hidden asp-for="TimNguoiId" value="@ViewBag.TimNguoi.Id">
+
+                            <div class="row">
+                                <!-- Thông tin cơ bản -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold">Tên người đã tìm thấy</label>
+                                        <input asp-for="HoTen" class="form-control form-control-lg"
+                                               value="@ViewBag.TimNguoi.HoTen" readonly />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="font-weight-bold">Ngày tìm thấy <span class="text-danger">*</span></label>
+                                        <input type="date" asp-for="NgayTimThay" class="form-control"
+                                               value="@DateTime.Now.ToString("yyyy-MM-dd")" required />
+                                        <span asp-validation-for="NgayTimThay" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="font-weight-bold">Giờ tìm thấy <span class="text-danger">*</span></label>
+                                        <input type="time" asp-for="GioTimThay" class="form-control"
+                                               value="@DateTime.Now.ToString("HH:mm")" required />
+                                        <span asp-validation-for="GioTimThay" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="font-weight-bold">Địa điểm tìm thấy <span class="text-danger">*</span></label>
+                                        <input asp-for="DiaDiemTimThay" class="form-control"
+                                               placeholder="Nhập địa điểm cụ thể" required />
+                                        <span asp-validation-for="DiaDiemTimThay" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Thông tin bổ sung -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="font-weight-bold">Tình trạng sức khỏe <span class="text-danger">*</span></label>
+                                        <select asp-for="TinhTrangSucKhoe" class="form-control" required>
+                                            <option value="">-- Chọn tình trạng --</option>
+                                            <option value="Ổn định">Ổn định</option>
+                                            <option value="Bị thương nhẹ">Bị thương nhẹ</option>
+                                            <option value="Bị thương nặng">Bị thương nặng</option>
+                                            <option value="Bệnh nặng">Bệnh nặng</option>
+                                            <option value="Khác">Khác</option>
+                                        </select>
+                                        <span asp-validation-for="TinhTrangSucKhoe" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="font-weight-bold">Đã đưa về gia đình?</label>
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input"
+                                                   asp-for="DaDuaVeGiaDinh" id="daDuaVeSwitch" checked>
+                                            <label class="custom-control-label" for="daDuaVeSwitch"></label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" id="hienDangOGroup" style="display:none;">
+                                        <label class="font-weight-bold">Hiện đang ở đâu?</label>
+                                        <input asp-for="HienDangO" class="form-control"
+                                               placeholder="Nhập nơi ở hiện tại" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="font-weight-bold">Người/Đơn vị tìm thấy <span class="text-danger">*</span></label>
+                                        <input asp-for="NguoiTimThay" class="form-control"
+                                               placeholder="Nhập tên người hoặc đơn vị tìm thấy" required />
+                                        <span asp-validation-for="NguoiTimThay" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="font-weight-bold">Số Điện Thoại Người Tìm Thấy <span class="text-danger">*</span></label>
+                                        <input type="tel" asp-for="SoDienThoaiNguoiXacNhan" class="form-control"
+                                               placeholder="Nhập Số Điện Thoại Người Tìm Thấy" required />
+                                        <span asp-validation-for="SoDienThoaiNguoiXacNhan" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mô tả chi tiết -->
+                            <div class="form-group mt-4">
+                                <label class="font-weight-bold">Mô tả chi tiết quá trình tìm thấy <span class="text-danger">*</span></label>
+                                <textarea asp-for="MoTaChiTiet" id="moTaChiTiet" class="form-control" rows="5"
+                                          placeholder="Mô tả chi tiết quá trình, hoàn cảnh tìm thấy..." required></textarea>
+                                <span asp-validation-for="MoTaChiTiet" class="text-danger"></span>
+                            </div>
+
+                            <!-- Ảnh minh chứng -->
+                            <div class="form-group mt-4">
+                                <label class="font-weight-bold">Ảnh minh chứng (nếu có)</label>
+                                <div class="mb-3">
+                                    <label asp-for="AnhMinhChung">Chọn Hình Ảnh</label>
+                                    <input name="HinhAnhCapNhat" id="AnhVuaTai" type="file" class="form-control"
+                                           accept="image/*" />
+                                    <small class="form-text text-muted">Chỉ chấp nhận file ảnh (jpg, png, jpeg), tối đa 5MB</small>
+                                    <div class="ChuaAnh mt-2"></div>
+                                </div>
+                            </div>
+
+                            <!-- Nút submit -->
+                            <div class="form-group mt-5 text-center">
+                                <button type="submit" class="btn btn-success btn-lg px-5" id="submitBtn">
+                                    <i class="fas fa-check-circle mr-2"></i> Xác Nhận Tìm Thấy
+                                </button>
+                                <a asp-action="ChiTietBaiTimNguoi" asp-controller="TimNguoi"
+                                   asp-route-id="@ViewBag.TimNguoi.Id" class="btn btn-secondary btn-lg ml-3">
+                                    <i class="fas fa-times-circle mr-2"></i> Hủy Bỏ
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Styles {
+    <style>
+        .hero-wrap {
+            height: 200px !important;
+        }
+
+        .card {
+            border-radius: 10px;
+            border: none;
+        }
+
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+            padding: 1.5rem;
+        }
+
+        .form-control, .custom-select {
+            height: calc(2.5em + .75rem + 2px);
+            border-radius: .25rem;
+        }
+
+        textarea.form-control {
+            height: auto !important;
+        }
+
+        .img-preview {
+            max-width: 150px;
+            max-height: 150px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+        }
+
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toastify {
+            padding: 12px 20px;
+            color: white;
+            border-radius: 4px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+            animation: slideInRight 0.5s, fadeOut 0.5s 2.5s;
+        }
+
+        @@keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        @@keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+    </style>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="~/clients/plugins/summernote/summernote-bs4.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Khởi tạo Summernote
+            $('#moTaChiTiet').summernote({
+            });
+
+            // Hiển thị/ẩn trường "Hiện đang ở đâu"
+            $('#daDuaVeSwitch').change(function() {
+                $('#hienDangOGroup').toggle(!this.checked);
+            }).trigger('change');
+
+            // Preview ảnh trước khi upload
+            $("#AnhVuaTai").change(function(e) {
+                let file = e.target.files[0];
+                if (file) {
+                    // Kiểm tra kích thước file (tối đa 5MB)
+                    if (file.size > 5 * 1024 * 1024) {
+                        showToast('File ảnh quá lớn (tối đa 5MB)', 'error');
+                        $(this).val('');
+                        return;
+                    }
+
+                    // Kiểm tra loại file
+                    if (!file.type.match('image.*')) {
+                        showToast('Chỉ chấp nhận file ảnh', 'error');
+                        $(this).val('');
+                        return;
+                    }
+
+                    $(".ChuaAnh").empty();
+                    let path = URL.createObjectURL(file);
+                    $(".ChuaAnh").append(`<img src="${path}" class="img-preview" />`);
+                }
+            });
+
+            // Xử lý form submit với AJAX
+            $('form').submit(function(e) {
+                e.preventDefault();
+
+                var formData = new FormData(this);
+                var submitBtn = $('#submitBtn');
+                var originalText = submitBtn.html();
+
+                // Hiển thị loading
+                submitBtn.prop('disabled', true).html(`
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Đang xử lý...
+                `);
+
+                // Ẩn tất cả thông báo lỗi trước khi submit
+                $('.text-danger').text('');
+                $('.alert-danger').addClass('d-none');
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.success) {
+                            showToast('Xác nhận thành công! Đang tải file...', 'success');
+
+                            // Tạo iframe ẩn để tải file
+                            var iframe = document.createElement('iframe');
+                            iframe.style.display = 'none';
+                            iframe.src = response.downloadUrl;
+                            document.body.appendChild(iframe);
+
+                            // Chuyển hướng sau khi tải file
+                            setTimeout(function() {
+                                window.location.href = response.redirectUrl;
+                            }, 2000);
+                        } else {
+                            showToast(response.message || 'Có lỗi xảy ra', 'error');
+
+                            // Hiển thị lỗi validation
+                            if (response.errors && response.errors.length > 0) {
+                                var errorHtml = '<ul>';
+                                response.errors.forEach(function(error) {
+                                    errorHtml += '<li>' + error + '</li>';
+                                });
+                                errorHtml += '</ul>';
+
+                                $('.alert-danger').removeClass('d-none').html(errorHtml);
+                            }
+                        }
+                    },
+                    error: function(xhr) {
+                        showToast('Lỗi kết nối đến server', 'error');
+                        console.error(xhr.responseText);
+                    },
+                    complete: function() {
+                        submitBtn.prop('disabled', false).html(originalText);
+                    }
+                });
+            });
+
+            // Hàm hiển thị toast thông báo
+            function showToast(message, type) {
+                var backgroundColor = type === 'success' ? '#4CAF50' : '#f44336';
+
+                Toastify({
+                    text: message,
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: backgroundColor,
+                    stopOnFocus: true
+                }).showToast();
+            }
+        });
+    </script>
+}

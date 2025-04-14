@@ -1,0 +1,494 @@
+﻿@using System.Security.Claims;
+@using WebTimNguoiThatLac.Data;
+@model WebTimNguoiThatLac.ViewModels.ChatViewModel
+
+@section Styles {
+    <style>
+        /* Main chat container */
+        .chat-container {
+            display: flex;
+            height: calc(100vh - 200px);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background: #fff;
+        }
+
+        /* Sidebar styling */
+        .chat-sidebar {
+            width: 350px;
+            background: #f8f9fa;
+            border-right: 1px solid #eaeaea;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 20px;
+            background: #4e73df;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .search-box {
+            padding: 15px;
+            background: #f1f3f5;
+        }
+
+            .search-box input {
+                width: 100%;
+                padding: 10px 15px;
+                border-radius: 20px;
+                border: 1px solid #ddd;
+                background: white;
+            }
+
+        /* Conversation list */
+        .conversation-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .conversation-item {
+            display: flex;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            text-decoration: none;
+            color: #333;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+            .conversation-item:hover {
+                background-color: #e9f5ff;
+            }
+
+            .conversation-item.active {
+                background-color: #e9f5ff;
+                border-left: 4px solid #4e73df;
+            }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #4e73df;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .name {
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 3px;
+        }
+
+        .preview {
+            font-size: 0.9em;
+            color: #777;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .time {
+            font-size: 0.8em;
+            color: #999;
+            margin-left: 10px;
+            white-space: nowrap;
+        }
+
+        /* Main chat area */
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f5f7fb;
+        }
+
+        .chat-main-header {
+            padding: 15px 20px;
+            background: white;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+
+            .chat-main-header .avatar {
+                width: 40px;
+                height: 40px;
+                margin-right: 10px;
+            }
+
+        .message-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f5f7fb;
+            background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path fill="%23e5e5e5" fill-opacity="0.2" d="M30 10L10 30v40l20 20h40l20-20V30L70 10H30z"/></svg>');
+            background-size: 100px;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 15px;
+            max-width: 70%;
+        }
+
+            .message.sent {
+                margin-left: auto;
+                justify-content: flex-end;
+            }
+
+            .message.received {
+                margin-right: auto;
+                justify-content: flex-start;
+            }
+
+            .message .content {
+                padding: 12px 15px;
+                border-radius: 18px;
+                position: relative;
+                word-wrap: break-word;
+            }
+
+            .message.sent .content {
+                background-color: #4e73df;
+                color: white;
+                border-radius: 18px 18px 0 18px;
+            }
+
+            .message.received .content {
+                background-color: white;
+                color: #333;
+                border-radius: 18px 18px 18px 0;
+                box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+            }
+
+        .message-image {
+            max-width: 250px;
+            max-height: 250px;
+            border-radius: 12px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+            .message-image:hover {
+                transform: scale(1.03);
+            }
+
+        .message .time {
+            font-size: 0.75em;
+            color: rgba(255,255,255,0.7);
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .message.received .time {
+            color: #999;
+        }
+
+        /* Chat input */
+        .chat-input {
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+        }
+
+            .input-group input[type="text"] {
+                flex: 1;
+                padding: 12px 20px;
+                border: 1px solid #ddd;
+                border-radius: 30px;
+                margin-right: 10px;
+                font-size: 1rem;
+            }
+
+        .file-upload {
+            padding: 10px 12px;
+            cursor: pointer;
+            color: #4e73df;
+            font-size: 1.2rem;
+        }
+
+        .chat-input button {
+            background: #4e73df;
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+            .chat-input button:hover {
+                background: #3a5bbf;
+                transform: scale(1.05);
+            }
+
+        /* Empty chat state */
+        .empty-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #777;
+            text-align: center;
+            padding: 40px;
+        }
+
+            .empty-chat .icon {
+                font-size: 4rem;
+                margin-bottom: 20px;
+                color: #ddd;
+            }
+
+            .empty-chat p {
+                font-size: 1.1rem;
+                max-width: 300px;
+            }
+
+        /* Badge for admin */
+        .badge-admin {
+            background: #4e73df;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 5px;
+        }
+
+        /* Unread count badge */
+        .unread-badge {
+            background: #e74a3b;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 50%;
+            margin-left: auto;
+        }
+    </style>
+}
+
+<div class="container-fluid px-4 py-4">
+    <h1 class="mb-4" style="color: #4e73df;">TIN NHẮN</h1>
+
+    <div class="chat-container">
+        <!-- Sidebar - Danh sách hộp thoại -->
+        <div class="chat-sidebar">
+            <div class="chat-header">
+                <i class="fas fa-comments me-2"></i> ĐOẠN CHAT
+            </div>
+
+            <div class="search-box">
+                <input type="text" placeholder="Tìm kiếm cuộc trò chuyện...">
+            </div>
+
+            <div class="conversation-list">
+                @foreach (var hopThoai in Model.HopThoais)
+                {
+                    var lastMessage = hopThoai.TinNhans.FirstOrDefault();
+                    var otherUser = hopThoai.NguoiThamGias 
+                    .FirstOrDefault(tv => tv.MaNguoiThamGia != User.FindFirstValue(ClaimTypes.NameIdentifier))?.ApplicationUser;
+                    var unreadCount = hopThoai.TinNhans.Count(t => (t.IsRead==false)  && t.MaNguoiGui != User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+                    <a href="@Url.Action("Index", new { hopThoaiId = hopThoai.Id })"
+                       class="conversation-item @(Model.HopThoaiHienTai?.Id == hopThoai.Id ? "active" : "")">
+                        <div class="avatar">
+                            @otherUser?.UserName?.Substring(0, 1).ToUpper()
+                        </div>
+                        <div class="info">
+                            <div class="name">
+                                @otherUser?.UserName
+                                @if (otherUser?.Id == Model.AdminId)
+                                {
+                                    <span class="badge-admin">Admin</span>
+                                }
+                            </div>
+                            <div class="preview">
+                                @if (lastMessage != null)
+                                {
+                                    @if (!string.IsNullOrEmpty(lastMessage.HinhAnh))
+                                    {
+                                        <span><i class="fas fa-image"></i> Hình ảnh</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@(lastMessage.NoiDung?.Length > 30 ? lastMessage.NoiDung.Substring(0, 30) + "..." : lastMessage.NoiDung)</span>
+                                    }
+                                }
+                            </div>
+                        </div>
+                        <div class="time">
+                            @if (lastMessage != null)
+                            {
+                                <span>@FormatTime(lastMessage.NgayGui)</span>
+                            }
+                        </div>
+                        @if (unreadCount > 0)
+                        {
+                            <span class="unread-badge">@unreadCount</span>
+                        }
+                    </a>
+                }
+            </div>
+        </div>
+
+        <!-- Khu vực chat chính -->
+        <div class="chat-main">
+            @if (Model.HopThoaiHienTai != null)
+            {
+                var otherUser = Model.HopThoaiHienTai.NguoiThamGias
+                .FirstOrDefault(tv => tv.MaNguoiThamGia != User.FindFirstValue(ClaimTypes.NameIdentifier))?.ApplicationUser;
+
+                <div class="chat-main-header">
+                    <div class="avatar">
+                        @otherUser?.UserName?.Substring(0, 1).ToUpper()
+                    </div>
+                    <div>
+                        <h6 class="mb-0">@otherUser?.UserName</h6>
+                        <small class="text-muted">
+                            @if (otherUser?.Id == Model.AdminId)
+                            {
+                                <span class="badge-admin">Admin</span>
+                            }
+                            else
+                            {
+                                <span>Đang hoạt động</span>
+                            }
+                        </small>
+                    </div>
+                </div>
+
+                <div class="message-container" id="messageContainer">
+                    @foreach (var tinNhan in Model.HopThoaiHienTai.TinNhans.OrderBy(t => t.NgayGui))
+                    {
+                        <div class="message @(tinNhan.MaNguoiGui == User.FindFirstValue(ClaimTypes.NameIdentifier) ? "sent" : "received")">
+                            @if (tinNhan.MaNguoiGui != User.FindFirstValue(ClaimTypes.NameIdentifier))
+                            {
+                                <div class="avatar">
+                                    @tinNhan.NguoiGuiTinNhan?.UserName?.Substring(0, 1).ToUpper()
+                                </div>
+                            }
+
+                            <div class="content">
+                                @if (!string.IsNullOrEmpty(tinNhan.HinhAnh))
+                                {
+                                    <img src="@tinNhan.HinhAnh" class="message-image" alt="Hình ảnh">
+                                }
+                                <div class="text">@tinNhan.NoiDung</div>
+                                <div class="time">
+                                    @tinNhan.NgayGui.ToString("HH:mm")
+                                    @if (tinNhan.MaNguoiGui == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                                    {
+                                        <i class="fas @(tinNhan.IsRead ? "fa-check-double" : "fa-check") ms-1"></i>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="chat-input">
+                    <form asp-action="GuiTinNhan" method="post" enctype="multipart/form-data" class="message-form">
+                        <input type="hidden" name="hopThoaiId" value="@Model.HopThoaiHienTai.Id">
+                        <div class="input-group">
+                            <input type="text" name="noiDung" placeholder="Nhập tin nhắn..." required>
+                            <label class="file-upload">
+                                <i class="fas fa-paperclip"></i>
+                                <input type="file" name="file" accept="image/*" hidden>
+                            </label>
+                            <button type="submit">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            }
+            else
+            {
+                <div class="empty-chat">
+                    <div class="icon">
+                        <i class="far fa-comment-dots"></i>
+                    </div>
+                    <h5>Chưa có cuộc trò chuyện nào</h5>
+                    <p>Chọn một cuộc trò chuyện từ danh sách hoặc bắt đầu cuộc trò chuyện mới</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Tự động scroll xuống tin nhắn mới nhất
+        $(document).ready(function() {
+            var container = $('#messageContainer');
+            if (container.length) {
+                container.scrollTop(container[0].scrollHeight);
+            }
+
+            // Xử lý phóng to ảnh khi click
+            $(document).on('click', '.message-image', function() {
+                var src = $(this).attr('src');
+                $('#imageModal').remove();
+                $('body').append(`
+                    <div id="imageModal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;display:flex;justify-content:center;align-items:center;">
+                        <img src="${src}" style="max-width:90%;max-height:90%;object-fit:contain;">
+                        <button onclick="$('#imageModal').remove();" style="position:absolute;top:20px;right:20px;background:#fff;border:none;width:40px;height:40px;border-radius:50%;font-size:1.5rem;">×</button>
+                    </div>
+                `);
+            });
+        });
+    </script>
+}
+
+@functions {
+    string FormatTime(DateTime date)
+    {
+        var now = DateTime.Now;
+        var diff = now - date;
+
+        if (diff.TotalMinutes < 1)
+        {
+            return "Vừa xong";
+        }
+        else if (diff.TotalMinutes < 60)
+        {
+            return $"{(int)diff.TotalMinutes} phút trước";
+        }
+        else if (diff.TotalHours < 24)
+        {
+            return $"{(int)diff.TotalHours} giờ trước";
+        }
+        else if (diff.TotalDays < 7)
+        {
+            return $"{(int)diff.TotalDays} ngày trước";
+        }
+        else
+        {
+            return date.ToString("dd/MM/yyyy");
+        }
+    }
+}

@@ -1,0 +1,682 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+@{
+    ViewData["Title"] = "Trang Chủ Admin";
+    var messageCount = ViewBag.DSTinNhanMoi?.Count ?? 0;
+}
+
+
+@section naviHeader {
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin" class="nav-link active">Trang Chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin/BaiViet" class="nav-link"> Bài Viết</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin/NguoiDung" class="nav-link"> Người Dùng</a>
+        </li>
+        <li class=" nav-item dropdown">
+            <a class="nav-link" data-toggle="dropdown" href="#">
+                <span>Quản Lý Báo Cáo</span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                <div class="dropdown-divider"></div>
+                <a href="/Admin/BaoCaoBaiViet" class="dropdown-item">
+                    Bài Viết
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="/Admin/BaoCaoBinhLuan" class="dropdown-item">
+                    Bình Luận
+                </a>
+            </div>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin/GioiThieu" class="nav-link"> Giới Thiệu</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin/TinTuc" class="nav-link"> Tin Tức</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin/TrungBay" class="nav-link"> Trưng Bày Hình Ảnh</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin/NguoiDungLienHe" class="nav-link"> Liên Hệ Người Dùng</a>
+        </li>
+
+    </ul>
+    <ul class="navbar-nav ml-auto">
+        <!-- new -->
+        <!-- Messages Dropdown Menu -->
+        <li class="nav-item dropdown">
+            <a class="nav-link" data-toggle="dropdown" href="#">
+                <i class="far fa-comments"></i>
+                @if (ViewBag.DSTinNhanMoi?.Count > 0)
+                {
+                    <span class="badge badge-warning navbar-badge">@ViewBag.DSTinNhanMoi.Count</span>
+                }
+            </a>
+            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                <span class="dropdown-header">Bạn có @(ViewBag.DSTinNhanMoi?.Count ?? 0) tin nhắn mới</span>
+
+                @if (ViewBag.DSTinNhanMoi != null)
+                {
+                    <div class="dropdown-divider"></div>
+
+                    @foreach (var hopThoai in ViewBag.DSTinNhanMoi as List<HopThoaiTinNhan> ?? new List<HopThoaiTinNhan>())
+                    {
+                        var user = await UserManager.GetUserAsync(User);
+                        var lastMessage = hopThoai.TinNhans?.FirstOrDefault();
+                        var otherUser = hopThoai.NguoiThamGias?
+                        .FirstOrDefault(tv => tv.MaNguoiThamGia != user.Id)?
+                        .ApplicationUser;
+
+                        <a asp-action="Index" asp-area="" asp-controller="Chat" asp-route-hopThoaiId="@hopThoai.Id" class="dropdown-item">
+                            <div class="media align-items-center">
+                                <!-- Avatar -->
+                                @if (!string.IsNullOrEmpty(otherUser?.HinhAnh))
+                                {
+                                    <img src="@otherUser.HinhAnh" class="img-size-50 img-circle mr-3" alt="User Avatar">
+                                }
+                                else
+                                {
+                                    <div class="img-size-50 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mr-3">
+                                        @otherUser?.UserName?.Substring(0, 1).ToUpper()
+                                    </div>
+                                }
+
+                                <!-- Nội dung tin nhắn -->
+                                <div class="media-body overflow-hidden">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="dropdown-item-title text-truncate mb-0" style="max-width: 150px;">
+                                            @otherUser?.UserName
+                                        </h6>
+                                        <small class="text-muted">
+                                            @if (lastMessage != null)
+                                            {
+                                                @FormatTime(lastMessage.NgayGui)
+                                            }
+                                        </small>
+                                    </div>
+
+                                    @if (lastMessage != null)
+                                    {
+                                        <p class="text-sm text-truncate mb-0" style="max-width: 200px;">
+                                            @if (!string.IsNullOrEmpty(lastMessage.HinhAnh))
+                                            {
+                                                <i class="fas fa-image mr-1"></i>
+                                                <span>Hình ảnh</span>
+                                            }
+                                            else
+                                            {
+                                                @lastMessage.NoiDung
+                                            }
+                                        </p>
+                                    }
+                                </div>
+                            </div>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                    }
+                }
+
+                <!-- Xem tất cả tin nhắn -->
+                <a asp-action="Index" asp-area="" asp-controller="Chat" class="dropdown-item dropdown-footer text-center">
+                    <i class="fas fa-envelope mr-1"></i> Xem tất cả tin nhắn
+                </a>
+            </div>
+        </li>
+        <!-- Notifications Dropdown Menu -->
+        <li class="nav-item dropdown">
+            <a class="nav-link" data-toggle="dropdown" href="#">
+                <i class="far fa-bell"></i>
+            @{int TongThongBao = ViewBag.DemBaoCaoBinhLuan + ViewBag.DemBaoCaoBaiViet + ViewBag.DemLienHeNguoiDung;}
+                <span class="badge badge-warning navbar-badge">
+                    @TongThongBao
+                </span>
+                
+            </a>
+            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                <span class="dropdown-item dropdown-header"> @TongThongBao Thông Báo Mới</span>
+                <div class="dropdown-divider"></div>
+                <a asp-area="Admin" asp-action="Index" asp-controller="NguoiDungLienHe" 
+                    class="dropdown-item">
+					<i class="fas fa-envelope mr-2"></i> @ViewBag.DemLienHeNguoiDung Người Dùng Liên Hệ
+                    <span class="float-right text-muted text-sm">3 mins</span>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a asp-area="Admin" asp-action="Index" asp-controller="BaoCaoBaiViet" 
+                    class="dropdown-item">
+                    <i class="fas fa-users mr-2"></i> @ViewBag.DemBaoCaoBaiViet  Báo Cáo Bài Viết
+                    <span class="float-right text-muted text-sm">12 hours</span>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a asp-area="Admin" asp-action="Index" asp-controller="BaoCaoBinhLuan" 
+                    class="dropdown-item">
+                    <i class="fas fa-file mr-2"></i> @ViewBag.DemBaoCaoBinhLuan Báo Cáo Bình Luận
+                    <span class="float-right text-muted text-sm">2 days</span>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+            </div>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" data-widget="fullscreen" href="#" role="button">
+                <i class="fas fa-expand-arrows-alt"></i>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/Home">
+                <i class="fas fa-th-large"></i>
+            </a>
+        </li>
+
+
+    </ul>
+}
+@model IEnumerable<WebTimNguoiThatLac.Models.TimNguoi>
+@{
+    ViewData["Title"] = "Thống Kê Bài Viết Tìm Người Thất Lạc";
+
+    // Xử lý dữ liệu cho biểu đồ
+    var khuVucs = ViewBag.KhuVucStats as List<dynamic> ?? new List<dynamic>();
+    var trangThais = ViewBag.TrangThaiStats as List<dynamic> ?? new List<dynamic>();
+    var gioiTinhData = ViewBag.GioiTinhStats as dynamic;
+
+
+
+    // Lấy dữ liệu từ ViewBag
+    var ngayLabels = ViewBag.NgayLabels as List<string> ?? new List<string>();
+    var baiVietTheoNgay = ViewBag.BaiVietTheoNgay as List<int> ?? new List<int>();
+    var allKhuVuc = ViewBag.AllKhuVuc as List<string> ?? new List<string>();
+    var allTrangThai = ViewBag.AllTrangThai as List<string> ?? new List<string>();
+
+    string label = ViewBag.Tuan != null ? $"{ViewBag.Tuan} tuần gần nhất" : "7 ngày gần nhất";
+    if (ViewBag.Year != null && ViewBag.Month != null && ViewBag.Day != null)
+    {
+        label = $"{ViewBag.Day:D2}/{ViewBag.Month:D2}/{ViewBag.Year}";
+    }
+    else if (ViewBag.Year != null && ViewBag.Month != null)
+    {
+        label = $"Tháng {ViewBag.Month:D2}/{ViewBag.Year}";
+    }
+    else if (ViewBag.Year != null)
+    {
+        label = $"Năm {ViewBag.Year}";
+    }
+}
+
+<div class="container-fluid">
+
+
+    <!-- Card lọc dữ liệu -->
+    <div class="card card-primary card-outline">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-filter"></i> Bộ lọc thống kê
+            </h3>
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <form id="filterForm" method="get" class="form-horizontal">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label><i class="far fa-calendar-alt"></i> Năm</label>
+                            <select name="year" class="form-control select2">
+                                <option value="">Tất cả năm</option>
+                                @for (int y = DateTime.Now.Year; y >= 2020; y--)
+                                {
+                                    <option value="@y" selected="@(ViewBag.Year == y)">@y</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label><i class="far fa-calendar"></i> Tháng</label>
+                            <select name="month" class="form-control select2">
+                                <option value="">Tất cả tháng</option>
+                                @for (int m = 1; m <= 12; m++)
+                                {
+                                    <option value="@m" selected="@(ViewBag.Month == m)">Tháng @m</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label><i class="fas fa-map-marker-alt"></i> Khu vực</label>
+                            <select name="khuVuc" class="form-control select2">
+                                <option value="">Tất cả khu vực</option>
+                                @foreach (var kv in allKhuVuc)
+                                {
+                                    <option value="@kv" selected="@(ViewBag.KhuVuc == kv)">@kv</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label><i class="fas fa-info-circle"></i> Trạng thái</label>
+                            <select name="trangThai" class="form-control select2">
+                                <option value="">Tất cả trạng thái</option>
+                                @foreach (var tt in allTrangThai)
+                                {
+                                    <option value="@tt" selected="@(ViewBag.TrangThai == tt)">@tt</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-week"></i> Khoảng thời gian</label>
+                            <select name="tuan" class="form-control select2">
+                                <option value="">-- Chọn --</option>
+                                <option value="1" selected="@(ViewBag.Tuan == 1)">1 tuần (7 ngày)</option>
+                                <option value="2" selected="@(ViewBag.Tuan == 2)">2 tuần (14 ngày)</option>
+                                <option value="3" selected="@(ViewBag.Tuan == 3)">3 tuần (21 ngày)</option>
+                                <option value="4" selected="@(ViewBag.Tuan == 4)">4 tuần (28 ngày)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button type="button" id="applyFilter" class="btn btn-primary">
+                <i class="fas fa-filter"></i> Áp dụng bộ lọc
+            </button>
+            <a href="@Url.Action("Index")" class="btn btn-default float-right">
+                <i class="fas fa-sync-alt"></i> Làm mới
+            </a>
+        </div>
+    </div>
+
+    <!-- Các biểu đồ -->
+    <div class="row">
+        <!-- Biểu đồ khu vực -->
+        <div class="col-lg-6">
+            <div class="card card-success card-outline">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-map-marked-alt"></i> Biểu đồ theo khu vực (@label)
+                    </h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas id="khuVucChart" style="min-height: 250px; height: 250px; max-height: 500px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Biểu đồ trạng thái -->
+        <div class="col-lg-6">
+            <div class="card card-danger card-outline">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-info-circle"></i> Biểu đồ theo trạng thái (@label)
+                    </h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas id="trangThaiChart" style="min-height: 250px; height: 250px; max-height: 500px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <!-- Biểu đồ giới tính -->
+        <div class="col-lg-6">
+            <div class="card card-info card-outline">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-venus-mars"></i> Biểu đồ theo giới tính (@label)
+                    </h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas id="gioiTinhChart" style="min-height: 250px; height: 250px; max-height: 500px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Biểu đồ theo thời gian -->
+        <div class="col-lg-6">
+            <div class="card card-warning card-outline">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-chart-line"></i> Biểu đồ bài viết theo thời gian (@label)
+                    </h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas id="thoiGianChart" style="min-height: 250px; height: 250px; max-height: 500px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        // Biến lưu trữ các biểu đồ
+        let khuVucChart, trangThaiChart, gioiTinhChart, thoiGianChart;
+
+        // Hàm tạo màu ngẫu nhiên
+        function generateRandomColors(count, opacity = 1) {
+            const colors = [];
+            for (let i = 0; i < count; i++) {
+                const hue = Math.floor(Math.random() * 360);
+                colors.push(`hsla(${hue}, 70%, 60%, ${opacity})`);
+            }
+            return colors;
+        }
+
+        $(document).ready(function() {
+            // Khởi tạo select2
+            $('.select2').select2({
+                theme: 'bootstrap4',
+                width: '100%'
+            });
+
+            // Khởi tạo biểu đồ
+            initCharts();
+
+            // Xử lý sự kiện lọc
+            $('#applyFilter').click(loadDataWithFilter);
+        });
+
+        function initCharts() {
+            // Biểu đồ khu vực
+            khuVucChart = new Chart($('#khuVucChart'), {
+                type: 'bar',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(khuVucs.Select(x => x.KhuVuc))),
+                    datasets: [{
+                        label: 'Số bài viết',
+                        data: @Html.Raw(Json.Serialize(khuVucs.Select(x => x.Count))),
+                        backgroundColor: generateRandomColors(@khuVucs.Count, 0.7),
+                        borderColor: generateRandomColors(@khuVucs.Count, 1),
+                        borderWidth: 1,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { drawBorder: false },
+                            ticks: { precision: 0 }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Biểu đồ trạng thái
+            trangThaiChart = new Chart($('#trangThaiChart'), {
+                type: 'pie',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(trangThais.Select(x => x.TrangThai))),
+                    datasets: [{
+                        data: @Html.Raw(Json.Serialize(trangThais.Select(x => x.Count))),
+                        backgroundColor: generateRandomColors(@trangThais.Count, 0.8),
+                        borderWidth: 1,
+                        hoverOffset: 20
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                font: { size: 12 },
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((context.raw / total) * 100);
+                                    return `${context.label}: ${context.raw} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+
+            // Biểu đồ giới tính
+            gioiTinhChart = new Chart($('#gioiTinhChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(gioiTinhData.Labels)),
+                    datasets: [{
+                        data: @Html.Raw(Json.Serialize(gioiTinhData.Counts)),
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(153, 102, 255, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 1,
+                        hoverOffset: 20
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { font: { size: 12 }, padding: 20 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((context.raw / total) * 100);
+                                    return `${context.label}: ${context.raw} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+
+            // Biểu đồ thời gian
+            thoiGianChart = new Chart($('#thoiGianChart'), {
+                type: 'line',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(ngayLabels)),
+                    datasets: [{
+                        label: 'Số bài viết',
+                        data: @Html.Raw(Json.Serialize(baiVietTheoNgay)),
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { drawBorder: false },
+                            ticks: { precision: 0 }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Xử lý sự kiện thu gọn/phóng to
+            $('[data-card-widget="collapse"]').on('click', function() {
+                setTimeout(() => {
+                    khuVucChart.resize();
+                    trangThaiChart.resize();
+                    gioiTinhChart.resize();
+                    thoiGianChart.resize();
+                }, 350);
+            });
+
+            $('[data-card-widget="maximize"]').on('click', function() {
+                setTimeout(() => {
+                    khuVucChart.resize();
+                    trangThaiChart.resize();
+                    gioiTinhChart.resize();
+                    thoiGianChart.resize();
+                }, 100);
+            });
+        }
+
+        function loadDataWithFilter() {
+            const formData = $('#filterForm').serialize();
+
+            $.ajax({
+                url: '@Url.Action("Index")',
+                type: 'GET',
+                data: formData,
+                success: function(data) {
+                    updateCharts(data);
+                    updateChartTitles(data.label);
+                },
+                error: function(xhr) {
+                    console.error('Lỗi khi tải dữ liệu:', xhr.responseText);
+                }
+            });
+        }
+
+        function updateCharts(data) {
+            // Cập nhật biểu đồ khu vực
+            khuVucChart.data.labels = data.khuVucs;
+            khuVucChart.data.datasets[0].data = data.soLuongsKhuVuc;
+            khuVucChart.data.datasets[0].backgroundColor = generateRandomColors(data.khuVucs.length, 0.7);
+            khuVucChart.data.datasets[0].borderColor = generateRandomColors(data.khuVucs.length, 1);
+            khuVucChart.update();
+
+            // Cập nhật biểu đồ trạng thái
+            trangThaiChart.data.labels = data.trangThais;
+            trangThaiChart.data.datasets[0].data = data.soLuongsTrangThai;
+            trangThaiChart.data.datasets[0].backgroundColor = generateRandomColors(data.trangThais.length, 0.8);
+            trangThaiChart.update();
+
+            // Cập nhật biểu đồ giới tính
+            gioiTinhChart.data.datasets[0].data = data.soLuongsGioiTinh;
+            gioiTinhChart.update();
+
+            // Cập nhật biểu đồ thời gian
+            thoiGianChart.data.labels = data.ngayLabels;
+            thoiGianChart.data.datasets[0].data = data.baiVietTheoNgay;
+            thoiGianChart.update();
+        }
+
+        function updateChartTitles(label) {
+            $('.card-title').each(function() {
+                const originalText = $(this).html().split('(')[0];
+                $(this).html(originalText + `(${label})`);
+            });
+        }
+    </script>
+}
+@functions {
+    string FormatTime(DateTime date)
+    {
+        var now = DateTime.Now;
+        var diff = now - date;
+
+        if (diff.TotalMinutes < 1)
+        {
+            return "Vừa xong";
+        }
+        else if (diff.TotalMinutes < 60)
+        {
+            return $"{(int)diff.TotalMinutes} phút trước";
+        }
+        else if (diff.TotalHours < 24)
+        {
+            return $"{(int)diff.TotalHours} giờ trước";
+        }
+        else if (diff.TotalDays < 7)
+        {
+            return $"{(int)diff.TotalDays} ngày trước";
+        }
+        else
+        {
+            return date.ToString("dd/MM/yyyy");
+        }
+    }
+}

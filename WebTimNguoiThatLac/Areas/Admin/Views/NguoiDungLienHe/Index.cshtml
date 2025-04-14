@@ -1,0 +1,180 @@
+﻿@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+@model X.PagedList.IPagedList<WebTimNguoiThatLac.Models.NguoiDungLienHe>
+
+@{
+    ViewData["Title"] = "Người Dùng Liên Hệ";
+    var status = ViewBag.TrangThai as string ?? "all";
+}
+
+@section naviHeader {
+<!-- Left navbar links -->
+<ul class="navbar-nav">
+    <li class="nav-item">
+        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+    </li>
+    <li class="nav-item d-none d-sm-inline-block">
+        <a href="/Admin" class="nav-link">Trang Chủ</a>
+    </li>
+    <li class="nav-item d-none d-sm-inline-block">
+        <a href="/Admin/NguoiDungLienHe" class="nav-link active">Người Dùng Liên Hệ</a>
+    </li>
+</ul>
+}
+
+
+
+
+<div class="container-fluid">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <div class="row">
+                <div class="col-md-6">
+                    <form method="get" class="form-inline">
+                        <div class="input-group">
+                            <input type="text" name="TimKiem" class="form-control" 
+                            placeholder="Tìm kiếm..." value="@ViewBag.TimKiem">
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-light">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-6 text-right">
+                    <div class="btn-group">
+                        <a asp-action="Index" asp-route-trangThai="all" 
+                        class="btn btn-light @(status == "all" ? "active" : "")">
+                            Tất cả
+                        </a>
+                        <a asp-action="Index" asp-route-trangThai="read" 
+                        class="btn btn-light @(status == "read" ? "active" : "")">
+                            Đã đọc
+                        </a>
+                        <a asp-action="Index" asp-route-trangThai="unread" 
+                        class="btn btn-light @(status == "unread" ? "active" : "")">
+                            Chưa đọc
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên người liên hệ</th>
+                            <th>Ngày liên hệ</th>
+                            <th>Vấn đề</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int d = ViewBag.STT;
+                        }
+                        @foreach (var item in Model)
+                        {
+                            <tr class="@(!item.isRead ? "table-warning" : "")">
+                                <td>@d</td>
+                                <td>@item.TenNguoiDungLienHe</td>
+                                <td>@item.NgayLienHe.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@item.VanDeLienHe</td>
+                                <td>
+                                    @if (item.isRead)
+                                    {
+                                        <span class="badge badge-success">Đã đọc</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-warning">Chưa đọc</span>
+                                    }
+                                </td>
+                                <td>
+                                        <a asp-action="Detail" asp-route-id="@item.MaLienHeNguoiDung" 
+                                        class="btn btn-info btn-sm">
+                                            <i class="fas fa-eye"></i>Chi Tiết
+                                        </a>
+                                        <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal-@item.MaLienHeNguoiDung">
+                                            <i class="fas fa-trash"></i>Xóa
+                                        </button>
+
+                                        <!-- Modal kiểm tra xóa -->
+                                        <div class="modal fade" id="deleteModal-@item.MaLienHeNguoiDung" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel-@item.MaLienHeNguoiDung" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="deleteModalLabel-@item.MaLienHeNguoiDung">Xác nhận xóa</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>Bạn có chắc chắn muốn xóa liên hệ này không?</p>
+                                                        <p><strong>Tên người liên hệ:</strong> @item.TenNguoiDungLienHe</p>
+                                                        <p><strong>Ngày liên hệ:</strong> @item.NgayLienHe.ToString("dd/MM/yyyy HH:mm")</p>
+                                                        <p><strong>Vấn đề:</strong> @item.VanDeLienHe</p>
+													    <p><strong>Trạng thái:</strong> @(item.isRead ? "Đã đọc" : "Chưa đọc")</p>
+													    <p><strong>Nội dung:</strong> </p>
+                                                        <div >
+														    @Html.Raw(item.NoiBungLienHe)
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                                                        <button type="button" class="btn btn-danger" onclick="XoaTinTuc(@item.MaLienHeNguoiDung)">Xóa</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                            </tr>
+                            d++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Phân trang -->
+            <div class="text-center d-flex justify-content-center align-items-center">
+                @Html.PagedListPager(Model, page => Url.Action("Index", new { 
+                    page, 
+                    TimKiem = ViewBag.TimKiem,
+                    trangThai = ViewBag.TrangThai
+                }), new PagedListRenderOptions {
+                    LiElementClasses = new[] { "page-item" },
+                    PageClasses = new[] { "page-link" }
+                })
+            </div>
+
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        function XoaTinTuc(id) {
+            $.ajax({
+                type: "POST",
+                url: "/Admin/NguoiDungLienHe/Delete",
+                data: { id: id },
+                success: function(rs) {
+                    if(rs.success) {
+                        location.reload(); // Reload lại trang sau khi xóa
+                        toastr.success('Đã xóa liên hệ thành công');
+                    } else {
+                        toastr.error('Lỗi: ' + rs.message);
+                    }
+                },
+                error: function() {
+                    toastr.error('Lỗi hệ thống');
+                }
+            });
+        }
+    </script>
+}

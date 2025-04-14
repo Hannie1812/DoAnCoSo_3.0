@@ -1,0 +1,124 @@
+﻿@model IPagedList<WebTimNguoiThatLac.Models.TinTuc>
+@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+
+@{
+    ViewData["Title"] = "Danh Sách Tin Tức";
+}
+
+<style>
+    /* Style cho phân trang */
+    .pagination {
+        margin-top: 20px;
+    }
+
+    .page-item .page-link {
+        border-radius: 50% !important;
+        margin: 0 5px;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        color: #333;
+    }
+
+    .page-item.active .page-link {
+        background-color: #ff6a00; /* Màu cam */
+        border-color: #ff6a00;
+        color: white;
+    }
+
+    .page-item:not(.active) .page-link:hover {
+        background-color: #ffe0cc; /* Màu cam nhạt khi hover */
+        color: #ff6a00;
+    }
+
+    /* Căn giữa toàn bộ phần phân trang */
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+</style>
+
+
+<div class="hero-wrap" style="background-image: url('/Templet/images/bg_2.jpg');" data-stellar-background-ratio="0.5">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row no-gutters slider-text align-items-center justify-content-center" data-scrollax-parent="true">
+            <div class="col-md-7 ftco-animate text-center" data-scrollax=" properties: { translateY: '70%' }">
+                <p class="breadcrumbs" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }"><span class="mr-2"><a href="/Home">Trang Chủ</a></span> <span>@ViewData["Title"]</span></p>
+                <h1 class="mb-3 bread" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">@ViewData["Title"]</h1>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Hero -->
+
+<!-- Search Form -->
+<div class="container mt-5">
+    <form asp-action="index" asp-controller="TinTuc">
+        <div class="input-group mb-4 shadow-sm">
+            <input name="TimKiem" value="@ViewBag.TimKiem" type="text" class="form-control form-control-lg"
+                   placeholder="Nhập tên Tin Tức, tên Tác Giả">
+            <button class="btn btn-primary btn-lg">
+                <i class="fas fa-search me-2"></i>Tìm Kiếm
+            </button>
+        </div>
+    </form>
+</div>
+<section class="ftco-section">
+        <div class="container">
+            <div class="row d-flex">
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var i in Model)
+                    {
+                        <div class="col-md-4 d-flex ftco-animate">
+                            <div class="blog-entry align-self-stretch">
+                                <a href="/TinTuc/Details?id=@i.Id" class="block-20" style="background-image: url('@i.HinhAnh');">
+                                </a>
+                                <div class="text p-4 d-block">
+                                    <div class="meta mb-3">
+                                            <div><a href="/TinTuc/Details?id=@i.Id">@i.NgayDang</a></div>
+                                            <div><a href="/TinTuc/Details?id=@i.Id" class="meta-chat"><span class="icon-chat"></span></a></div>
+                                            <div><a href="/TinTuc/Details?id=@i.Id">@i.TacGia</a></div>
+                                        </div>
+                                        <h3 class="heading mt-3"><a href="/TinTuc/Details?id=@i.Id">@i.TieuDe</a></h3>
+                                        <p>@i.MoTaNgan</p>
+                                    </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12 text-center py-5">
+                        <div class="alert alert-info">
+                            <i class="fa fa-info-circle"></i> Không tìm thấy kết quả phù hợp
+                        </div>
+                    </div>
+                }
+            </div>
+            <!-- Phân trang -->
+            <div class="row mt-5">
+                <div class="col-12 d-flex justify-content-center">
+                    @Html.PagedListPager(Model, page => Url.Action("Index", new
+                        {
+                            page,
+                            ViewBag.TimKiem,
+                           
+                        }), new PagedListRenderOptions
+                   {
+                       LiElementClasses = new[] { "page-item" },
+                       PageClasses = new[] { "page-link" },
+                       UlElementClasses = new[] { "pagination", "justify-content-center" }
+                   })
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+

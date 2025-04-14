@@ -1,0 +1,103 @@
+﻿@model ApplicationUser
+@using WebTimNguoiThatLac.Data;
+
+@{
+    ViewData["Title"] = "Thông Tin Cá Nhân";
+}
+
+<div class="hero-wrap" style="background-image: url('/Templet/images/bg_2.jpg');" data-stellar-background-ratio="0.5">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row no-gutters slider-text align-items-center justify-content-center" data-scrollax-parent="true">
+            <div class="col-md-7 ftco-animate text-center" data-scrollax=" properties: { translateY: '70%' }">
+                <p class="breadcrumbs" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }"><span class="mr-2"><a href="Home">Trang Chủ</a></span> <span>@ViewData["Title"]</span></p>
+                <h1 class="mb-3 bread" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">@ViewData["Title"]</h1>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card mt-5">
+                <div class="card-header bg-primary text-white d-flex">
+                    <div>
+                        <h2 class="card-title">@ViewData["Title"]</h2>
+                    </div>
+                    <div class="ms-auto">
+                        <a asp-action="ThemNguoiCanTim" asp-controller="TimNguoi" class="btn btn-success">Thêm Bài tìm Kiếm</a>
+                        <a asp-action="Index" asp-controller="Chat" class="btn btn-info">Xem Tin Nhắn</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label"><strong>Họ và tên:</strong></label>
+                        <div class="col-sm-9">
+                            <p class="form-control-plaintext">@Model.FullName</p>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label"><strong>Email:</strong></label>
+                        <div class="col-sm-9">
+                            <p class="form-control-plaintext">@Model.Email</p>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-3 col-form-label"><strong>Số điện thoại:</strong></label>
+                        <div class="col-sm-9">
+                            <p class="form-control-plaintext">@Model.PhoneNumber</p>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-12 text-right">
+                            <a asp-action="EditTaiKhoan" asp-controller="NguoiDung" class="btn btn-primary">Chỉnh sửa</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Danh sách bài viết tìm người -->
+<div class="mt-4">
+    <h4>Bài Viết Tìm Người</h4>
+
+    @if (ViewBag.CacBaiDang != null)
+    { 
+        <div class="row">
+            @foreach (WebTimNguoiThatLac.Models.TimNguoi i in ViewBag.CacBaiDang)
+            { 
+                <div class="col-md-6"> 
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-header">
+                            <div><h3>@Model.FullName</h3> </div>
+                            <div><span style="color:rgb(101, 104, 108);">Đăng bài từ:</span> @i.NgayDang</div>
+                            <span style="color:rgb(101, 104, 108);">Trạng thái:</span> @i.TrangThai
+                        </div>
+                        <div class="card-body">
+                            
+                            @{
+                                AnhTimNguoi anhdau = i.AnhTimNguois?.FirstOrDefault(z => z.IdNguoiCanTim == i.Id);
+                            }
+                            @if(anhdau != null)
+                            {
+                                <img src="@anhdau.HinhAnh" style="max-width:100%" />
+                            }
+                            
+                            
+                            <h5 class="card-title">@i.TieuDe</h5> 
+                            @* <p class="card-text">@i.MoTa</p> *@
+                            <a href="/TimNguoi/ChiTietBaiTimNguoi?id=@i.Id" class="btn btn-info">Xem chi tiết</a>
+                        </div> 
+                    </div> 
+                 </div> 
+             } 
+         </div> 
+     } 
+     else 
+     { 
+         <p class="text-muted">Bạn chưa có bài viết tìm người nào.</p> 
+     } 
+</div>

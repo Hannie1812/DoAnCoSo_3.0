@@ -1,0 +1,70 @@
+﻿@model WebTimNguoiThatLac.Models.TrungBayHinhAnh
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "Thêm Hình Ảnh Trưng Bày";
+
+}
+@section naviHeader {
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin" class="nav-link ">Trang Chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin/TrungBay" class="nav-link">Hình Ảnh Trưng Bày</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="#" class="nav-link active"> Thêm Hình Ảnh Trưng Bày</a>
+        </li>
+    </ul>
+}
+
+
+
+<form asp-area="Admin" asp-controller="TrungBay" asp-action="Create" method="post" enctype="multipart/form-data">
+    <div class="card container-fluid ">
+        <div class="card-header d-flex ">
+            <h2 class="card-title">Chi Tiết @ViewData["Title"]</h2>
+        </div>
+        <div class="card-body">
+            <div asp-validation-summary="All" class="text-danger"></div>
+     
+            <div class=" mb-3">
+                <label>Chọn Hình Ảnh </label>
+                <input name="HinhAnhCapNhat" id="AnhVuaTai" type="file" placeholder="Nhập Hình Ảnh" class="form-control" />
+                <div class="HienThiAnhGTMoi"></div>
+            </div>
+            <div class=" mb-3">
+                <input asp-for="Active" type="checkbox">
+                <span>Hoạt động</span>
+
+            </div>
+            <div class=" mb-3">
+                <a class="btn btn-primary" href="/Admin/TinTuc">Thoát</a>
+                <button class="btn btn-success">Thêm</button>
+            </div>
+        </div>
+        <div class="card-footer">
+        </div>
+    </div>
+</form>
+
+
+@section Scripts {
+    <script>
+        $("#AnhVuaTai").change(function(e){//input #AnhVuaTai
+            let a = e.target.files[0]; // lấy thằng file đầu tiên
+            if(a != null)
+            {
+
+                let path = URL.createObjectURL(a) // lấy ra địa chỉ
+                let s = `<img src="${path}" style="width:199px"/>`;
+                $(".HienThiAnhGTMoi").empty();
+                $(".HienThiAnhGTMoi").append(s);
+            }
+        });
+    </script>
+}

@@ -1,0 +1,571 @@
+﻿@model WebTimNguoiThatLac.Models.NguoiDungLienHe
+@{
+    ViewData["Title"] = "Liên Hệ";
+}
+<div class="hero-wrap" style="background-image: url('/Templet/images/bg_2.jpg');" data-stellar-background-ratio="0.5">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row no-gutters slider-text align-items-center justify-content-center" data-scrollax-parent="true">
+            <div class="col-md-7 ftco-animate text-center" data-scrollax=" properties: { translateY: '70%' }">
+                <p class="breadcrumbs" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }"><span class="mr-2"><a href="/Home">Trang Chủ</a></span> <span>@ViewData["Title"]</span></p>
+                <h1 class="mb-3 bread" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">@ViewData["Title"]</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* ===== GENERAL STYLES ===== */
+    .contact-section {
+        padding: 80px 0;
+        background-color: #f9f9f9;
+    }
+
+    .section-title {
+        font-size: 2rem;
+        margin-bottom: 30px;
+        color: #2c3e50;
+        position: relative;
+        padding-bottom: 15px;
+        font-weight: 700;
+    }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 60px;
+            height: 3px;
+            background: #f86f2d;
+        }
+
+    .section-subtitle {
+        color: #7f8c8d;
+        margin-bottom: 30px;
+        font-size: 1.1rem;
+    }
+
+    /* ===== TAB STYLES ===== */
+    .nav-tabs {
+        border-bottom: 2px solid #f86f2d;
+        margin-bottom: 30px;
+    }
+
+        .nav-tabs .nav-link {
+            color: #2c3e50;
+            font-weight: 600;
+            border: none;
+            padding: 12px 25px;
+            margin-right: 5px;
+            border-radius: 0;
+            transition: all 0.3s;
+        }
+
+            .nav-tabs .nav-link:hover {
+                color: #f86f2d;
+                background-color: rgba(248, 111, 45, 0.1);
+            }
+
+            .nav-tabs .nav-link.active {
+                color: #f86f2d;
+                background-color: transparent;
+                border-bottom: 3px solid #f86f2d;
+            }
+
+    .tab-content {
+        padding: 20px 0;
+    }
+
+    /* ===== CONTACT INFO STYLES ===== */
+    .contact-details {
+        margin-bottom: 30px;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 25px;
+        padding: 15px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        transition: transform 0.3s ease;
+    }
+
+        .contact-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .contact-item i {
+            font-size: 22px;
+            color: #f86f2d;
+            margin-right: 15px;
+            margin-top: 3px;
+        }
+
+        .contact-item h5 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .contact-item p,
+        .contact-item a {
+            color: #7f8c8d;
+            margin: 0;
+            transition: color 0.3s;
+        }
+
+            .contact-item a:hover {
+                color: #f86f2d;
+                text-decoration: none;
+            }
+
+    /* ===== SOCIAL LINKS ===== */
+    .social-links {
+        display: flex;
+        margin-top: 30px;
+    }
+
+    .social-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #f86f2d;
+        color: white;
+        margin-right: 10px;
+        transition: all 0.3s;
+    }
+
+        .social-icon:hover {
+            background: #2c3e50;
+            transform: translateY(-3px);
+        }
+
+    /* ===== CONTACT FORM ===== */
+    .contact-form-container {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .form-title {
+        font-size: 1.5rem;
+        margin-bottom: 25px;
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .form-control {
+        height: 50px;
+        border-radius: 6px;
+        border: 1px solid #e1e1e1;
+        transition: border-color 0.3s;
+    }
+
+        .form-control:focus {
+            border-color: #f86f2d;
+            box-shadow: 0 0 0 0.2rem rgba(248, 111, 45, 0.25);
+        }
+
+    textarea.form-control {
+        height: auto;
+        resize: none;
+    }
+
+    .btn-send {
+        padding: 12px 30px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        background: #f86f2d;
+        border: none;
+        color: white;
+        transition: all 0.3s;
+    }
+
+        .btn-send:hover {
+            background: #e65c1a;
+            transform: translateY(-2px);
+        }
+
+    /* ===== MAP STYLES ===== */
+    .map-container {
+        margin-top: 50px;
+    }
+
+    .map-title {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .map-wrapper {
+        height: 450px;
+        width: 100%;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+
+    .map-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        filter: grayscale(20%);
+        transition: filter 0.3s;
+    }
+
+    .map-wrapper:hover .map-iframe {
+        filter: grayscale(0%);
+    }
+
+    .map-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        background: linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 20%);
+    }
+
+    /* ===== SUPPORT ORGANIZATIONS ===== */
+    .support-organizations-section {
+        padding: 30px 0;
+    }
+
+    .organization-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 25px;
+        margin-top: 20px;
+    }
+
+    .organization-card {
+        background: white;
+        border-radius: 10px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transition: transform 0.3s ease;
+        border-top: 3px solid #f86f2d;
+    }
+
+        .organization-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+    .org-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        color: white;
+        font-size: 24px;
+        background: #f86f2d;
+    }
+
+    .organization-card h5 {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .org-links {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .org-link {
+        color: #f86f2d;
+        text-decoration: none;
+        transition: color 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 0;
+        border-bottom: 1px dashed #eee;
+    }
+
+        .org-link:hover {
+            color: #e65c1a;
+            text-decoration: none;
+        }
+
+        .org-link i {
+            font-size: 14px;
+        }
+
+    /* ===== RESPONSIVE STYLES ===== */
+    @@media (max-width: 991px) {
+        .contact-info {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+        }
+
+        .organization-grid {
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        }
+    }
+
+    @@media (max-width: 767px) {
+        .contact-section {
+            padding: 50px 0;
+        }
+
+        .contact-item {
+            padding: 12px;
+        }
+
+        .nav-tabs .nav-link {
+            padding: 10px 15px;
+            font-size: 0.9rem;
+        }
+
+        .organization-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<section class="contact-section">
+    <div class="container">
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs" id="contactTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="true">Liên hệ</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="support-tab" data-toggle="tab" href="#support" role="tab" aria-controls="support" aria-selected="false">Tổ chức hỗ trợ</a>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="contactTabsContent">
+            <!-- Contact Tab -->
+            <div class="tab-pane fade show active" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                <div class="row">
+                    <!-- Contact Information -->
+                    <div class="col-lg-5 contact-info">
+                        <h2 class="section-title">Liên Hệ Với Chúng Tôi</h2>
+
+                        <div class="contact-details">
+                            <div class="contact-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <div>
+                                    <h5>Địa Chỉ</h5>
+                                    <p>1496/1, KP3, Trẳng Dài, Biên Hòa, Đồng Nai</p>
+                                </div>
+                            </div>
+
+                            <div class="contact-item">
+                                <i class="fas fa-phone"></i>
+                                <div>
+                                    <h5>Điện Thoại</h5>
+                                    <p><a href="tel:0776117577">077 611 7577</a></p>
+                                </div>
+                            </div>
+
+                            <div class="contact-item">
+                                <i class="fas fa-envelope"></i>
+                                <div>
+                                    <h5>Email</h5>
+                                    <p><a href="mailto:dinhminh4424@gmail.com">dinhminh4424@gmail.com</a></p>
+                                </div>
+                            </div>
+
+                            <div class="contact-item">
+                                <i class="fas fa-globe"></i>
+                                <div>
+                                    <h5>Website</h5>
+                                    <p><a href="/Home">TimNguoiThatLac.com</a></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="social-links">
+                            <a href="#" class="social-icon" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="social-icon" title="Zalo"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="social-icon" title="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="social-icon" title="YouTube"><i class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Contact Form -->
+                    <div class="col-lg-7">
+                        <div class="contact-form-container">
+                            <h4 class="form-title">Gửi Tin Nhắn Cho Chúng Tôi</h4>
+                            <form asp-action="LienHe" asp-controller="Home" method="post" class="contact-form" enctype="multipart/form-data">
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label asp-for="TenNguoiDungLienHe">Tên Của Bạn <span class="text-danger">*</span></label>
+                                        <input asp-for="TenNguoiDungLienHe" type="text" class="form-control" placeholder="Nhập tên của bạn">
+										<span asp-validation-for="TenNguoiDungLienHe" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label asp-for="PhoneNguoiDungLienHe">Điện Thoại <span class="text-danger">*</span></label>
+                                        <input asp-for="PhoneNguoiDungLienHe" type="number" class="form-control" placeholder="Nhập số điẹn thoại của bạn" required>
+                                        <span asp-validation-for="PhoneNguoiDungLienHe" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="EmailNguoiDungLienHe" for="subject">Email  <span class="text-danger">*</span></label>
+                                    <input asp-for="EmailNguoiDungLienHe" type="text" class="form-control" placeholder="Email liên hệ">
+                                    <span asp-validation-for="EmailNguoiDungLienHe" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="VanDeLienHe" for="subject">Vấn Đề Gặp Phải  <span class="text-danger">*</span></label>
+                                    <input asp-for="VanDeLienHe" type="text" class="form-control" placeholder="Vấn Đề Bạn Đang Gặp Phải ">
+                                    <span asp-validation-for="VanDeLienHe" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <textarea asp-for="NoiBungLienHe" id="compose-textarea" class="form-control border-0 bg-light px-4 py-3" rows="5" placeholder="Mô Tả Vấn Đề"></textarea>
+                                    <span asp-validation-for="NoiBungLienHe" class="text-danger"></span>
+
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-send">
+                                    <i class="fas fa-paper-plane mr-2"></i> Gửi Tin Nhắn
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Map Section -->
+                <div class="row mt-5">
+                    <div class="col-12">
+                        <div class="map-container">
+                            <h4 class="map-title">Vị Trí Của Chúng Tôi</h4>
+                            <div class="map-wrapper wow fadeIn" data-wow-delay="0.4s">
+                                <iframe src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3916.4972980194193!2d106.8495600750452!3d11.001265989161523!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMTHCsDAwJzA0LjYiTiAxMDbCsDUxJzA3LjciRQ!5e0!3m2!1svi!2s!4v1740760401661!5m2!1svi!2s"
+                                        class="map-iframe" frameborder="0" allowfullscreen="" aria-hidden="false" tabindex="0" loading="lazy"></iframe>
+                                <div class="map-overlay"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support Organizations Tab -->
+            <div class="tab-pane fade" id="support" role="tabpanel" aria-labelledby="support-tab">
+                <div class="support-organizations-section">
+                    <h2 class="section-title">Kết Nối Với Tổ Chức Hỗ Trợ</h2>
+                    <p class="section-subtitle">Liên hệ với các tổ chức cứu trợ và chính quyền địa phương để được hỗ trợ thêm</p>
+
+                    <div class="organization-grid">
+                        <!-- Government Support -->
+                        <div class="organization-card">
+                            <div class="org-icon">
+                                <i class="fas fa-landmark"></i>
+                            </div>
+                            <h5>Cơ Quan Chính Quyền</h5>
+                            <div class="org-links">
+                                <a href="https://www.mps.gov.vn" target="_blank" class="org-link">
+                                    <i class="fas fa-external-link-alt"></i> Bộ Công An
+                                </a>
+                                <a href="https://www.dongnai.gov.vn" target="_blank" class="org-link">
+                                    <i class="fas fa-external-link-alt"></i> UBND Tỉnh Đồng Nai
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Rescue Organizations -->
+                        <div class="organization-card">
+                            <div class="org-icon">
+                                <i class="fas fa-hands-helping"></i>
+                            </div>
+                            <h5>Tổ Chức Cứu Trợ</h5>
+                            <div class="org-links">
+                                <a href="https://www.redcross.org.vn" target="_blank" class="org-link">
+                                    <i class="fas fa-external-link-alt"></i> Hội Chữ Thập Đỏ Việt Nam
+                                </a>
+                                <a href="https://www.undp.org/vietnam" target="_blank" class="org-link">
+                                    <i class="fas fa-external-link-alt"></i> UNDP Việt Nam
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Missing Persons Resources -->
+                        <div class="organization-card">
+                            <div class="org-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <h5>Trang Tìm Người Thất Lạc</h5>
+                            <div class="org-links">
+                                <a href="https://timnguothan.com" target="_blank" class="org-link">
+                                    <i class="fas fa-external-link-alt"></i> Tìm Người Thân
+                                </a>
+                                <a href="https://www.facebook.com/timnguoilac" target="_blank" class="org-link">
+                                    <i class="fas fa-external-link-alt"></i> Cộng đồng Tìm Người Lạc
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Local Support -->
+                        <div class="organization-card">
+                            <div class="org-icon">
+                                <i class="fas fa-hands"></i>
+                            </div>
+                            <h5>Hỗ Trợ Địa Phương</h5>
+                            <div class="org-links">
+                                <a href="tel:0776117577" class="org-link">
+                                    <i class="fas fa-phone"></i> Đường dây nóng Biên Hòa
+                                </a>
+                                <a href="https://www.facebook.com/groups/hoitrobiendong" target="_blank" class="org-link">
+                                    <i class="fas fa-external-link-alt"></i> Hội Tương Thân Đồng Nai
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/clients/plugins/summernote/summernote-bs4.min.js"></script>
+    <script>
+        $(function () {
+          //Add text editor
+          $('#compose-textarea').summernote()
+        })
+    </script>
+    @* <script> *@
+        
+    @*         // Form submission handling *@
+    @*         $('.contact-form').on('submit', function(e) { *@
+    @*             e.preventDefault(); *@
+    @*             // Add your form submission logic here *@
+    @*             alert('Tin nhắn của bạn đã được gửi thành công!'); *@
+    @*             this.reset(); *@
+    @*             $('#compose-textarea').summernote('reset'); *@
+    @*         }); *@
+
+    @*         // Initialize tabs if not already initialized *@
+    @*         if ($.fn.tab) { *@
+    @*             $('#contactTabs a').on('click', function (e) { *@
+    @*                 e.preventDefault(); *@
+    @*                 $(this).tab('show'); *@
+    @*             }); *@
+    @*         } *@
+    @*     }); *@
+    @* </script> *@
+}

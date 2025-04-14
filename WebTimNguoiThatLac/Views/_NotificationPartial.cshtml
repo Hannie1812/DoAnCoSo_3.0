@@ -1,0 +1,108 @@
+﻿@using Humanizer
+@model IEnumerable<BinhLuan>
+
+<div class="dropdown-menu dropdown-menu-end p-0 shadow notification-dropdown"
+     style="width: 380px; max-height: 70vh; overflow-y: auto;">
+    <!-- Header -->
+    <div class="dropdown-header bg-primary text-white p-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">
+                <i class="fas fa-bell me-2"></i> Thông báo
+                <span id="unreadCount" class="badge bg-danger ms-2">@Model.Count(x => !x.DaDoc)</span>
+            </h6>
+            <form asp-controller="BinhLuan" asp-action="MarkAllAsRead" method="post" class="d-inline">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-sm btn-light">Đánh dấu đã đọc</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification List -->
+    <div class="list-group list-group-flush">
+        @if (Model.Any())
+        {
+            foreach (var bl in Model)
+            {
+                <a href="@Url.Action("ChiTietBaiTimNguoi", "TimNguoi", new { id = bl.IdBaiViet })"
+                   class="list-group-item list-group-item-action @(!bl.DaDoc ? "unread" : "")"
+                   data-id="@bl.Id">
+                    <div class="d-flex align-items-start">
+                        <div class="flex-shrink-0 me-3">
+                            <i class="fas fa-comment-dots text-primary mt-1"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <h6 class="mb-1 fw-bold">@bl.ApplicationUser?.FullName</h6>
+                                @if (!bl.DaDoc)
+                                {
+                                    <span class="badge bg-primary">Mới</span>
+                                }
+                            </div>
+                            <p class="mb-1 small text-muted">@bl.NoiDung.Truncate(80)</p>
+                            <small class="text-muted">
+                                <i class="far fa-clock me-1"></i>
+                                @bl.NgayBinhLuan.Humanize(utcDate: false, culture: new System.Globalization.CultureInfo("vi-VN"))
+                            </small>
+                        </div>
+                    </div>
+                </a>
+            }
+        }
+        else
+        {
+            <div class="text-center p-4">
+                <i class="far fa-bell-slash fa-2x text-muted mb-2"></i>
+                <p class="text-muted mb-0">Không có thông báo mới</p>
+            </div>
+        }
+    </div>
+
+    <!-- Footer -->
+    <div class="dropdown-footer p-2 text-center bg-light">
+        <a href="@Url.Action("XemTatCa", "BinhLuan")" class="btn btn-sm btn-link text-decoration-none">
+            <i class="fas fa-list me-1"></i> Xem tất cả
+        </a>
+    </div>
+</div>
+
+<style>
+    .notification-dropdown {
+        display: none;
+    }
+
+    .unread {
+        background-color: #f8fbff;
+        border-left: 3px solid #0d6efd;
+    }
+
+    .notification-item:hover {
+        background-color: #f8f9fa !important;
+    }
+</style>
+
+<script>
+    $(document).ready(function() {
+        // Xử lý đánh dấu đã đọc khi click vào thông báo
+        $('.list-group-item').click(function() {
+            const notificationId = $(this).data('id');
+            if (notificationId) {
+                $.post('/BinhLuan/MarkAsRead', { id: notificationId }, function() {
+                    $(this).removeClass('unread');
+                    $(this).find('.badge').remove();
+                    updateNotificationCount();
+                });
+            }
+        });
+
+        // Cập nhật số lượng thông báo chưa đọc
+        function updateNotificationCount() {
+            $.get('/BinhLuan/GetUnreadCount', function(count) {
+                $('#unreadCount').text(count).toggle(count > 0);
+                $('.notification-counter').text(count).toggle(count > 0);
+            });
+        }
+
+        // Tự động làm mới mỗi 30 giây
+        setInterval(updateNotificationCount, 30000);
+    });
+</script>

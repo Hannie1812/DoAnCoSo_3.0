@@ -1,0 +1,209 @@
+﻿@model IPagedList<WebTimNguoiThatLac.Models.ApplicationUser>
+@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+
+@{
+    ViewData["Title"] = "Danh Sách Các Người Dùng";
+}
+
+<style>
+    /* Style cho phân trang */
+    .pagination {
+        margin-top: 20px;
+    }
+
+    .page-item .page-link {
+        border-radius: 50% !important;
+        margin: 0 5px;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        color: #333;
+    }
+
+    .page-item.active .page-link {
+        background-color: #ff6a00;
+        border-color: #ff6a00;
+        color: white;
+    }
+
+    .page-item:not(.active) .page-link:hover {
+        background-color: #ffe0cc;
+        color: #ff6a00;
+    }
+
+    /* Avatar styles */
+    .user-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #fff;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .default-avatar {
+        background: linear-gradient(135deg, #ff9966, #ff5e62);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 2rem;
+    }
+
+    /* Card styles */
+    .user-card {
+        transition: all 0.3s ease;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        height: 100%;
+    }
+
+        .user-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+    .user-info {
+        padding: 20px;
+    }
+
+    .contact-btn {
+        transition: all 0.3s;
+    }
+
+        .contact-btn:hover {
+            transform: scale(1.05);
+        }
+</style>
+
+<div class="hero-wrap" style="background-image: url('/Templet/images/bg_6.jpg');" data-stellar-background-ratio="0.5">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row no-gutters slider-text align-items-center justify-content-center" data-scrollax-parent="true">
+            <div class="col-md-7 ftco-animate text-center" data-scrollax=" properties: { translateY: '70%' }">
+                <p class="breadcrumbs" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">
+                    <span class="mr-2"><a href="/Home">Trang Chủ</a></span>
+                    <span>@ViewData["Title"]</span>
+                </p>
+                <h1 class="mb-3 bread" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">@ViewData["Title"]</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <form asp-action="index" asp-controller="NguoiDung">
+        <div class="input-group mb-4 shadow-sm">
+            <input name="TimKiem" value="@ViewBag.TimKiem" type="text" class="form-control form-control-lg"
+                   placeholder="Nhập tên Email, Tên Người Dùng, Số Điện Thoại cần tìm">
+            <button class="btn btn-primary btn-lg">
+                <i class="fas fa-search me-2"></i>Tìm Kiếm
+            </button>
+        </div>
+    </form>
+</div>
+
+
+<section class="ftco-section bg-light">
+    <div class="container">
+        <div class="row">
+            @if (Model != null && Model.Any())
+            {
+                foreach (var user in Model)
+                {
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="user-card bg-white h-100">
+                            <div class="d-flex flex-column align-items-center py-4">
+                                @*
+                                    @if (!string.IsNullOrEmpty(user.))
+                                    {
+                                        <img src="@user.ProfilePicture" class="user-avatar" alt="@user.FullName">
+                                    }
+                                    else
+                                    {
+                                        <div class="user-avatar default-avatar">
+                                            @user.FullName?.Substring(0, 1).ToUpper()
+                                        </div>
+                                    }
+                                *@
+                                <div class="user-avatar default-avatar">
+                                    @user.FullName?.Substring(0, 1).ToUpper()
+                                </div>
+                            </div>
+
+                            <div class="user-info text-center">
+                                <h3 class="mb-2">@user.FullName</h3>
+                                <p class="text-muted mb-3">@user.Email</p>
+
+                                <div class="d-flex justify-content-center">
+                                    <a href="@Url.Action("BatDauChat", "Chat", new { nguoiNhanId = user.Id })"
+                                       class="btn btn-primary contact-btn px-4">
+                                        <i class="fas fa-comment me-2"></i>Liên hệ
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-5">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>Không tìm thấy người dùng nào phù hợp
+                    </div>
+                </div>
+            }
+
+            <!-- Phân trang -->
+            <div class="row mt-5">
+                <div class="col-12 d-flex justify-content-center">
+                    @Html.PagedListPager(Model, Page => Url.Action("Index", new
+                        {
+                            Page,
+                            ViewBag.TimKiem
+                        }), new PagedListRenderOptions
+               {
+                   LiElementClasses = new[] { "page-item" },
+                   PageClasses = new[] { "page-link" },
+                   UlElementClasses = new[] { "pagination", "justify-content-center" }
+               })
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="ftco-section-3 img" style="background-image: url(/Templet/images/bg_3.jpg);">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row d-md-flex">
+            <div class="col-md-6 d-flex ftco-animate">
+                <div class="img img-2 align-self-stretch" style="background-image: url(/Templet/images/bg_4.jpg);"></div>
+            </div>
+            <div class="col-md-6 volunteer pl-md-5 ftco-animate">
+                <h3 class="mb-3">Be a volunteer</h3>
+                <form action="#" class="volunter-form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Your Name">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Your Email">
+                    </div>
+                    <div class="form-group">
+                        <textarea name="" id="" cols="30" rows="3" class="form-control" placeholder="Message"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Send Message" class="btn btn-white py-3 px-5">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

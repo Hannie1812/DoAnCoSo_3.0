@@ -1,0 +1,384 @@
+﻿@model WebTimNguoiThatLac.Models.NguoiDungLienHe
+
+@{
+    ViewData["Title"] = "Thông Tin Liên Hệ";
+}
+
+@section naviHeader {
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin" class="nav-link">Trang Chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin/NguoiDungLienHe" class="nav-link active">Người Dùng Liên Hệ</a>
+        </li>
+    </ul>
+}
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .contact-detail-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: #3498db;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            padding-left: 15px;
+        }
+
+        .contact-date {
+            background-color: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .content-box {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        /* Button styles */
+        .btn {
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+        }
+
+        .btn-back {
+            background-color: #6c757d;
+            color: white;
+        }
+
+            .btn-back:hover {
+                background-color: #5a6268;
+                color: white;
+            }
+
+        .btn-edit {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+            .btn-edit:hover {
+                background-color: #e0a800;
+                color: #212529;
+            }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+
+            .btn-delete:hover {
+                background-color: #c82333;
+                color: white;
+            }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1050;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 5px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+            .close:hover {
+                color: black;
+            }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 5px;
+                font-weight: bold;
+            }
+
+        .form-control {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .validation-summary-errors {
+            color: #dc3545;
+            margin-bottom: 15px;
+        }
+
+        .field-validation-error {
+            color: #dc3545;
+            font-size: 0.875em;
+        }
+    </style>
+
+
+<div class="contact-detail-container">
+    <div class="detail-item">
+        <span class="detail-label">Mã liên hệ:</span>
+        <div class="detail-value" id="contact-id">@Model.MaLienHeNguoiDung</div>
+    </div>
+
+    <div class="detail-item">
+        <span class="detail-label">Tên người liên hệ:</span>
+        <div class="detail-value" id="contact-name">@Model.TenNguoiDungLienHe</div>
+    </div>
+
+    <div class="detail-item">
+        <span class="detail-label">Email:</span>
+        <div class="detail-value" id="contact-email">@Model.EmailNguoiDungLienHe</div>
+    </div>
+
+    <div class="detail-item">
+        <span class="detail-label">Số điện thoại:</span>
+        <div class="detail-value" id="contact-phone">@Model.PhoneNguoiDungLienHe</div>
+    </div>
+
+    <div class="detail-item">
+        <span class="detail-label">Vấn đề liên hệ:</span>
+        <div class="detail-value" id="contact-issue">@Model.VanDeLienHe</div>
+    </div>
+
+    <div class="detail-item">
+        <span class="detail-label">Nội dung:</span>
+        <div class="content-box" id="contact-content">@Html.Raw(Model.NoiBungLienHe)</div>
+    </div>
+
+    <div class="detail-item">
+        <span class="detail-label">Ngày gửi liên hệ:</span>
+        <div class="detail-value contact-date" id="contact-date">@Model.NgayLienHe.ToString("dd/MM/yyyy HH:mm")</div>
+    </div>
+
+    <div class="button-group">
+        <a href="@Url.Action("Index", "NguoiDungLienHe")" class="btn btn-back">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+        <div>
+            <button class="btn btn-edit" onclick="openEditModal()">
+                <i class="fas fa-edit"></i> Sửa
+            </button>
+            <button class="btn btn-delete" onclick="openDeleteModal()">
+                <i class="fas fa-trash"></i> Xóa
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        @using (Html.BeginForm("Edit", "NguoiDungLienHe", FormMethod.Post, new { id = "editForm" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.MaLienHeNguoiDung)
+
+            <div class="modal-header">
+                <h2>Sửa thông tin liên hệ</h2>
+                <span class="close" onclick="closeEditModal()">&times;</span>
+            </div>
+
+            <div class="modal-body">
+                @Html.ValidationSummary(true)
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.TenNguoiDungLienHe)
+                    @Html.TextBoxFor(model => model.TenNguoiDungLienHe, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.TenNguoiDungLienHe)
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.EmailNguoiDungLienHe)
+                    @Html.TextBoxFor(model => model.EmailNguoiDungLienHe, new { @class = "form-control", type = "email" })
+                    @Html.ValidationMessageFor(model => model.EmailNguoiDungLienHe)
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.PhoneNguoiDungLienHe)
+                    @Html.TextBoxFor(model => model.PhoneNguoiDungLienHe, new { @class = "form-control", type = "tel" })
+                    @Html.ValidationMessageFor(model => model.PhoneNguoiDungLienHe)
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.VanDeLienHe)
+                    @Html.TextBoxFor(model => model.VanDeLienHe, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.VanDeLienHe)
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.NoiBungLienHe)
+                    <textarea asp-for="NoiBungLienHe" id="compose-textarea" class="form-control border-0 bg-light px-4 py-3" rows="5" placeholder="Mô Tả ..."></textarea>
+                    @Html.ValidationMessageFor(model => model.NoiBungLienHe)
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-back" onclick="closeEditModal()">Hủy</button>
+                <button type="submit" class="btn btn-edit">Lưu thay đổi</button>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+     
+        <form asp-action="XoaLienHe"  asp-controller="NguoiDungLienHe" method="post" >
+            @Html.AntiForgeryToken()
+            <input name="id"  type="hidden"value="@Model.MaLienHeNguoiDung"/>
+
+            <div class="modal-header">
+                <h2>Xác nhận xóa</h2>
+                <span class="close" onclick="closeDeleteModal()">&times;</span>
+            </div>
+
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa liên hệ này? Hành động này không thể hoàn tác.</p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-back" onclick="closeDeleteModal()">Hủy</button>
+                <button type="submit" class="btn btn-delete">Xóa</button>
+            </div>
+        </form>
+            
+        
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/clients/plugins/summernote/summernote-bs4.min.js"></script>
+    <script>
+        $(function () {
+          //Add text editor
+          $('#compose-textarea').summernote()
+        })
+    </script>
+    <script>
+        // Modal functions
+        function openEditModal() {
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        function openDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.className === 'modal') {
+                closeEditModal();
+                closeDeleteModal();
+            }
+        }
+
+        // Handle form submissions
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            // Form will be submitted via normal MVC post
+        });
+
+        // Show modal if there are validation errors
+        @if (ViewData.ModelState.Any(x => x.Value.Errors.Any()))
+        {
+            <text>
+                $(document).ready(function() {
+                    openEditModal();
+                });
+            </text>
+        }
+    </script>
+}

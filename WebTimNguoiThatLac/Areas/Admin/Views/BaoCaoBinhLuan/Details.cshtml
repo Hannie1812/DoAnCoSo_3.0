@@ -1,0 +1,346 @@
+﻿@model BaoCaoBinhLuan
+@{
+    ViewData["Title"] = "Chi Tiết Báo Cáo Bình Luận";
+    var reportCount = ViewBag.ReportCount as int? ?? 0;
+}
+
+@section naviHeader {
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin" class="nav-link">Trang Chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin/BaoCaoBinhLuan" class="nav-link">Báo Cáo Bình Luận</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="#" class="nav-link active">Chi Tiết</a>
+        </li>
+    </ul>
+}
+
+<!-- Thêm vào phần đầu trang -->
+<div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+<style>
+    .notification {
+        padding: 15px 20px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        color: white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        animation: slideIn 0.3s, fadeOut 0.5s 4.5s;
+        transition: all 0.3s;
+    }
+
+        .notification.success {
+            background-color: #28a745;
+        }
+
+        .notification.error {
+            background-color: #dc3545;
+        }
+
+        .notification.warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .notification.info {
+            background-color: #17a2b8;
+        }
+
+    @@keyframes slideIn {
+        from {
+            transform: translateX(100%);
+        }
+
+        to {
+            transform: translateX(0);
+        }
+    }
+
+    @@keyframes fadeOut {
+        from {
+            opacity: 1;
+        }
+
+        to {
+            opacity: 0;
+        }
+    }
+</style>
+
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-6">
+        </div>
+        <div class="col-md-6 text-right">
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="card-title mb-0">Thông tin báo cáo</h3>
+                <div>
+                    <span class="badge @(Model.DaDoc ? "badge-success" : "badge-warning") mr-2">
+                        @(Model.DaDoc ? "Đã đọc" : "Chưa đọc")
+                    </span>
+                    <span class="badge badge-danger">
+                        <i class="fas fa-flag"></i> Tổng: @reportCount báo cáo
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5>Thông tin người báo cáo</h5>
+                    <hr />
+                    <dl class="row">
+                        <dt class="col-sm-4">Người báo cáo:</dt>
+                        <dd class="col-sm-8">@Model.ApplicationUser?.FullName</dd>
+                        <dt class="col-sm-4">Email:</dt>
+                        <dd class="col-sm-8">@Model.ApplicationUser?.Email</dd>
+                        <dt class="col-sm-4">Ngày báo cáo:</dt>
+                        <dd class="col-sm-8">@Model.NgayBaoCao.ToString("dd/MM/yyyy HH:mm")</dd>
+                        <dt class="col-sm-4">Lý do:</dt>
+                        <dd class="col-sm-8">@Model.LyDo</dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <h5>Trạng thái bình luận</h5>
+                    <hr />
+                    <dl class="row">
+                        <dt class="col-sm-4">Trạng thái:</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.BinhLuan?.Active ?? false)
+                            {
+                                <span class="badge badge-success">Đang hiển thị</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-danger">Đã bị ẩn</span>
+                            }
+                        </dd>
+                        <dt class="col-sm-4">Bài viết liên quan:</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.BinhLuan?.TimNguoi != null)
+                            {
+                                <a href="/TimNguoi/ChiTietBaiTimNguoi/@Model.BinhLuan.TimNguoi.Id" target="_blank">
+                                    @Model.BinhLuan.TimNguoi.TieuDe
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-danger">Bài viết đã bị xóa</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <h5>Nội dung bình luận bị báo cáo</h5>
+                    <hr />
+                    <div class="card bg-light p-3 mb-3">
+                        @if (Model.BinhLuan != null)
+                        {
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <img src="https://via.placeholder.com/50" class="rounded-circle" alt="Avatar">
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6>@Model.BinhLuan.ApplicationUser?.FullName</h6>
+                                    <p class="text-muted small">@Model.BinhLuan.NgayBinhLuan.ToString("dd/MM/yyyy HH:mm")</p>
+                                    <p>@Model.BinhLuan.NoiDung</p>
+
+                                    @if (!string.IsNullOrEmpty(Model.BinhLuan.HinhAnh))
+                                    {
+                                        <img src="@Model.BinhLuan.HinhAnh" class="img-fluid rounded" style="max-height: 200px;" alt="Hình ảnh bình luận">
+                                    }
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning">
+                                Bình luận đã bị xóa
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12 text-right">
+                    <form asp-action="Delete" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <button type="submit" class="btn btn-danger"
+                                onclick="return confirm('Bạn chắc chắn muốn xóa báo cáo này?')">
+                            <i class="fas fa-trash"></i> Xóa báo cáo
+                        </button>
+                    </form>
+
+                    @if (Model.BinhLuan != null)
+                    {
+                        <form asp-action="ToggleCommentStatus" method="post" class="d-inline ml-2">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="commentId" value="@Model.BinhLuan.Id" />
+                            <input type="hidden" name="reportId" value="@Model.Id" />
+                            <button type="submit" class="btn @(Model.BinhLuan.Active ? "btn-warning" : "btn-success")"
+                                    onclick="return confirm('Bạn chắc chắn muốn @(Model.BinhLuan.Active ? "ẩn" : "hiển thị") bình luận này?')">
+                                <i class="fas @(Model.BinhLuan.Active ? "fa-eye-slash" : "fa-eye")"></i>
+                                @(Model.BinhLuan.Active ? "Ẩn bình luận" : "Hiển thị bình luận")
+                            </button>
+                        </form>
+
+                        <form asp-action="DeleteComment" method="post" class="d-inline ml-2">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="commentId" value="@Model.BinhLuan.Id" />
+                            <input type="hidden" name="reportId" value="@Model.Id" />
+                            <button type="submit" class="btn btn-danger"
+                                    onclick="return confirm('Bạn chắc chắn muốn XÓA VĨNH VIỄN bình luận này và tất cả báo cáo liên quan?')">
+                                <i class="fas fa-trash-alt"></i> Xóa bình luận
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+@section Scripts {
+    <script>
+        // Hiển thị thông báo từ TempData
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>
+                showNotification('success', '@Html.Raw(TempData["SuccessMessage"])');
+            </text>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>
+                showNotification('error', '@Html.Raw(TempData["ErrorMessage"])');
+            </text>
+        }
+        @if (TempData["WarningMessage"] != null)
+        {
+            <text>
+                showNotification('warning', '@Html.Raw(TempData["WarningMessage"])');
+            </text>
+        }
+        @if (TempData["InfoMessage"] != null)
+        {
+            <text>
+                showNotification('info', '@Html.Raw(TempData["InfoMessage"])');
+            </text>
+        }
+
+        function showNotification(type, message) {
+            const notificationArea = document.getElementById('notification-area');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas ${getIconForType(type)} me-2"></i>
+                ${message}
+            `;
+
+            notificationArea.appendChild(notification);
+
+            // Tự động xóa sau 5 giây
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        function getIconForType(type) {
+            switch(type) {
+                case 'success': return 'fa-check-circle';
+                case 'error': return 'fa-exclamation-circle';
+                case 'warning': return 'fa-exclamation-triangle';
+                case 'info': return 'fa-info-circle';
+                default: return 'fa-bell';
+            }
+        }
+
+        // Xử lý các hành động và hiển thị thông báo
+        document.addEventListener('DOMContentLoaded', function() {
+            // Xử lý khi xóa báo cáo
+            document.querySelector('form[asp-action="Delete"]')?.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (confirm('Bạn chắc chắn muốn xóa báo cáo này?')) {
+                    submitFormWithNotification(this, 'Xóa báo cáo thành công', 'Có lỗi xảy ra khi xóa báo cáo');
+                }
+            });
+
+            // Xử lý khi thay đổi trạng thái bài viết
+            document.querySelector('form[asp-action="TogglePostStatus"]')?.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const isActive = @Model.BinhLuan.Active.ToString().ToLower();
+                const action = isActive ? "vô hiệu hóa" : "kích hoạt";
+                if (confirm(`Bạn chắc chắn muốn ${action} bài viết này?`)) {
+                    const successMsg = isActive ? "Đã vô hiệu hóa bài viết thành công" : "Đã kích hoạt bài viết thành công";
+                    submitFormWithNotification(this, successMsg, `Có lỗi xảy ra khi ${action} bài viết`);
+                }
+            });
+        });
+
+        function submitFormWithNotification(form, successMessage, errorMessage) {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+
+            // Hiển thị loading
+            submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang xử lý...`;
+            submitBtn.disabled = true;
+
+            fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: {
+                    'RequestVerificationToken': form.querySelector('input[name="__RequestVerificationToken"]').value
+                }
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else {
+                    return response.json();
+                }
+            })
+            .then(data => {
+                if (data && data.success) {
+                    showNotification('success', successMessage);
+                    // Nếu cần reload trang sau khi thành công
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showNotification('error', errorMessage);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('error', errorMessage);
+            })
+            .finally(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
+        }
+    </script>
+}

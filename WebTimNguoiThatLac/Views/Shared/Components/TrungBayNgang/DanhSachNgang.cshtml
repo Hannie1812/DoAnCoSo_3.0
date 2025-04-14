@@ -1,0 +1,22 @@
+﻿@model IEnumerable<WebTimNguoiThatLac.Models.TrungBayHinhAnh>
+
+<section class="ftco-section ftco-gallery">
+    @if (Model != null)
+    {
+        <div class="row">
+            @foreach (var i in Model)
+            {
+
+                <a href="@i.HinhAnh" class="col-md-3 gallery image-popup d-flex justify-content-center align-items-center img ftco-animate w-100" style="background-image: url(@i.HinhAnh);">
+                    <div class="icon d-flex justify-content-center align-items-center">
+                        <span class="icon-search"></span>
+                    </div>
+                </a>
+            }
+        </div>
+    }
+    else
+    {
+        <h2>Không có hình ảnh nào để hiển thị.</h2>
+    }
+</section>

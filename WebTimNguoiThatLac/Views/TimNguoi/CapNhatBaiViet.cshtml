@@ -1,0 +1,159 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using WebTimNguoiThatLac.Data
+@model WebTimNguoiThatLac.Models.TimNguoi
+@inject UserManager<ApplicationUser> UserManager
+
+
+@{
+    ViewData["Title"] = "Cập Nhật Bài Viết";
+}
+
+<div class="hero-wrap" style="background-image: url('/Templet/images/bg_5.jpg');" data-stellar-background-ratio="0.5">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row no-gutters slider-text align-items-center justify-content-center" data-scrollax-parent="true">
+            <div class="col-md-7 ftco-animate text-center" data-scrollax=" properties: { translateY: '70%' }">
+                <p class="breadcrumbs" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }"><span class="mr-2"><a href="/Home">Trang Chủ</a></span> <span>@ViewData["Title"]</span></p>
+                <h1 class="mb-3 bread" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">@ViewData["Title"]</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card mt-5">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="card-title">@ViewData["Title"]</h2>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CapNhatBaiViet" asp-controller="TimNguoi" enctype="multipart/form-data" method="post">
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <input hidden asp-for="IdNguoiDung" >
+                        <input hidden asp-for="Id" />
+                        <div class="form-group">
+                            <label asp-for="HoTen" class="control-label"><strong>Họ và Tên:</strong></label>
+                            <input asp-for="HoTen" class="form-control" placeholder="Nhập họ và tên" />
+                            <span asp-validation-for="HoTen" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="TieuDe" class="control-label"><strong>Tiêu Đề Tin:</strong></label>
+                            <input asp-for="TieuDe" class="form-control" placeholder="Nhập tiêu đề tin" />
+                            <span asp-validation-for="TieuDe" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="MoTa">Nhập Nội Dung </label>
+                            <textarea asp-for="MoTa" id="compose-textarea" class="form-control">
+
+                            </textarea>
+                            <span asp-validation-for="MoTa"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="DaciemNhanDang" class="control-label"><strong>Đặc Điểm Nhận Dạng:</strong></label>
+                            <input asp-for="DaciemNhanDang" class="form-control" placeholder="Nhập đặc điểm nhận dạng" />
+                            <span asp-validation-for="DaciemNhanDang" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="TrangThai" class="control-label"><strong>Trạng Thái:</strong></label>
+                            <select asp-for="TrangThai" class="form-control">
+                                <option value="Đã Tìm Thấy">Đã Tìm Thấy</option>
+                                <option value="Đang Tìm Kiếm">Đang Tìm Kiếm</option>
+                                <option value="Cần hỗ trợ từ cộng đồng">Cần hỗ trợ từ cộng đồng</option>
+                            </select>
+                            <span asp-validation-for="TrangThai" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="GioiTinh" class="control-label"><strong>Giới Tính:</strong></label>
+                            <select asp-for="GioiTinh" class="form-control">
+                                <option value="1">Nam</option>
+                                <option value="2">Nữ</option>
+                            </select>
+                            <span asp-validation-for="GioiTinh" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="KhuVuc" class="control-label"><strong>Khu Vực:</strong></label>
+                            <select asp-for="KhuVuc" class="form-control">
+                                @foreach (string i in ViewBag.DanhSachTinhThanh)
+                                {
+                                    if(i == Model.KhuVuc)
+                                    {
+                                        <option selected value="@i">@i</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@i">@i</option>
+                                    }
+
+                                }
+                            </select>
+                            <span asp-validation-for="KhuVuc" class="text-danger"></span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <p>Chọn Danh Sách Hình Ảnh Hiện Tại</p>
+                               @if(ViewBag.DanhSachHinhAnh != null)
+                               {
+                                    foreach (WebTimNguoiThatLac.Models.AnhTimNguoi i in ViewBag.DanhSachHinhAnh)
+                                    {
+                                        <img src="@i.HinhAnh" width="100" class="m-2" />
+                                    }
+                                  
+                               }
+                            </div>
+                            <div class=" col-md-6 mb-3">
+                                <label>Chọn Danh Sách Hình Ảnh Cập Nhật </label>
+                                <input multiple name="DSHinhAnhCapNhat" id="AnhVuaTai" type="file" placeholder="Nhập Hình Ảnh" class="form-control" />
+                                <div class="ChuaAnh"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group text-right">
+                            <button class="btn btn-primary">Thêm</button>
+                            <a asp-action="ThongTinCaNhan" asp-controller="NguoiDung" class="btn btn-secondary">Hủy</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/clients/plugins/summernote/summernote-bs4.min.js"></script>
+    <script>
+        $(function () {
+          //Add text editor
+          $('#compose-textarea').summernote()
+        })
+    </script>
+    <script>
+        $("#AnhVuaTai").change(function (e) {
+            let files = e.target.files; // Lấy danh sách file
+            $(".ChuaAnh").empty(); // Xóa hình ảnh cũ
+
+            if (files.length > 0) {
+                for (let i = 0; i < files.length; i++) {
+                    let file = files[i];
+
+                    // Kiểm tra định dạng file (chỉ cho phép hình ảnh)
+                    if (file.type.startsWith("image/")) {
+                        let path = URL.createObjectURL(file); // Tạo URL tạm thời
+                        let imgElement = `<img src="${path}" class="m-3" style="width:100px; height:auto;" alt="Hình ảnh ${i + 1}"/>`;
+                        $(".ChuaAnh").append(imgElement); // Thêm hình ảnh vào container
+                    } else {
+                        alert("Vui lòng chọn file hình ảnh (định dạng JPEG, PNG, v.v.).");
+                        return; // Dừng nếu có file không phải hình ảnh
+                    }
+                }
+            } else {
+                alert("Không có file nào được chọn.");
+            }
+        });
+    </script>
+}

@@ -1,0 +1,142 @@
+﻿@model WebTimNguoiThatLac.Models.TimNguoi
+
+
+@{
+    ViewData["Title"] = "Thêm Bài Viết";
+}
+
+@section naviHeader {
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin" class="nav-link ">Trang Chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin/BaiViet" class="nav-link active">Bài Viết</a>
+        </li>
+    </ul>
+}
+
+<div class="card container-fluid ">
+    <div class="card-header d-flex ">
+        <h2 class="card-title">Chi Tiết @ViewData["Title"]</h2>
+    </div>
+    <div class="card-body">
+        <form asp-controller="BaiViet" asp-action="Create" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="row">
+                <label asp-for="IdNguoiDung">Nhập Email Tài Khoản</label>
+                <input name="EmailNguoiDung" class="form-control" type="email" placeholder="Nhập Email Tài Khoản ......" />
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <label asp-for="HoTen">Tên Người Cần Tìm</label>
+                    <input asp-for="HoTen" class="form-control" type="text" placeholder="Nhập tên Người Cần Tìm ......" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="KhuVuc">Khu Vực Lần Cuối Nhìn Thấy </label>
+                    <select asp-for="KhuVuc" class="form-control">
+                        <option value="" selected>-- Chọn Khu Vực --</option>
+                        @foreach (string i in ViewBag.DanhSachTinhThanh)
+                        {
+                            <option value="@i" >@i</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <label asp-for="GioiTinh">Giới Tính</label>
+                    <select asp-for="GioiTinh" class="form-control">
+                        <option value="1">Nam</option>
+                        <option value="2">Nữ</option>
+                        <option value="0">Khác</option>
+                    </select>
+                    <span asp-validation-for="GioiTinh" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="TrangThai" class="control-label"><strong>Trạng Thái:</strong></label>
+                    <select asp-for="TrangThai" class="form-control">
+                        <option value="Đã Tìm Thấy">Đã Tìm Thấy</option>
+                        <option value="Đang Tìm Kiếm">Đang Tìm Kiếm</option>
+                        <option value="Cần hỗ trợ từ cộng đồng">Cần hỗ trợ từ cộng đồng</option>
+                    </select>
+                    <span asp-validation-for="TrangThai" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <label asp-for="TieuDe">Tiêu Đề</label>
+                    <input asp-for="TieuDe" type="text" class="form-control" placeholder="NhậpTiêu Đề Người Cần Tìm ......" />
+                    <span asp-validation-for="TieuDe" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <label >Danh Sách Hình Ảnh</label>
+                    <input name="DanhSachHinhAnh" id="AnhVuaTai" multiple type="file" class="form-control" placeholder="NhậpTiêu Đề Người Cần Tìm ......" />
+                    <div class="ChuaAnh"></div>
+                    <span asp-validation-for="TieuDe" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <label asp-for="DaciemNhanDang">Đặc Điểm Nhận Dạng</label>
+                    <textarea asp-for="DaciemNhanDang"  class="form-control" placeholder="NhậpTiêu Đề Người Cần Tìm ......" >
+                    </textarea>
+                    <span asp-validation-for="TieuDe" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <label asp-for="MoTa">Mô Tả</label>
+                    <textarea asp-for="MoTa" id="compose-textarea" class="form-control" placeholder="NhậpTiêu Đề Người Cần Tìm ......">
+                    </textarea>
+                    <span asp-validation-for="MoTa" class="text-danger"></span>
+                </div>
+            </div> 
+            <div class="form-group text-right">
+                <button class="btn btn-primary">Thêm</button>
+                <a asp-action="ThongTinCaNhan" asp-controller="NguoiDung" class="btn btn-secondary">Hủy</a>
+            </div>
+        </form>
+    </div>
+    <div class="card-footer"></div>
+</div>
+       
+@section Scripts {
+    <script src="~/clients/plugins/summernote/summernote-bs4.min.js"></script>
+    <script>
+        $(function () {
+          //Add text editor
+          $('#compose-textarea').summernote()
+        })
+    </script>
+    <script>
+        $("#AnhVuaTai").change(function (e) {
+            let files = e.target.files; // Lấy danh sách file
+            $(".ChuaAnh").empty(); // Xóa hình ảnh cũ
+
+            if (files.length > 0) {
+                for (let i = 0; i < files.length; i++) {
+                    let file = files[i];
+
+                    // Kiểm tra định dạng file (chỉ cho phép hình ảnh)
+                    if (file.type.startsWith("image/")) {
+                        let path = URL.createObjectURL(file); // Tạo URL tạm thời
+                        let imgElement = `<img src="${path}" class="m-3" style="width:79px; height:auto;" alt="Hình ảnh ${i + 1}"/>`;
+                        $(".ChuaAnh").append(imgElement); // Thêm hình ảnh vào container
+                    } else {
+                        alert("Vui lòng chọn file hình ảnh (định dạng JPEG, PNG, v.v.).");
+                        return; // Dừng nếu có file không phải hình ảnh
+                    }
+                }
+            } else {
+                alert("Không có file nào được chọn.");
+            }
+        });
+    </script>
+}   

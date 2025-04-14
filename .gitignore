@@ -1,0 +1,10 @@
+bin/
+Migrations/
+*.bin
+*.db
+*.cache
+*.v2
+Debug/
+WebTimNguoiThatLac.AssemblyInfoInputs.cache
+
+WebTimNguoiThatLac.AssemblyInfo.cs

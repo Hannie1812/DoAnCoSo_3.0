@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|c:\\users\\admin\\documents\\zalo received files\\doancoso_3.0\\webtimnguoithatlac\\areas\\identity\\pages\\account\\register.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|solutionrelative:webtimnguoithatlac\\areas\\identity\\pages\\account\\register.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|c:\\users\\admin\\documents\\zalo received files\\doancoso_3.0\\webtimnguoithatlac\\areas\\identity\\pages\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|solutionrelative:webtimnguoithatlac\\areas\\identity\\pages\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
@@ -58,7 +62,7 @@
       "DocumentGroups": [
         {
           "DockedHeight": 303,
-          "SelectedChildIndex": 15,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Bookmark",
@@ -86,7 +90,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
+              "Title": "Register.cshtml",
+              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\Register.cshtml",
+              "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\Register.cshtml",
+              "ToolTip": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\Register.cshtml",
+              "RelativeToolTip": "WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\Register.cshtml",
+              "ViewState": "AgIAAEsAAAAAAAAAAAAqwGQAAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-14T06:16:20.874Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "Login.cshtml.cs",
               "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\Login.cshtml.cs",
               "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\Login.cshtml.cs",
@@ -99,7 +116,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "20250414060101_Intitial2.cs",
               "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Migrations\\20250414060101_Intitial2.cs",
               "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Migrations\\20250414060101_Intitial2.cs",
@@ -112,7 +129,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "ApplicationUser.cs",
               "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Models\\ApplicationUser.cs",
               "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Models\\ApplicationUser.cs",
@@ -125,7 +142,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "20250414055500_Intitial.cs",
               "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Migrations\\20250414055500_Intitial.cs",
               "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Migrations\\20250414055500_Intitial.cs",
@@ -138,7 +155,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "HomeController.cs",
               "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Controllers\\HomeController.cs",
               "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Controllers\\HomeController.cs",
@@ -151,7 +168,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "NguoiDungController.cs",
               "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Controllers\\NguoiDungController.cs",
               "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Controllers\\NguoiDungController.cs",
@@ -164,7 +181,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 11,
               "Title": "_ValidationScriptsPartial.cshtml",
               "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Areas\\Identity\\Pages\\_ValidationScriptsPartial.cshtml",
               "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Areas\\Identity\\Pages\\_ValidationScriptsPartial.cshtml",
@@ -177,7 +194,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "ExternalLogin.cshtml.cs",
               "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\ExternalLogin.cshtml.cs",
               "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\ExternalLogin.cshtml.cs",
@@ -190,7 +207,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "ExternalLogin.cshtml",
               "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\ExternalLogin.cshtml",
               "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\ExternalLogin.cshtml",
@@ -203,20 +220,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "Login.cshtml",
               "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\Login.cshtml",
               "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\Login.cshtml",
               "ToolTip": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\Login.cshtml",
               "RelativeToolTip": "WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\Login.cshtml",
-              "ViewState": "AgIAACcAAAAAAAAAAAAAAEAAAAAuAAAAAAAAAA==",
+              "ViewState": "AgIAAEIAAAAAAAAAAAAqwFcAAAAbAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2025-04-14T05:41:40.958Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 12,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Program.cs",
               "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Program.cs",
@@ -229,7 +246,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "appsettings.json",
               "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\appsettings.json",
               "RelativeDocumentMoniker": "WebTimNguoiThatLac\\appsettings.json",

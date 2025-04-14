@@ -11,7 +11,7 @@ using X.PagedList.Extensions;
 namespace WebTimNguoiThatLac.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = SD.Role_Admin)]
+    [Authorize(Roles = $"{SD.Role_Moderator},{SD.Role_Admin}")]
     public class TinTucController : Controller
     {
         private ApplicationDbContext db;

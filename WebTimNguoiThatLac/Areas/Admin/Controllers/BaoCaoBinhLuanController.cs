@@ -10,11 +10,12 @@ using WebTimNguoiThatLac.Services;
 using X.PagedList;
 using System.IO;
 using X.PagedList.Extensions;
+using WebTimNguoiThatLac.Areas.Admin.Models;
 
 namespace WebTimNguoiThatLac.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = $"{SD.Role_Moderator},{SD.Role_Admin}")]
     public class BaoCaoBinhLuanController : Controller
     {
         private readonly EmailService _emailService;

@@ -1,58 +1,26 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\",
+  "WorkspaceRootPath": "E:\\USER\\Documents\\DOANCOSO-TIMNGUOITHAN\\BanChinhThuc\\DoAnCoSo_3.0\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|c:\\users\\admin\\documents\\zalo received files\\doancoso_3.0\\webtimnguoithatlac\\areas\\identity\\pages\\account\\register.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|solutionrelative:webtimnguoithatlac\\areas\\identity\\pages\\account\\register.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|e:\\user\\documents\\doancoso-timnguoithan\\banchinhthuc\\doancoso_3.0\\webtimnguoithatlac\\views\\timnguoi\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|solutionrelative:webtimnguoithatlac\\views\\timnguoi\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|c:\\users\\admin\\documents\\zalo received files\\doancoso_3.0\\webtimnguoithatlac\\areas\\identity\\pages\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|solutionrelative:webtimnguoithatlac\\areas\\identity\\pages\\account\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|c:\\users\\admin\\documents\\zalo received files\\doancoso_3.0\\webtimnguoithatlac\\areas\\identity\\pages\\account\\login.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|solutionrelative:webtimnguoithatlac\\areas\\identity\\pages\\account\\login.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|c:\\users\\admin\\documents\\zalo received files\\doancoso_3.0\\webtimnguoithatlac\\areas\\identity\\pages\\account\\externallogin.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|solutionrelative:webtimnguoithatlac\\areas\\identity\\pages\\account\\externallogin.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|c:\\users\\admin\\documents\\zalo received files\\doancoso_3.0\\webtimnguoithatlac\\areas\\identity\\pages\\account\\externallogin.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|solutionrelative:webtimnguoithatlac\\areas\\identity\\pages\\account\\externallogin.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Migrations\\20250414060101_Intitial2.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:WebTimNguoiThatLac\\Migrations\\20250414060101_Intitial2.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|c:\\users\\admin\\documents\\zalo received files\\doancoso_3.0\\webtimnguoithatlac\\models\\applicationuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|solutionrelative:webtimnguoithatlac\\models\\applicationuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|c:\\users\\admin\\documents\\zalo received files\\doancoso_3.0\\webtimnguoithatlac\\migrations\\20250414055500_intitial.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|solutionrelative:webtimnguoithatlac\\migrations\\20250414055500_intitial.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|c:\\users\\admin\\documents\\zalo received files\\doancoso_3.0\\webtimnguoithatlac\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "AbsoluteMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|e:\\user\\documents\\doancoso-timnguoithan\\banchinhthuc\\doancoso_3.0\\webtimnguoithatlac\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|solutionrelative:webtimnguoithatlac\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|c:\\users\\admin\\documents\\zalo received files\\doancoso_3.0\\webtimnguoithatlac\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|solutionrelative:webtimnguoithatlac\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|e:\\user\\documents\\doancoso-timnguoithan\\banchinhthuc\\doancoso_3.0\\webtimnguoithatlac\\views\\timnguoi\\themnguoicantim.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|solutionrelative:webtimnguoithatlac\\views\\timnguoi\\themnguoicantim.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|c:\\users\\admin\\documents\\zalo received files\\doancoso_3.0\\webtimnguoithatlac\\controllers\\nguoidungcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|solutionrelative:webtimnguoithatlac\\controllers\\nguoidungcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|e:\\user\\documents\\doancoso-timnguoithan\\banchinhthuc\\doancoso_3.0\\webtimnguoithatlac\\models\\timnguoi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|solutionrelative:webtimnguoithatlac\\models\\timnguoi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|c:\\users\\admin\\documents\\zalo received files\\doancoso_3.0\\webtimnguoithatlac\\areas\\identity\\pages\\_validationscriptspartial.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|solutionrelative:webtimnguoithatlac\\areas\\identity\\pages\\_validationscriptspartial.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|c:\\users\\admin\\documents\\zalo received files\\doancoso_3.0\\webtimnguoithatlac\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|solutionrelative:webtimnguoithatlac\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|e:\\user\\documents\\doancoso-timnguoithan\\banchinhthuc\\doancoso_3.0\\webtimnguoithatlac\\models\\applicationuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{40F4BA7A-D392-4D58-B627-38FD04443231}|WebTimNguoiThatLac\\WebTimNguoiThatLac.csproj|solutionrelative:webtimnguoithatlac\\models\\applicationuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -62,224 +30,72 @@
       "DocumentGroups": [
         {
           "DockedHeight": 303,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 4,
           "Children": [
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:1:0:{e8b06f52-6d01-11d2-aa7d-00c04f990343}"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
-            },
-            {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Register.cshtml",
-              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\Register.cshtml",
-              "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\Register.cshtml",
-              "ToolTip": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\Register.cshtml",
-              "RelativeToolTip": "WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\Register.cshtml",
-              "ViewState": "AgIAAEsAAAAAAAAAAAAqwGQAAAAbAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-04-14T06:16:20.874Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Login.cshtml.cs",
-              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\Login.cshtml.cs",
-              "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\Login.cshtml.cs",
-              "ToolTip": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\Login.cshtml.cs",
-              "RelativeToolTip": "WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\Login.cshtml.cs",
-              "ViewState": "AgIAAHYAAAAAAAAAAAAcwB4AAAAnAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-14T06:03:54.388Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "20250414060101_Intitial2.cs",
-              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Migrations\\20250414060101_Intitial2.cs",
-              "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Migrations\\20250414060101_Intitial2.cs",
-              "ToolTip": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Migrations\\20250414060101_Intitial2.cs",
-              "RelativeToolTip": "WebTimNguoiThatLac\\Migrations\\20250414060101_Intitial2.cs",
-              "ViewState": "AgIAAAoAAAAAAAAAAAAzwBMAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-14T06:01:02.138Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "ApplicationUser.cs",
-              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Models\\ApplicationUser.cs",
-              "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Models\\ApplicationUser.cs",
-              "ToolTip": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Models\\ApplicationUser.cs",
-              "RelativeToolTip": "WebTimNguoiThatLac\\Models\\ApplicationUser.cs",
-              "ViewState": "AgIAAAoAAAAAAAAAAAAQwBUAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-14T05:59:50.91Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "20250414055500_Intitial.cs",
-              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Migrations\\20250414055500_Intitial.cs",
-              "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Migrations\\20250414055500_Intitial.cs",
-              "ToolTip": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Migrations\\20250414055500_Intitial.cs",
-              "RelativeToolTip": "WebTimNguoiThatLac\\Migrations\\20250414055500_Intitial.cs",
-              "ViewState": "AgIAAJ0AAAAAAAAAAAAQwEUAAAAlAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-14T05:55:00.834Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "HomeController.cs",
-              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Controllers\\HomeController.cs",
-              "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Controllers\\HomeController.cs",
-              "ToolTip": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Controllers\\HomeController.cs",
-              "RelativeToolTip": "WebTimNguoiThatLac\\Controllers\\HomeController.cs",
-              "ViewState": "AgIAAAoAAAAAAAAAAAAywBMAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-14T05:46:52.674Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "NguoiDungController.cs",
-              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Controllers\\NguoiDungController.cs",
-              "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Controllers\\NguoiDungController.cs",
-              "ToolTip": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Controllers\\NguoiDungController.cs",
-              "RelativeToolTip": "WebTimNguoiThatLac\\Controllers\\NguoiDungController.cs",
-              "ViewState": "AgIAAHEAAAAAAAAAAAAswH0AAAAcAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-14T05:43:58.258Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "_ValidationScriptsPartial.cshtml",
-              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Areas\\Identity\\Pages\\_ValidationScriptsPartial.cshtml",
-              "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Areas\\Identity\\Pages\\_ValidationScriptsPartial.cshtml",
-              "ToolTip": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Areas\\Identity\\Pages\\_ValidationScriptsPartial.cshtml",
-              "RelativeToolTip": "WebTimNguoiThatLac\\Areas\\Identity\\Pages\\_ValidationScriptsPartial.cshtml",
+              "DocumentIndex": 1,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "E:\\USER\\Documents\\DOANCOSO-TIMNGUOITHAN\\BanChinhThuc\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\appsettings.json",
+              "RelativeDocumentMoniker": "WebTimNguoiThatLac\\appsettings.json",
+              "ToolTip": "E:\\USER\\Documents\\DOANCOSO-TIMNGUOITHAN\\BanChinhThuc\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\appsettings.json",
+              "RelativeToolTip": "WebTimNguoiThatLac\\appsettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-04-14T05:43:51.227Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "ExternalLogin.cshtml.cs",
-              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\ExternalLogin.cshtml.cs",
-              "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\ExternalLogin.cshtml.cs",
-              "ToolTip": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\ExternalLogin.cshtml.cs",
-              "RelativeToolTip": "WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\ExternalLogin.cshtml.cs",
-              "ViewState": "AgIAAGIAAAAAAAAAAAAgwJMAAAARAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-14T05:42:29.3Z",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-04-14T14:51:35.392Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "ExternalLogin.cshtml",
-              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\ExternalLogin.cshtml",
-              "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\ExternalLogin.cshtml",
-              "ToolTip": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\ExternalLogin.cshtml",
-              "RelativeToolTip": "WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\ExternalLogin.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-04-14T05:42:23.137Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Login.cshtml",
-              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\Login.cshtml",
-              "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\Login.cshtml",
-              "ToolTip": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\Login.cshtml",
-              "RelativeToolTip": "WebTimNguoiThatLac\\Areas\\Identity\\Pages\\Account\\Login.cshtml",
-              "ViewState": "AgIAAEIAAAAAAAAAAAAqwFcAAAAbAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-04-14T05:41:40.958Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Program.cs",
-              "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Program.cs",
-              "ToolTip": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Program.cs",
-              "RelativeToolTip": "WebTimNguoiThatLac\\Program.cs",
-              "ViewState": "AgIAADMAAAAAAAAAAAAAACQAAAAyAAAAAAAAAA==",
+              "Title": "ApplicationUser.cs",
+              "DocumentMoniker": "E:\\USER\\Documents\\DOANCOSO-TIMNGUOITHAN\\BanChinhThuc\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Models\\ApplicationUser.cs",
+              "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Models\\ApplicationUser.cs",
+              "ToolTip": "E:\\USER\\Documents\\DOANCOSO-TIMNGUOITHAN\\BanChinhThuc\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Models\\ApplicationUser.cs",
+              "RelativeToolTip": "WebTimNguoiThatLac\\Models\\ApplicationUser.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAxwA0AAAA9AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-14T05:38:47.594Z",
+              "WhenOpened": "2025-04-14T08:55:32.241Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\appsettings.json",
-              "RelativeDocumentMoniker": "WebTimNguoiThatLac\\appsettings.json",
-              "ToolTip": "C:\\Users\\Admin\\Documents\\Zalo Received Files\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\appsettings.json",
-              "RelativeToolTip": "WebTimNguoiThatLac\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAABHAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-04-14T05:38:25.229Z",
+              "DocumentIndex": 2,
+              "Title": "ThemNguoiCanTim.cshtml",
+              "DocumentMoniker": "E:\\USER\\Documents\\DOANCOSO-TIMNGUOITHAN\\BanChinhThuc\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Views\\TimNguoi\\ThemNguoiCanTim.cshtml",
+              "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Views\\TimNguoi\\ThemNguoiCanTim.cshtml",
+              "ToolTip": "E:\\USER\\Documents\\DOANCOSO-TIMNGUOITHAN\\BanChinhThuc\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Views\\TimNguoi\\ThemNguoiCanTim.cshtml",
+              "RelativeToolTip": "WebTimNguoiThatLac\\Views\\TimNguoi\\ThemNguoiCanTim.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-14T08:19:14.442Z",
               "EditorCaption": ""
-            }
-          ]
-        },
-        {
-          "DockedHeight": 81,
-          "SelectedChildIndex": -1,
-          "Children": [
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
             },
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
-            }
-          ]
-        },
-        {
-          "DockedHeight": 200,
-          "SelectedChildIndex": -1,
-          "Children": [
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "TimNguoi.cs",
+              "DocumentMoniker": "E:\\USER\\Documents\\DOANCOSO-TIMNGUOITHAN\\BanChinhThuc\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Models\\TimNguoi.cs",
+              "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Models\\TimNguoi.cs",
+              "ToolTip": "E:\\USER\\Documents\\DOANCOSO-TIMNGUOITHAN\\BanChinhThuc\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Models\\TimNguoi.cs",
+              "RelativeToolTip": "WebTimNguoiThatLac\\Models\\TimNguoi.cs",
+              "ViewState": "AgIAABQAAAAAAAAAAAA0wCMAAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-14T08:17:58.083Z",
+              "EditorCaption": ""
+            },
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "E:\\USER\\Documents\\DOANCOSO-TIMNGUOITHAN\\BanChinhThuc\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Views\\TimNguoi\\Index.cshtml",
+              "RelativeDocumentMoniker": "WebTimNguoiThatLac\\Views\\TimNguoi\\Index.cshtml",
+              "ToolTip": "E:\\USER\\Documents\\DOANCOSO-TIMNGUOITHAN\\BanChinhThuc\\DoAnCoSo_3.0\\WebTimNguoiThatLac\\Views\\TimNguoi\\Index.cshtml",
+              "RelativeToolTip": "WebTimNguoiThatLac\\Views\\TimNguoi\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-14T08:17:14.733Z",
+              "EditorCaption": ""
             }
           ]
         }

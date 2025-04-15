@@ -1,9 +1,17 @@
-.vs/
+# Build results
 bin/
 obj/
+*.dll
+*.exe
+*.pdb
+*.cache
+*.log
+
+# User-specific
+.vs/
+.vscode/
 *.user
 *.suo
-*.dll
-*.pdb
-*.exe
-*.cache
+
+# Publish
+wwwroot/build/

@@ -1,10 +1,9 @@
+.vs/
 bin/
-Migrations/
-*.bin
-*.db
+obj/
+*.user
+*.suo
+*.dll
+*.pdb
+*.exe
 *.cache
-*.v2
-Debug/
-WebTimNguoiThatLac.AssemblyInfoInputs.cache
-
-WebTimNguoiThatLac.AssemblyInfo.cs

@@ -5,6 +5,8 @@ Migrations/
 *.cache
 *.v2
 Debug/
+./vs
+obj/
 WebTimNguoiThatLac.AssemblyInfoInputs.cache
 
 WebTimNguoiThatLac.AssemblyInfo.cs

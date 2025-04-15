@@ -1,17 +1,21 @@
-# Build results
+.vs/
 bin/
 obj/
-*.dll
-*.exe
-*.pdb
-*.cache
-*.log
-
-# User-specific
-.vs/
-.vscode/
 *.user
 *.suo
+*.cache
+*.pdb
+*.exe
+*.dll
+# Build
+WebTimNguoiThatLac/bin/
+WebTimNguoiThatLac/obj/
 
-# Publish
-wwwroot/build/
+# User-specific files
+.vs/
+
+# Migrations
+WebTimNguoiThatLac/Migrations/
+
+# appsettings.json
+WebTimNguoiThatLac/appsettings.json

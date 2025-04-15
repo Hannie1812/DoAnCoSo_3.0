@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using WebTimNguoiThatLac.Areas.Admin.Models;
 using WebTimNguoiThatLac.Data;
 using WebTimNguoiThatLac.Models;
 using X.PagedList.Extensions;
@@ -12,7 +13,7 @@ using X.PagedList.Extensions;
 namespace WebTimNguoiThatLac.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = $"{SD.Role_Moderator},{SD.Role_Admin}")]
     public class GioiThieuController : Controller
     {
         private ApplicationDbContext db;

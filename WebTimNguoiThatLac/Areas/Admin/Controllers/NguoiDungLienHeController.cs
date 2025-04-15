@@ -10,7 +10,7 @@ using X.PagedList.Extensions;
 namespace PhongKhamThuCung.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = SD.Role_Admin)]
+    [Authorize(Roles = $"{SD.Role_Moderator},{SD.Role_Admin}")]
     public class NguoiDungLienHeController : Controller
     {
         private ApplicationDbContext db;

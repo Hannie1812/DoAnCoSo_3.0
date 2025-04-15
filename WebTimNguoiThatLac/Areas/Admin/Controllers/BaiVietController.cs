@@ -18,7 +18,7 @@ using ILogger = Microsoft.Extensions.Logging.ILogger;
 namespace WebTimNguoiThatLac.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = SD.Role_Admin)]// chỉ cho phép admin
+    [Authorize(Roles = $"{SD.Role_Moderator},{SD.Role_Admin}")]
     public class BaiVietController : Controller
     {
         private ApplicationDbContext db;

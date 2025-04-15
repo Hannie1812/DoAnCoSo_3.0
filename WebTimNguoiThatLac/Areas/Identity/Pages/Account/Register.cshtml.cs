@@ -124,8 +124,30 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
                 // Nếu chưa tồn tại role Role_Customer thì tạo ra all role
                 _roleManager.CreateAsync(new IdentityRole(SD.Role_Customer)).GetAwaiter().GetResult();
                 _roleManager.CreateAsync(new IdentityRole(SD.Role_Admin)).GetAwaiter().GetResult();
-                _roleManager.CreateAsync(new IdentityRole(SD.Role_Employee)).GetAwaiter().GetResult();
-                _roleManager.CreateAsync(new IdentityRole(SD.Role_Company)).GetAwaiter().GetResult();
+                _roleManager.CreateAsync(new IdentityRole(SD.Role_Moderator)).GetAwaiter().GetResult();
+
+            }
+            if ((await _userManager.GetUsersInRoleAsync(SD.Role_Admin)).Count == 0)
+            {
+                // Tạo tài khoản admin mặc định
+                var adminUser = new ApplicationUser
+                {
+                    UserName = "Admin9999@gmail.com",
+                    Email = "Admin9999@gmail.com",
+                    FullName = "Quản trị viên",
+                    EmailConfirmed = true // Bỏ qua xác thực email cho admin
+                };
+
+                var result = await _userManager.CreateAsync(adminUser, "Admin9999@gmail.com"); // Mật khẩu mạnh mặc định
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(adminUser, SD.Role_Admin);
+                    _logger.LogInformation("Đã tạo tài khoản admin mặc định.");
+                }
+                else
+                {
+                    _logger.LogError("Không thể tạo tài khoản admin mặc định: {Errors}", result.Errors);
+                }
             }
             Input = new()
             {

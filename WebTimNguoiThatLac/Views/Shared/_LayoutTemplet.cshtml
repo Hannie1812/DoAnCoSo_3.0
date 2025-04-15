@@ -33,7 +33,7 @@
     <link rel="stylesheet" href="~/Templet/css/flaticon.css">
     <link rel="stylesheet" href="~/Templet/css/icomoon.css">
     <link rel="stylesheet" href="~/Templet/css/style.css">
-
+    <link rel="stylesheet" href="~/css/site.css">
    
     <style>
         .chat-container {
@@ -84,7 +84,8 @@
     </nav>
     <!-- END nav -->
 
-    
+    @* Nút báo tin cho nhân chứng *@
+    @await Html.PartialAsync("_LayoutStickyCallButton")
 
     @RenderBody()
 

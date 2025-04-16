@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebTimNguoiThatLac.Models
 {
+    [Table("NhanChung")]
     public class NhanChung
     {
         [Key]

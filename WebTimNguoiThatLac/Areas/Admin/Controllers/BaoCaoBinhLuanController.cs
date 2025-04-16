@@ -65,7 +65,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             return View(reports);
         }
 
-        private async Task ProcessReportedComments()
+        private async Task ProcessReportedComments() // Xử lý bình luận bị báo cáo
         {
             var problematicComments = await _context.BaoCaoBinhLuans
                 .Where(b => !b.check)
@@ -107,6 +107,43 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                             $"Bình luận của bạn trong bài viết \"{comment.TimNguoi?.TieuDe}\" " +
                             $"đã bị ẩn tự động do nhận được {item.ReportCount} báo cáo vi phạm."
                         );
+
+                        ApplicationUser applicationUser = await _context.Users
+                            .FirstOrDefaultAsync(u => u.Id == comment.ApplicationUser.Id);
+                        if (applicationUser != null)
+                        {
+                            applicationUser.SoLanViPham += 1;
+                            await _context.SaveChangesAsync();
+
+                          
+
+                            HanhViDangNgo hanhVi = new HanhViDangNgo
+                            {
+                                NguoiDungId = applicationUser.Id,
+                                HanhDong = "Bình luận bị báo cáo nhiều lần",
+                                ThoiGian = DateTime.Now
+
+                            };
+                            _context.HanhViDangNgos.Add(hanhVi);
+
+                            if (applicationUser.SoLanViPham >= 3)
+                            {
+                                applicationUser.Active = false;
+
+                                await _context.SaveChangesAsync();
+
+                                await _emailService.SendEmailAsync(
+                                    applicationUser.Email,
+                                    "Tài khoản của bạn đã bị khóa",
+                                    "Tài khoản của bạn đã bị khóa do vi phạm quy định nhiều lần. " +
+                                    "Vui lòng liên hệ với quản trị viên để biết thêm chi tiết."
+                                );
+
+                            }
+
+                            await _context.SaveChangesAsync();
+
+                        }
                     }
                 }
             }
@@ -139,7 +176,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id) // xóa báo cáo
         {
             var report = await _context.BaoCaoBinhLuans.FindAsync(id);
             if (report == null)
@@ -157,7 +194,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> MarkAsRead(int id)
+        public async Task<IActionResult> MarkAsRead(int id) //  Đã đánh dấu đã đọc
         {
             var report = await _context.BaoCaoBinhLuans.FindAsync(id);
             if (report == null)
@@ -175,7 +212,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ToggleCommentStatus(int commentId, int reportId)
+        public async Task<IActionResult> ToggleCommentStatus(int commentId, int reportId) // Ẩn/hiện bình luận
         {
             try
             {
@@ -228,7 +265,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteComment(int commentId, int reportId)
+        public async Task<IActionResult> DeleteComment(int commentId, int reportId) // Xóa bình luận
         {
             try
             {
@@ -279,7 +316,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             }
         }
 
-        private void DeleteImage(string imageUrl, string subFolder)
+        private void DeleteImage(string imageUrl, string subFolder) // Xóa hình ảnh
         {
             if (string.IsNullOrEmpty(imageUrl)) return;
 

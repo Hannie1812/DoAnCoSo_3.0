@@ -6,13 +6,13 @@
 
 @if (SignInManager.IsSignedIn(User))
 {
-    <a class="dropdown-item text-white" asp-action="ThongTinCaNhan" asp-controller="NguoiDung">
+    <a class="btn btn-link text-white dropdown-item" asp-action="ThongTinCaNhan" asp-controller="NguoiDung">
         Xin chào @UserManager.GetUserName(User)!
     </a>
     @* Kiểm tra nếu người dùng là Admin thì hiển thị menu Manager *@
     @if (User.IsInRole("Admin"))
     {
-        <a class="nav-link js-scroll-trigger" asp-area="Admin" asp-controller="Home" asp-action="Index">Quản lý</a>
+        <a class="btn btn-link text-white dropdown-item" asp-area="Admin" asp-controller="Home" asp-action="Index">Quản lý</a>
     }
     <form class="dropdown-item p-0" asp-area="Identity" asp-page="/Account/Logout"
           asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
@@ -21,6 +21,6 @@
 }
 else
 {
-    <a class="dropdown-item text-white" asp-area="Identity" asp-page="/Account/Register">Register</a>
-    <a class="dropdown-item text-white" asp-area="Identity" asp-page="/Account/Login">Login</a>
+    <a class="btn btn-link text-white dropdown-item" asp-area="Identity" asp-page="/Account/Register">Register</a>
+    <a class="btn btn-link text-white dropdown-item" asp-area="Identity" asp-page="/Account/Login">Login</a>
 }

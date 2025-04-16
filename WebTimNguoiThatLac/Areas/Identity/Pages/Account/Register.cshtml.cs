@@ -1,4 +1,5 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+﻿
+// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
@@ -135,7 +136,9 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
                     UserName = "Admin9999@gmail.com",
                     Email = "Admin9999@gmail.com",
                     FullName = "Quản trị viên",
-                    EmailConfirmed = true // Bỏ qua xác thực email cho admin
+                    EmailConfirmed = true, // Bỏ qua xác thực email cho admin
+                    Active = true,
+
                 };
 
                 var result = await _userManager.CreateAsync(adminUser, "Admin9999@gmail.com"); // Mật khẩu mạnh mặc định
@@ -168,10 +171,14 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
-
+                 
                 user.FullName = Input.FullName;
                 user.CCCD = Input.CCCD;
                 user.Address = Input.Address;
+                if (!String.IsNullOrEmpty(Input.Role) && Input.Role == SD.Role_Admin )
+                {
+                    user.IsAdmin = true;
+                }
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -182,7 +189,9 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
                     _logger.LogInformation("User created a new account with password.");
                     if (!String.IsNullOrEmpty(Input.Role))
                     {
+
                         await _userManager.AddToRoleAsync(user, Input.Role);
+                        
                     }
                     else
                     {

@@ -18,7 +18,7 @@
     <div class="container">
         <div class="row no-gutters slider-text align-items-center justify-content-center" data-scrollax-parent="true">
             <div class="col-md-7 ftco-animate text-center" data-scrollax=" properties: { translateY: '70%' }">
-                <p class="breadcrumbs" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }"><span class="mr-2"><a href="/Home">Home</a></span> <span>@ViewData["Title"]</span></p>
+                <p class="breadcrumbs" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }"><span class="mr-2"><a href="/Home">Trang Chủ</a></span> <span>@ViewData["Title"]</span></p>
                 <h1 class="mb-3 bread" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">@ViewData["Title"]</h1>
             </div>
         </div>
@@ -30,450 +30,450 @@
 <div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
 <style>
     .description-section {
-        margin-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
     }
 
     .section-title {
-        font-weight: 600;
-        color: var(--dark-color);
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
     }
 
     .identification-container {
-        transition: all 0.3s ease;
+    transition: all 0.3s ease;
     }
 
-        .identification-container:hover {
-            box-shadow: 0 2px 8px rgba(67, 97, 238, 0.15);
-        }
+    .identification-container:hover {
+    box-shadow: 0 2px 8px rgba(67, 97, 238, 0.15);
+    }
 
     .info-value {
-        line-height: 1.6;
-        color: var(--dark-color);
+    line-height: 1.6;
+    color: var(--dark-color);
     }
 </style>
 
 <style>
     :root {
-        --primary-color: #4361ee;
-        --primary-hover: #3a56d4;
-        --secondary-color: #3f37c9;
-        --success-color: #4cc9f0;
-        --danger-color: #f72585;
-        --warning-color: #f8961e;
-        --info-color: #4895ef;
-        --light-color: #f8f9fa;
-        --dark-color: #212529;
-        --border-radius: 12px;
-        --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        --transition: all 0.3s ease;
+    --primary-color: #4361ee;
+    --primary-hover: #3a56d4;
+    --secondary-color: #3f37c9;
+    --success-color: #4cc9f0;
+    --danger-color: #f72585;
+    --warning-color: #f8961e;
+    --info-color: #4895ef;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --border-radius: 12px;
+    --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    --transition: all 0.3s ease;
     }
 
     /* Notification Styles */
     .notification {
-        padding: 15px 20px;
-        margin-bottom: 10px;
-        border-radius: 5px;
-        color: white;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        animation: slideIn 0.3s, fadeOut 0.5s 4.5s;
-        transition: all 0.3s;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    animation: slideIn 0.3s, fadeOut 0.5s 4.5s;
+    transition: all 0.3s;
     }
 
-        .notification.success {
-            background-color: #28a745;
-        }
+    .notification.success {
+    background-color: #28a745;
+    }
 
-        .notification.error {
-            background-color: #dc3545;
-        }
+    .notification.error {
+    background-color: #dc3545;
+    }
 
     @@keyframes slideIn {
-        from {
-            transform: translateX(100%);
-        }
+    from {
+    transform: translateX(100%);
+    }
 
-        to {
-            transform: translateX(0);
-        }
+    to {
+    transform: translateX(0);
+    }
     }
 
     @@keyframes fadeOut {
-        from {
-            opacity: 1;
-        }
+    from {
+    opacity: 1;
+    }
 
-        to {
-            opacity: 0;
-        }
+    to {
+    opacity: 0;
+    }
     }
 
     /* Main Container */
     .missing-person-container {
-        max-width: 1200px;
-        margin: 2rem auto;
-        padding: 0 15px;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 15px;
     }
 
     /* Image Section */
     .image-main-container {
-        position: relative;
-        height: 400px;
-        background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
-        border-radius: var(--border-radius);
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 1rem;
+    position: relative;
+    height: 400px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
     }
 
     .main-image {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-        transition: transform 0.5s ease;
-        cursor: zoom-in;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transition: transform 0.5s ease;
+    cursor: zoom-in;
     }
 
-        .main-image.zoomed {
-            transform: scale(1.5);
-            cursor: zoom-out;
-        }
+    .main-image.zoomed {
+    transform: scale(1.5);
+    cursor: zoom-out;
+    }
 
     .image-actions {
-        position: absolute;
-        bottom: 20px;
-        right: 20px;
-        display: flex;
-        gap: 10px;
-        z-index: 10;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+    z-index: 10;
     }
 
     .image-action-btn {
-        width: 40px;
-        height: 40px;
-        background: rgba(0,0,0,0.6);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: var(--transition);
+    width: 40px;
+    height: 40px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
     }
 
-        .image-action-btn:hover {
-            background: var(--primary-color);
-            transform: scale(1.1);
-        }
+    .image-action-btn:hover {
+    background: var(--primary-color);
+    transform: scale(1.1);
+    }
 
     /* Gallery Styles */
     .gallery-container {
-        background: white;
-        padding: 1.5rem;
-        border-radius: var(--border-radius);
-        box-shadow: var(--box-shadow);
-        margin-bottom: 2rem;
+    background: white;
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    margin-bottom: 2rem;
     }
 
     .gallery-scroll {
-        display: flex;
-        gap: 0.8rem;
-        padding-bottom: 0.5rem;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
+    display: flex;
+    gap: 0.8rem;
+    padding-bottom: 0.5rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
     }
 
     .gallery-thumbnail {
-        width: 100px;
-        height: 100px;
-        object-fit: cover;
-        border-radius: 8px;
-        border: 3px solid white;
-        box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-        cursor: pointer;
-        transition: var(--transition);
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 3px solid white;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: var(--transition);
     }
 
-        .gallery-thumbnail:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            border-color: var(--primary-color);
-        }
+    .gallery-thumbnail:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    border-color: var(--primary-color);
+    }
 
     /* Info Section */
     .info-basic-container {
-        background: white;
-        padding: 2rem;
-        border-radius: var(--border-radius);
-        box-shadow: var(--box-shadow);
-        height: 100%;
+    background: white;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    height: 100%;
     }
 
     .info-title {
-        font-weight: 700;
-        color: var(--primary-color);
-        margin-bottom: 0.75rem;
-        font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 0.75rem;
+    font-size: 1.8rem;
     }
 
     .status-badge {
-        font-size: 0.9rem;
-        padding: 0.5rem 1.25rem;
-        border-radius: 50px;
-        font-weight: 500;
-        display: inline-flex;
-        align-items: center;
+    font-size: 0.9rem;
+    padding: 0.5rem 1.25rem;
+    border-radius: 50px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
     }
 
     .status-searching {
-        background-color: #fff3cd;
-        color: #856404;
+    background-color: #fff3cd;
+    color: #856404;
     }
 
     .status-found {
-        background-color: #d4edda;
-        color: #155724;
+    background-color: #d4edda;
+    color: #155724;
     }
 
     .status-other {
-        background-color: #e2e3e5;
-        color: #383d41;
+    background-color: #e2e3e5;
+    color: #383d41;
     }
 
     .info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 1rem;
-        margin: 1.5rem 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
     }
 
     .info-item {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 1rem;
-        background-color: rgba(248, 249, 250, 0.6);
-        border-radius: 10px;
-        transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: rgba(248, 249, 250, 0.6);
+    border-radius: 10px;
+    transition: var(--transition);
     }
 
-        .info-item:hover {
-            background-color: rgba(13, 110, 253, 0.05);
-            transform: translateY(-3px);
-        }
+    .info-item:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+    transform: translateY(-3px);
+    }
 
     .info-icon {
-        width: 42px;
-        height: 42px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: rgba(13, 110, 253, 0.1);
-        color: var(--primary-color);
-        border-radius: 10px;
-        flex-shrink: 0;
-        font-size: 1.1rem;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(13, 110, 253, 0.1);
+    color: var(--primary-color);
+    border-radius: 10px;
+    flex-shrink: 0;
+    font-size: 1.1rem;
     }
 
     .info-label {
-        font-weight: 600;
-        color: #6c757d;
-        font-size: 0.9rem;
-        margin-bottom: 0.25rem;
+    font-weight: 600;
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
     }
 
     .info-value {
-        color: var(--dark-color);
-        font-weight: 500;
-        font-size: 1.05rem;
+    color: var(--dark-color);
+    font-weight: 500;
+    font-size: 1.05rem;
     }
 
     /* Description Section */
     .description-section {
-        background: white;
-        padding: 2rem;
-        border-radius: var(--border-radius);
-        box-shadow: var(--box-shadow);
-        margin-bottom: 2rem;
+    background: white;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    margin-bottom: 2rem;
     }
 
     .description-container {
-        background-color: rgba(248, 249, 250, 0.6);
-        border-radius: 10px;
-        padding: 1.75rem;
-        border-left: 4px solid var(--primary-color);
-        line-height: 1.7;
+    background-color: rgba(248, 249, 250, 0.6);
+    border-radius: 10px;
+    padding: 1.75rem;
+    border-left: 4px solid var(--primary-color);
+    line-height: 1.7;
     }
 
     /* Action Buttons */
     .action-buttons {
-        display: flex;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-        margin-top: 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
     }
 
     .btn {
-        padding: 0.6rem 1.25rem;
-        border-radius: 50px;
-        font-weight: 500;
-        transition: var(--transition);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border: none;
+    padding: 0.6rem 1.25rem;
+    border-radius: 50px;
+    font-weight: 500;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
     }
 
     .btn-primary {
-        background-color: var(--primary-color);
-        color: white;
+    background-color: var(--primary-color);
+    color: white;
     }
 
-        .btn-primary:hover {
-            background-color: var(--secondary-color);
-            color: white;
-            transform: translateY(-2px);
-        }
+    .btn-primary:hover {
+    background-color: var(--secondary-color);
+    color: white;
+    transform: translateY(-2px);
+    }
 
     .btn-outline-primary {
-        border: 1px solid var(--primary-color);
-        color: var(--primary-color);
-        background: transparent;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    background: transparent;
     }
 
-        .btn-outline-primary:hover {
-            background-color: var(--primary-color);
-            color: white;
-        }
+    .btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: white;
+    }
 
     .btn-outline-danger {
-        border: 1px solid var(--danger-color);
-        color: var(--danger-color);
-        background: transparent;
+    border: 1px solid var(--danger-color);
+    color: var(--danger-color);
+    background: transparent;
     }
 
-        .btn-outline-danger:hover {
-            background-color: var(--danger-color);
-            color: white;
-        }
+    .btn-outline-danger:hover {
+    background-color: var(--danger-color);
+    color: white;
+    }
 
     .btn-success {
-        background-color: #25D366;
-        color: white;
+    background-color: #25D366;
+    color: white;
     }
 
-        .btn-success:hover {
-            background-color: #128C7E;
-            color: white;
-        }
+    .btn-success:hover {
+    background-color: #128C7E;
+    color: white;
+    }
 
     /* Comments Section */
     .comments-card {
-        border-radius: var(--border-radius);
-        overflow: hidden;
-        box-shadow: var(--box-shadow);
-        border: none;
-        background: white;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--box-shadow);
+    border: none;
+    background: white;
     }
 
     .comment-avatar {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        background-color: var(--primary-color);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        flex-shrink: 0;
-        font-size: 1.1rem;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    font-size: 1.1rem;
     }
 
     .comment-image {
-        max-width: 250px;
-        max-height: 250px;
-        border-radius: 8px;
-        cursor: zoom-in;
-        transition: transform 0.2s ease;
-        object-fit: cover;
+    max-width: 250px;
+    max-height: 250px;
+    border-radius: 8px;
+    cursor: zoom-in;
+    transition: transform 0.2s ease;
+    object-fit: cover;
     }
 
-        .comment-image:hover {
-            transform: scale(1.03);
-        }
+    .comment-image:hover {
+    transform: scale(1.03);
+    }
 
     /* Responsive Adjustments */
     @@media (max-width: 992px) {
-        .image-main-container {
-            min-height: 350px;
-        }
+    .image-main-container {
+    min-height: 350px;
+    }
     }
 
     @@media (max-width: 768px) {
-        .info-grid {
-            grid-template-columns: 1fr;
-        }
+    .info-grid {
+    grid-template-columns: 1fr;
+    }
 
-        .gallery-thumbnail {
-            width: 90px;
-            height: 90px;
-        }
+    .gallery-thumbnail {
+    width: 90px;
+    height: 90px;
+    }
     }
 </style>
 <style>
     .comments-card {
-        transition: all 0.3s ease;
+    transition: all 0.3s ease;
     }
 
     .comment-item {
-        transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease;
     }
 
-        .comment-item:hover {
-            background-color: rgba(248, 249, 250, 0.8);
-        }
+    .comment-item:hover {
+    background-color: rgba(248, 249, 250, 0.8);
+    }
 
     .comment-avatar {
-        flex-shrink: 0;
+    flex-shrink: 0;
     }
 
     .comment-image {
-        transition: transform 0.2s ease;
+    transition: transform 0.2s ease;
     }
 
-        .comment-image:hover {
-            transform: scale(1.02);
-        }
+    .comment-image:hover {
+    transform: scale(1.02);
+    }
 
     .comment-content {
-        white-space: pre-line;
-        word-break: break-word;
+    white-space: pre-line;
+    word-break: break-word;
     }
 
     .dropdown-menu {
-        min-width: 150px;
+    min-width: 150px;
     }
 
     .no-comments {
-        border-radius: 0 0 12px 12px;
+    border-radius: 0 0 12px 12px;
     }
 
     /* Responsive adjustments */
     @@media (max-width: 576px) {
-        .comment-form .d-flex {
-            flex-direction: column;
-        }
+    .comment-form .d-flex {
+    flex-direction: column;
+    }
 
-        .comment-form button {
-            margin-top: 1rem;
-            width: 100%;
-        }
+    .comment-form button {
+    margin-top: 1rem;
+    width: 100%;
+    }
     }
 </style>
 <div class="missing-person-container">
@@ -539,10 +539,10 @@
                                 <div class="gallery-item">
                                     <div class="position-relative">
                                         <img src="@img.HinhAnh"
-                                             class="gallery-thumbnail"
-                                             onclick="changeMainImage('@img.HinhAnh')"
-                                             alt="Ảnh liên quan"
-                                             loading="lazy">
+                                        class="gallery-thumbnail"
+                                        onclick="changeMainImage('@img.HinhAnh')"
+                                        alt="Ảnh liên quan"
+                                        loading="lazy">
                                         @if (img.TrangThai == 1)
                                         {
                                             <span class="badge bg-success rounded-circle p-1" style="position: absolute; top: -5px; right: -5px;">
@@ -631,10 +631,10 @@
                             </div>
                             <div class="info-content">
                                 <div class="info-label">Ngày mất tích</div>
-                                <div class="info-value">@Model.NgayDang.ToString("dd/MM/yyyy")</div>
+                                <div class="info-value">@Model.NgayMatTich?.ToString("dd/MM/yyyy")</div>
                                 <small class="text-muted">
                                     <i class="far fa-clock me-1"></i>
-                                    @((DateTime.Now - Model.NgayDang).Days.ToString()) ngày trước
+                                    @((DateTime.Now - Model.NgayMatTich)?.Days.ToString()) ngày trước
                                 </small>
                             </div>
                         </div>
@@ -660,12 +660,12 @@
                         @if (!isAuthor && user != null)
                         {
                             <a href="@Url.Action("BatDauChat", "Chat", new { nguoiNhanId = Model.IdNguoiDung })"
-                               class="btn btn-success">
+                            class="btn btn-success">
                                 <i class="fas fa-comment me-1"></i> Liên hệ
                             </a>
                         }
                         <a href="@Url.Action("BatDauChat", "Chat", new { nguoiNhanId = "19dbf6fb-5ed5-4393-831d-640b5e30d6c1" })"
-                           class="btn btn-outline-primary">
+                        class="btn btn-outline-primary">
                             <i class="fas fa-headset"></i> Liên hệ Admin
                         </a>
                     </div>
@@ -704,7 +704,7 @@
             </div>
         </div>
 
-       
+
         <!-- Comments Section -->
         <div class="comments-card bg-white rounded-3 shadow-sm mb-4 border">
             <div class="comments-header p-4 border-bottom bg-light rounded-top">
@@ -757,7 +757,7 @@
                                 <!-- Avatar -->
                                 <div class="me-3">
                                     <div class="comment-avatar bg-primary text-white d-flex align-items-center justify-content-center rounded-circle"
-                                         style="width: 48px; height: 48px; font-size: 1.2rem;">
+                                    style="width: 48px; height: 48px; font-size: 1.2rem;">
                                         @if (!string.IsNullOrEmpty(binhLuan.ApplicationUser?.FullName))
                                         {
                                             @binhLuan.ApplicationUser.FullName[0]
@@ -797,12 +797,27 @@
                                                 <ul class="dropdown-menu dropdown-menu-end">
                                                     <li>
                                                         <button class="dropdown-item text-danger report-comment-btn"
-                                                                data-comment-id="@binhLuan.Id"
-                                                                data-bs-toggle="modal"
-                                                                data-bs-target="#reportCommentModal">
+                                                        data-comment-id="@binhLuan.Id"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#reportCommentModal">
                                                             <i class="fas fa-flag me-2"></i> Báo cáo
                                                         </button>
                                                     </li>
+                                                    @if (isAuthor)
+                                                    {
+                                                        <li>
+                                                            <button class="dropdown-item text-danger "
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#XoaBinhLuan">
+                                                                <i class="fa fa-window-close-o me-2"></i> Xóa Bình Luận
+                                                                
+                                                            </button>
+
+                                                           
+                                                        </li>
+                                                        
+                                                    }
+                                                   
                                                 </ul>
                                             </div>
                                         }
@@ -823,6 +838,26 @@
                                                  loading="lazy">
                                         </div>
                                     }
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Modal Xóa Bình Luận -->
+                        <div class="modal fade" id="XoaBinhLuan" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Xác nhận xóa bình luận</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Bạn có chắc chắn muốn xóa bình luận này không?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Thoát</button>
+                                        <button type="button" onclick="XacNhanXoaBinhLuan('@binhLuan.Id')" class="btn btn-primary" data-bs-dismiss="modal">Xóa Bình Luận</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -938,6 +973,9 @@
         </div>
     </div>
 </div>
+
+
+
 
 <script>
 
@@ -1142,4 +1180,28 @@
             });
         </script>
     }
+    
+    <script>
+        function XacNhanXoaBinhLuan(id)
+        {
+			$.ajax({
+				type: "POST",
+				url: "/TimNguoi/XoaBinhLuan",
+				data: { id: id },
+				success: function(response) {
+					if (response.success) {
+						// Xóa bình luận khỏi giao diện
+						$("#comment-" + id).remove();
+						showNotification('success', 'Đã xóa bình luận thành công!');
+
+					} else {
+						showNotification('error', 'Có lỗi xảy ra khi xóa bình luận');
+					}
+				},
+				error: function() {
+					showNotification('error', 'Lỗi kết nối đến server');
+				}
+			});
+        }
+    </script>
 }

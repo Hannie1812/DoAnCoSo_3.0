@@ -17,19 +17,20 @@ namespace WebTimNguoiThatLac.Models
         [Required]
         public string FullName { get; set; }
         public string? Address { get; set; }
-        
         public DateTime? NgaySinh { get; set; }
-
         public bool Active { get; set; } = true;
         public string? CCCD { get; set; }
-
         public string? HinhAnh { get; set; }
+        public int SoLanViPham { get; set; } = 0; // 👉 Đếm số lần vi phạm
 
+        public bool IsAdmin { get; set; } = false; // 👉 Thêm để phân quyền
         public virtual ICollection<TimNguoi>? TimNguois { get; set; }
         public virtual ICollection<BinhLuan>? BinhLuans { get; set; }
-        public ICollection<BaoCaoBaiViet> BaoCaoBaiViets { get; set; }
-        public ICollection<BaoCaoBinhLuan> BaoCaoBinhLuans { get; set; }
-        public ICollection<NguoiThamGia> NguoiThamGias { get; set; }
+        public virtual ICollection<BaoCaoBaiViet>? BaoCaoBaiViets { get; set; }
+        public virtual ICollection<BaoCaoBinhLuan>? BaoCaoBinhLuans { get; set; }
+        public virtual ICollection<NguoiThamGia>? NguoiThamGias { get; set; }
+        public virtual ICollection<LichSuTimKiem>? LichSuTimKiems { get; set; }
+        public virtual ICollection<HanhViDangNgo>? HanhViDangNgos { get; set; }
 
     }
 }

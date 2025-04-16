@@ -77,6 +77,9 @@ namespace WebTimNguoiThatLac.Controllers
             return View(x);
 
         }
+
+
+
         public async Task<IActionResult> EditTaiKhoan()
         {
             ApplicationUser x = await _userManager.GetUserAsync(User);
@@ -139,5 +142,7 @@ namespace WebTimNguoiThatLac.Controllers
 
             return LocalRedirect("~/");
         }
+
+
     }
 }

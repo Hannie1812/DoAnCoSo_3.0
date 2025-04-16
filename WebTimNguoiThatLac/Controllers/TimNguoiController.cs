@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.InkML;
 using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -104,7 +105,7 @@ namespace WebTimNguoiThatLac.Controllers
 
 
 
-        public IActionResult Index(string ten, string khuVuc, string dacDiem, int page = 1)
+        public async Task<IActionResult> Index(string ten, string khuVuc, string dacDiem, int page = 1)
         {
             int pageSize = 6; // Số bài viết mỗi trang
 
@@ -113,22 +114,104 @@ namespace WebTimNguoiThatLac.Controllers
                 .Include(u => u.AnhTimNguois)
                 .Where(i => i.active == true);
 
+            int d = 0;
             // Áp dụng bộ lọc tên
             if (!string.IsNullOrEmpty(ten))
             {
                 query = query.Where(x => x.HoTen.Contains(ten) || x.TieuDe.Contains(ten));
+                d++;
             }
 
             // Áp dụng bộ lọc khu vực
             if (!string.IsNullOrEmpty(khuVuc))
             {
                 query = query.Where(x => x.KhuVuc.Contains(khuVuc));
+                d ++;
             }
 
             // Áp dụng bộ lọc đặc điểm nhận dạng
             if (!string.IsNullOrEmpty(dacDiem))
             {
                 query = query.Where(x => x.DaciemNhanDang.Contains(dacDiem));
+                d++;
+            }
+
+            if(d>0)
+            {
+
+                // Lưu lịch sử tìm kiếm
+                string nguoiDungId = null;
+
+                var diaChiIP = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+                if(User.Identity.IsAuthenticated)
+                {
+                    var nguoiDung = await userManager.GetUserAsync(User);
+                    nguoiDungId = nguoiDung.Id;
+
+                    // Ghi lịch sử tìm kiếm
+                    LichSuTimKiem lichSu = new LichSuTimKiem
+                    {
+                        IdNguoiDung = nguoiDungId,
+                        TuKhoa = ten + khuVuc + dacDiem,
+                        ThoiGianTimKiem = DateTime.UtcNow,
+                        DiaChiIP = diaChiIP
+                    };
+                    db.LichSuTimKiems.Add(lichSu);
+                    await db.SaveChangesAsync();
+
+                    // Kiểm tra hành vi đáng ngờ
+                    var soLanTimTrong1Phut = db.LichSuTimKiems
+                        .Where(x => x.IdNguoiDung == nguoiDungId && x.ThoiGianTimKiem > DateTime.UtcNow.AddMinutes(-1))
+                        .Count();
+
+                    if (soLanTimTrong1Phut > 10)
+                    {
+                        var hanhVi = new HanhViDangNgo
+                        {
+                            NguoiDungId = nguoiDungId,
+                            HanhDong = "Tìm kiếm quá nhiều",
+                            ThoiGian = DateTime.UtcNow,
+                            ChiTiet = $"Đã tìm kiếm {soLanTimTrong1Phut} lần trong vòng 1 phút, Nghi ngờ bạn đang có ý định xâm hại hệ thống"
+                        };
+                        db.HanhViDangNgos.Add(hanhVi);
+                        await db.SaveChangesAsync();
+
+                        // 👉 Tăng số lần vi phạm của người dùng
+                        ApplicationUser nguoiDungViPham = await db.Users.FirstOrDefaultAsync(u => u.Id == nguoiDungId);
+                        if (nguoiDungViPham != null)
+                        {
+                            nguoiDungViPham.SoLanViPham++;
+                            await db.SaveChangesAsync();
+
+                            if (nguoiDungViPham.SoLanViPham >= 5)
+                            {
+                                nguoiDungViPham.Active = false;
+                                await db.SaveChangesAsync();
+
+                                // 👉 Gửi email thông báo
+                                await _emailService.SendEmailAsync(nguoiDungViPham.Email, "Tài khoản của bạn đã bị vô hiệu hóa", "Tài khoản của bạn đã bị vô hiệu hóa do vi phạm quy định của hệ thống. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.");
+
+                                // 👉 Ghi log
+                                _logger.LogWarning($"Tài khoản {nguoiDungViPham.Email} đã bị vô hiệu hóa do vi phạm quy định.");
+
+
+                                return Redirect("/Identity/Account/Login");
+
+                            }
+                            else
+                            {
+                                ViewData["Warning"] = "Bạn đang bị nghi ngờ phá hoại hệ thống. Cần Đăng Nhập Lại";
+                            }
+                           
+                        }
+                        // 👉 đăng nhập lại
+                        //return Redirect("/Identity/Account/Login");
+
+                        
+                    }
+                }
+
             }
 
             // Lưu các giá trị filter vào ViewBag
@@ -262,7 +345,7 @@ namespace WebTimNguoiThatLac.Controllers
                                                         .ToListAsync();
                 List<BinhLuan> DSBinhLuan = db.BinhLuans
                                                         .Include(u => u.ApplicationUser)
-                                                        .Where(i => i.IdBaiViet ==  id && i.Active == true)
+                                                        .Where(i => i.IdBaiViet ==  id && i.Active == true && i.NguoiDangBaiXoa==false)
                                                         .OrderByDescending(z => z.NgayBinhLuan)
                                                         .ToList();
                 if (idBinhLuan != 0)
@@ -735,6 +818,49 @@ namespace WebTimNguoiThatLac.Controllers
             return File(fileContents,
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                 fileName);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> XoaBinhLuan(int id)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Json(new { success = false, message = "Vui lòng đăng nhập để thực hiện báo cáo" });
+            }
+
+            try
+            {
+                var currentUser = await userManager.GetUserAsync(User);
+                var binhluan = await db.BinhLuans
+                    .Include(b => b.TimNguoi)
+                    .Include(b => b.ApplicationUser)
+                    .FirstOrDefaultAsync(i => i.Id == id);
+
+                if (binhluan == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy bình luận" });
+                }
+               
+
+                binhluan.NguoiDangBaiXoa = true;
+
+                await db.SaveChangesAsync();
+
+                // Gửi thông báo cho admin/quản trị viên
+                await _emailService.SendEmailAsync(
+                     "dinhcongminh4424@gmail.com",
+                     "Báo cáo bình luận mới",
+                     $"Bình luận #{binhluan.NoiDung} trong bài viết '{binhluan.TimNguoi.HoTen}' đã được xóa bởi {currentUser.Email} người đăng bài"
+                 );
+
+                return Json(new { success = true, message = "Bạn đã xóa bình luận thành công" });
+            }
+            catch (Exception ex)
+            {
+
+                return Json(new { success = false, message = "Đã xảy ra lỗi khi xóa bình luận" });
+            }
         }
     }
 

@@ -43,6 +43,58 @@
     }
 </style>
 
+<!-- Thêm vào phần đầu trang -->
+<div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+<style>
+    .notification {
+        padding: 15px 20px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        color: white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        animation: slideIn 0.3s, fadeOut 0.5s 4.5s;
+        transition: all 0.3s;
+    }
+
+        .notification.success {
+            background-color: #28a745;
+        }
+
+        .notification.error {
+            background-color: #dc3545;
+        }
+
+        .notification.warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .notification.info {
+            background-color: #17a2b8;
+        }
+
+    @@keyframes slideIn {
+        from {
+            transform: translateX(100%);
+        }
+
+        to {
+            transform: translateX(0);
+        }
+    }
+
+    @@keyframes fadeOut {
+        from {
+            opacity: 1;
+        }
+
+        to {
+            opacity: 0;
+        }
+    }
+</style>
+
 
 <!-- Hero -->
 <div class="hero-wrap" style="background-image: url('/Templet/images/bg_5.jpg');" data-stellar-background-ratio="0.5">
@@ -179,3 +231,81 @@
         </div>
     </div>
 </section>
+
+@section Scripts {
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script>
+        // Hiển thị thông báo từ TempData
+        document.addEventListener('DOMContentLoaded', function() {
+            @if (ViewData["Warning"] != null)
+            {
+                <text>
+                            showNotification('warning', '@Html.Raw(ViewData["Warning"])');
+                </text>
+            }
+        });
+        
+
+        function showNotification(type, message) {
+            console.log("nd:"+message);
+            const notificationArea = document.getElementById('notification-area');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas ${getIconForType(type)} me-2"></i>
+                ${message}
+            `;
+
+            notificationArea.appendChild(notification);
+
+            // Tự động xóa sau 5 giây
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+
+			// Tự động xóa khi nhấn vào
+			notification.addEventListener('click', () => {
+				notification.remove();
+			});
+
+			// Thêm hiệu ứng hover
+			notification.addEventListener('mouseover', () => {
+				notification.style.transform = 'scale(1.05)';
+			});
+			notification.addEventListener('mouseout', () => {
+				notification.style.transform = 'scale(1)';
+			});
+
+			// Thêm hiệu ứng slide-in
+			notification.style.transform = 'translateX(100%)';
+			setTimeout(() => {
+				notification.style.transform = 'translateX(0)';
+			}, 10);
+
+            console.log("nd2:"+message+"type:"+type);
+            // chuyuển sang trang login
+            // Chuyển trang nếu là thông báo đăng nhập
+            if (type === 'warning' && message.includes('Bạn đang bị nghi ngờ phá hoại hệ thống. Cần Đăng Nhập Lại')) 
+            {
+                console.log('Redirect condition met - redirecting to login');
+                setTimeout(() => {
+                    window.location.href = '/Identity/Account/Login';
+                }, 2000);
+            }
+            
+        }    
+
+        function getIconForType(type) {
+            switch(type) {
+                case 'success': return 'fa-check-circle';
+                case 'error': return 'fa-exclamation-circle';
+                case 'warning': return 'fa-exclamation-triangle';
+                case 'info': return 'fa-info-circle';
+                default: return 'fa-bell';
+            }
+        }
+       
+    </script>
+}

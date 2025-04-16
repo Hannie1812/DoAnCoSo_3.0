@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebTimNguoiThatLac.Data;
+using WebTimNguoiThatLac.Middlewares;
 using WebTimNguoiThatLac.Models;
 using WebTimNguoiThatLac.Services;
 
@@ -49,6 +50,10 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
+
+
+app.UseMiddleware<GhiLogNguoiDungMiddleware>(); // Ghi log người dùng
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebTimNguoiThatLac.Data;
 
@@ -11,9 +12,11 @@ using WebTimNguoiThatLac.Data;
 namespace WebTimNguoiThatLac.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250415132007_TheoDoiLan5")]
+    partial class TheoDoiLan5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -424,17 +427,8 @@ namespace WebTimNguoiThatLac.Migrations
                     b.Property<string>("ChiTiet")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("DaXem")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("DaXuLy")
-                        .HasColumnType("bit");
-
                     b.Property<string>("HanhDong")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("KhangNghi")
-                        .HasColumnType("bit");
 
                     b.Property<string>("NguoiDungId")
                         .HasColumnType("nvarchar(450)");

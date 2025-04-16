@@ -120,21 +120,17 @@
                     <div class="col-lg-4 col-md-6 mb-4">
                         <div class="user-card bg-white h-100">
                             <div class="d-flex flex-column align-items-center py-4">
-                                @*
-                                    @if (!string.IsNullOrEmpty(user.))
-                                    {
-                                        <img src="@user.ProfilePicture" class="user-avatar" alt="@user.FullName">
-                                    }
-                                    else
-                                    {
-                                        <div class="user-avatar default-avatar">
-                                            @user.FullName?.Substring(0, 1).ToUpper()
-                                        </div>
-                                    }
-                                *@
-                                <div class="user-avatar default-avatar">
-                                    @user.FullName?.Substring(0, 1).ToUpper()
-                                </div>
+                                
+                                @if (!string.IsNullOrEmpty(user.HinhAnh))
+                                {
+                                    <img src="@user.HinhAnh" class="user-avatar" alt="@user.FullName">
+                                }
+                                else
+                                {
+                                    <div class="user-avatar default-avatar">
+                                        @user.FullName?.Substring(0, 1).ToUpper()
+                                    </div>
+                                }
                             </div>
 
                             <div class="user-info text-center">

@@ -21,5 +21,7 @@ namespace WebTimNguoiThatLac.Data
         public DbSet<TrungBayHinhAnh> TrungBayHinhAnhs { get; set; }
         public DbSet<TimThayNguoiThatLac> TimThayNguoiThatLacs { get; set; }
         public DbSet<NguoiDungLienHe> NguoiDungLienHes { get; set; }
+        public DbSet<LichSuTimKiem> LichSuTimKiems { get; set; }
+        public DbSet<HanhViDangNgo> HanhViDangNgos { get; set; }
     }
 }

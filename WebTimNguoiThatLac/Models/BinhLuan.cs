@@ -25,6 +25,7 @@ namespace WebTimNguoiThatLac.Models
         public virtual TimNguoi? TimNguoi { get; set; }
         public bool Active { get; set; } = true; // Mặc định là hirnt thị
         public bool DaDoc { get; set; } = false; // Mặc định là chưa đọc
+        public bool NguoiDangBaiXoa { get; set; } = false; // Mặc định là chuaxoa
         public ICollection<BaoCaoBinhLuan> BaoCaoBinhLuans { get; set; }
     }
 }

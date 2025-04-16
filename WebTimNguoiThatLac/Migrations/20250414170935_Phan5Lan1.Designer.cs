@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebTimNguoiThatLac.Data;
 
@@ -11,9 +12,11 @@ using WebTimNguoiThatLac.Data;
 namespace WebTimNguoiThatLac.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250414170935_Phan5Lan1")]
+    partial class Phan5Lan1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -215,9 +218,6 @@ namespace WebTimNguoiThatLac.Migrations
                     b.Property<string>("HinhAnh")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsAdmin")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -246,9 +246,6 @@ namespace WebTimNguoiThatLac.Migrations
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("SoLanViPham")
-                        .HasColumnType("int");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
@@ -369,9 +366,6 @@ namespace WebTimNguoiThatLac.Migrations
                     b.Property<DateTime>("NgayBinhLuan")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("NguoiDangBaiXoa")
-                        .HasColumnType("bit");
-
                     b.Property<string>("NoiDung")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -421,30 +415,24 @@ namespace WebTimNguoiThatLac.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("ChiTiet")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("DaXem")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("DaXuLy")
-                        .HasColumnType("bit");
 
                     b.Property<string>("HanhDong")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("KhangNghi")
-                        .HasColumnType("bit");
-
                     b.Property<string>("NguoiDungId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ThoiGian")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NguoiDungId");
+                    b.HasIndex("ApplicationUserId");
 
                     b.ToTable("HanhViDangNgo");
                 });
@@ -482,11 +470,14 @@ namespace WebTimNguoiThatLac.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("DiaChiIP")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IdNguoiDung")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ThoiGianTimKiem")
                         .HasColumnType("datetime2");
@@ -496,9 +487,9 @@ namespace WebTimNguoiThatLac.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdNguoiDung");
+                    b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("LichSuTimKiem");
+                    b.ToTable("LichSuTraCu");
                 });
 
             modelBuilder.Entity("WebTimNguoiThatLac.Models.NguoiDungLienHe", b =>
@@ -896,7 +887,7 @@ namespace WebTimNguoiThatLac.Migrations
                 {
                     b.HasOne("WebTimNguoiThatLac.Models.ApplicationUser", "ApplicationUser")
                         .WithMany("HanhViDangNgos")
-                        .HasForeignKey("NguoiDungId");
+                        .HasForeignKey("ApplicationUserId");
 
                     b.Navigation("ApplicationUser");
                 });
@@ -905,7 +896,7 @@ namespace WebTimNguoiThatLac.Migrations
                 {
                     b.HasOne("WebTimNguoiThatLac.Models.ApplicationUser", "ApplicationUser")
                         .WithMany("LichSuTimKiems")
-                        .HasForeignKey("IdNguoiDung");
+                        .HasForeignKey("ApplicationUserId");
 
                     b.Navigation("ApplicationUser");
                 });

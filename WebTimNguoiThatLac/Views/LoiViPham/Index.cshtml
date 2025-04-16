@@ -1,0 +1,275 @@
+﻿@model IPagedList<WebTimNguoiThatLac.Models.HanhViDangNgo>
+@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+
+<div class="hero-wrap" style="background-image: url('/Templet/images/bg_5.jpg');" data-stellar-background-ratio="0.5">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row no-gutters slider-text align-items-center justify-content-center" data-scrollax-parent="true">
+            <div class="col-md-7 ftco-animate text-center" data-scrollax=" properties: { translateY: '70%' }">
+                <p class="breadcrumbs" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }"><span class="mr-2"><a href="/Home">Trang Chủ</a></span> <span>@ViewData["Title"]</span></p>
+                <h1 class="mb-3 bread" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">@ViewData["Title"]</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@{
+    ViewData["Title"] = "Danh Sách Hành Vi Đáng Ngờ";
+    int stt = (Model.PageNumber - 1) * Model.PageSize + 1;
+}
+
+<style>
+    .page-link {
+        color: #fd7e14;
+    }
+
+    .page-item.active .page-link {
+        background-color: #fd7e14;
+        border-color: #fd7e14;
+    }
+
+    .btn-outline-primary {
+        color: #fd7e14;
+        border-color: #fd7e14;
+    }
+
+        .btn-outline-primary:hover {
+            background-color: #fd7e14;
+            color: white;
+        }
+
+    .btn-outline-danger {
+        color: #dc3545;
+        border-color: #dc3545;
+    }
+
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+
+    .alert-info {
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+        color: #0c5460;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(253, 126, 20, 0.1);
+    }
+
+    .modal-header {
+        border-bottom: 1px solid #fd7e14;
+    }
+
+    .badge {
+        font-size: 0.8em;
+        padding: 0.4em 0.6em;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2 class="text-center" style="color: #fd7e14;">
+                <i class="fas fa-exclamation-triangle"></i> @ViewData["Title"]
+            </h2>
+        </div>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="thead-dark" style="background-color: #fd7e14; color: white;">
+                    <tr>
+                        <th>STT</th>
+                        <th>Hành Động</th>
+                        <th>Thời Gian</th>
+                        <th>Trạng Thái</th>
+                        <th>Chi Tiết</th>
+                        <th>Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr class="@(item.DaXem ? "" : "font-weight-bold")" 
+                            style="@(item.DaXem ? "" : "background-color: rgba(253, 126, 20, 0.05);")">
+                            <td>@(stt++)</td>
+                            <td>@item.HanhDong</td>
+                            <td>@item.ThoiGian?.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <span class="badge @(item.DaXuLy ? "badge-success" : "badge-warning") mb-1">
+                                        @(item.DaXuLy ? "Đã xử lý" : "Chưa xử lý")
+                                    </span>
+                                    @if (item.KhangNghi)
+                                    {
+                                        <span class="badge badge-danger">Đã kháng nghị</span>
+                                    }
+                                    else if (!item.DaXem)
+                                    {
+                                        <span class="badge badge-primary">Mới</span>
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.ChiTiet))
+                                {
+                                    <span class="d-inline-block text-truncate" style="max-width: 150px;" 
+                                          title="@item.ChiTiet">
+                                        @item.ChiTiet
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Không có chi tiết</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-sm btn-outline-primary" data-toggle="modal" 
+                                            data-target="#detailModal" data-details="@item.ChiTiet"
+                                            data-id="@item.Id" data-daxem="@item.DaXem.ToString().ToLower()">
+                                        <i class="fas fa-eye"></i> Xem
+                                    </button>
+                                    @if (!item.DaXuLy)
+                                    {
+                                        <button class="btn btn-sm btn-outline-danger ml-1" data-toggle="modal"
+                                                data-target="#confirmModal" data-id="@item.Id">
+                                            <i class="fas fa-hand-paper"></i> Kháng nghị
+                                        </button>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-12">
+                @Html.PagedListPager(Model, page => Url.Action("Index", new { page = page }), 
+                new PagedListRenderOptions {
+                    LiElementClasses = new string[] { "page-item" },
+                    PageClasses = new string[] { "page-link" },
+                    UlElementClasses = new string[] { "pagination justify-content-center" },
+                    DisplayLinkToFirstPage = PagedListDisplayMode.IfNeeded,
+                    DisplayLinkToLastPage = PagedListDisplayMode.IfNeeded,
+                    LinkToFirstPageFormat = "««",
+                    LinkToPreviousPageFormat = "«",
+                    LinkToNextPageFormat = "»",
+                    LinkToLastPageFormat = "»»",
+                    MaximumPageNumbersToDisplay = 5
+                })
+            </div>
+        </div>
+        
+        <!-- Modal xem chi tiết -->
+        <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color: #fd7e14; color: white;">
+                        <h5 class="modal-title" id="detailModalLabel">Chi tiết hành vi</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="modalDetailContent">
+                        <!-- Nội dung chi tiết sẽ được điền ở đây bằng JS -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal xác nhận kháng nghị -->
+        <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning">
+                        <h5 class="modal-title" id="confirmModalLabel">Xác nhận kháng nghị</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Bạn có chắc chắn muốn kháng nghị hành vi này? Hành động này không thể hoàn tác.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                        <button type="button" class="btn btn-danger" id="confirmKhangNghi">Xác nhận kháng nghị</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle"></i> Không tìm thấy hành vi đáng ngờ nào.
+        </div>
+    }
+</div>
+
+
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            var currentId;
+            
+            // Xử lý modal chi tiết
+            $('#detailModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var details = button.data('details');
+                var id = button.data('id');
+                var daXem = button.data('daxem') === 'true';
+                
+                currentId = id;
+                
+                var modal = $(this);
+                if (details && details.trim() !== '') {
+                    modal.find('.modal-body').text(details);
+                } else {
+                    modal.find('.modal-body').html('<p class="text-muted">Không có chi tiết nào được ghi nhận</p>');
+                }
+                
+                // Đánh dấu đã xem nếu chưa xem
+                if (!daXem) {
+                    $.post('@Url.Action("MarkAsRead", "HanhViDangNgo")', { id: id }, function() {
+                        // Cập nhật UI
+                        button.closest('tr').removeClass('font-weight-bold')
+                            .css('background-color', '');
+                        button.data('daxem', 'true');
+                    });
+                }
+            });
+            
+            // Xử lý modal kháng nghị
+            $('#confirmModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                currentId = button.data('id');
+            });
+            
+            // Xác nhận kháng nghị
+            $('#confirmKhangNghi').click(function() {
+                $.post('@Url.Action("KhangNghi", "HanhViDangNgo")', { id: currentId }, function() {
+                    location.reload(); // Tải lại trang để cập nhật trạng thái
+                });
+                $('#confirmModal').modal('hide');
+            });
+        });
+    </script>
+}

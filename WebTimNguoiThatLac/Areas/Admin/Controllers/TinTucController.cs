@@ -65,6 +65,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         {
             return View();
         }
+
         [HttpPost]
         public async Task<IActionResult> Create(TinTuc t, IFormFile? HinhAnhCapNhat)
         {
@@ -77,7 +78,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     t.HinhAnh = await SaveImage(HinhAnhCapNhat, "TinTuc");
                 }
                 db.TinTucs.Add(t);
-                db.SaveChanges();
+                await db.SaveChangesAsync();
                 return RedirectToAction("Index");
 
             }

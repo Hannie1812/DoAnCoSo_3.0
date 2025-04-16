@@ -138,6 +138,7 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
                     FullName = "Quản trị viên",
                     EmailConfirmed = true, // Bỏ qua xác thực email cho admin
                     Active = true,
+                    IsAdmin = true,
 
                 };
 

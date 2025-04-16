@@ -1,4 +1,4 @@
-html {
+﻿html {
   font-size: 14px;
 }
 
@@ -19,4 +19,101 @@ html {
 
 body {
   margin-bottom: 60px;
+}
+
+.hotline-group {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Sticky call button */
+.hotline-group {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Nút gọi khẩn cấp */
+.hotline-call-ring {
+    width: 60px;
+    height: 60px;
+    background-color: #e53935;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    animation: phonering-alo-circle-img-anim 1s infinite ease-in-out;
+}
+
+    .hotline-call-ring a {
+        color: #fff;
+        font-size: 24px;
+    }
+
+/* Nút báo tin nhân chứng */
+.hotline-phone-ring {
+    width: 60px;
+    height: 60px;
+    background-color: #ffa000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    animation: phonering-alo-circle-img-anim 1s infinite ease-in-out;
+}
+
+    .hotline-phone-ring a {
+        color: #fff;
+        font-size: 22px;
+    }
+
+/* Animation */
+@keyframes phonering-alo-circle-anim {
+    0% {
+        transform: rotate(0deg) scale(0.5) skew(1deg);
+        opacity: 0.1;
+    }
+
+    30% {
+        transform: rotate(0deg) scale(0.7) skew(1deg);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: rotate(0deg) scale(1) skew(1deg);
+        opacity: 0.1;
+    }
+}
+
+@keyframes phonering-alo-circle-fill-anim {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.75;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+}
+
+@keyframes phonering-alo-circle-img-anim {
+    0%, 100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
 }

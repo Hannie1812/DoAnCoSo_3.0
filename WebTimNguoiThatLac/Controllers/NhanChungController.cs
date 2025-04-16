@@ -63,11 +63,17 @@ public class NhanChungController : Controller
             _context.NhanChungs.Add(model);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Success");
-        }
+            //return RedirectToAction("Success");
 
-        ViewBag.NguoiMatTiches = _context.TimNguois.ToList(); // Load lại danh sách người mất tích nếu có lỗi
-        return View(model);
+            TempData["SuccessMessage"] = "Thông tin đã được gửi thành công!";
+            return RedirectToAction("ChiTietBaiViet", "TimNguoi", new { id = model.Id });
+        }
+        /*
+                ViewBag.NguoiMatTiches = _context.TimNguois.ToList(); // Load lại danh sách người mất tích nếu có lỗi
+                return View(model);*/
+
+        TempData["ErrorMessage"] = "Đã xảy ra lỗi. Vui lòng thử lại.";
+        return RedirectToAction("ChiTietBaiViet", "TimNguoi", new { id = model.Id });
     }
 
     public IActionResult Success()

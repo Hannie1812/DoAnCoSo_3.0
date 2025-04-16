@@ -23,5 +23,6 @@ namespace WebTimNguoiThatLac.Data
         public DbSet<NguoiDungLienHe> NguoiDungLienHes { get; set; }
         public DbSet<LichSuTimKiem> LichSuTimKiems { get; set; }
         public DbSet<HanhViDangNgo> HanhViDangNgos { get; set; }
+        public DbSet<NhanChung> NhanChungs { get; set; }
     }
 }

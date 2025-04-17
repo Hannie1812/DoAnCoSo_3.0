@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
+    <Folder Include="NewFolder\" />
     <Folder Include="ViewComponents\" />
     <Folder Include="wwwroot\DangKiTimKiem\" />
     <Folder Include="wwwroot\uploads\AnhMinhChungTimThay\" />

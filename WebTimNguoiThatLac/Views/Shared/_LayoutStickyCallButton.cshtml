@@ -1,4 +1,6 @@
-﻿<div class="hotline-group">
+﻿@model int? // Nhận Id của người mất tích
+
+<div class="hotline-group">
     <!-- Nút gọi khẩn cấp -->
     <div class="hotline-call-ring">
         <a href="tel:+84858581488">
@@ -9,7 +11,7 @@
     <!-- Nút để nhân chứng điền thông tin -->
     <div class="hotline-phone-ring">
         <div class="hotline-phone-ring-img-circle">
-            <a class="nav-link text-light" asp-area="" asp-controller="NhanChung" asp-action="Create">
+            <a class="nav-link text-light" asp-area="" asp-controller="NhanChung" asp-action="Create" asp-route-id="@Model">
                 <i class="fa-solid fa-file-signature"></i>
             </a>
         </div>

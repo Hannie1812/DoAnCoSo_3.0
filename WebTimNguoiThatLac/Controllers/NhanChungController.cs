@@ -5,75 +5,110 @@ using WebTimNguoiThatLac.Models;
 using System.IO;
 using System.Threading.Tasks;
 using WebTimNguoiThatLac.Data;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using WebTimNguoiThatLac.Repositories;
 
 public class NhanChungController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ITimNguoiRepository _timNguoiRepository;
+    private readonly ILogger<NhanChungController> _logger;
 
-    public NhanChungController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+    public NhanChungController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, ITimNguoiRepository timNguoiRepository, ILogger<NhanChungController> logger)
     {
         _context = context;
         _userManager = userManager;
+        _timNguoiRepository = timNguoiRepository;
+        _logger = logger;
     }
 
     [HttpGet]
-    public async Task<IActionResult> Create()
+    public async Task<IActionResult> Create(int id) // id của bài viết tìm người
     {
+        // Lấy thông tin người mất tích từ database
+        var timNguoi = await _context.TimNguois
+            .Where(t => t.Id == id)
+            .Select(t => new {
+                t.HoTen,
+                t.KhuVuc,
+                t.NgaySinh
+            })
+            .FirstOrDefaultAsync();
+
+        if (timNguoi == null)
+        {
+            return NotFound();
+        }
+
+        // Lưu thông tin vào ViewBag
+        ViewBag.TenNguoiMatTich = timNguoi.HoTen;
+        ViewBag.KhuVucMatTich = timNguoi.KhuVuc;
+        ViewBag.NgaySinh = timNguoi.NgaySinh;
+
         // Lấy thông tin người dùng hiện tại
         var currentUser = await _userManager.GetUserAsync(User);
 
-        // Tạo đối tượng model với thông tin tự động điền
+        // Tạo model với thông tin tự động điền
         var model = new NhanChung
         {
-            HoTen = currentUser?.FullName, // Kiểm tra currentUser không null
+            TimNguoiId = id,
+            HoTen = currentUser?.FullName,
             Email = currentUser?.Email,
             SoDienThoai = currentUser?.PhoneNumber
         };
-
-        // Luôn gán ViewBag, kể cả khi không có người mất tích
-        var nguoiMatTiches = _context.TimNguois.ToList();
-        ViewBag.NguoiMatTiches = nguoiMatTiches ?? new List<TimNguoi>();
 
         return View(model);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(NhanChung model)
+    public async Task<IActionResult> Create(NhanChung model, IFormFile file)
     {
         if (ModelState.IsValid)
         {
-            string filePath = null;
-
-            // Lưu file upload, nếu có
-            var files = Request.Form.Files;
-            if (files.Count > 0)
+            try
             {
-                var file = files[0];
-                string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
-                filePath = Path.Combine(uploadsFolder, file.FileName);
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                // Xử lý file đính kèm nếu có
+                if (file != null && file.Length > 0)
                 {
-                    await file.CopyToAsync(fileStream);
+                    // Tạo thư mục upload nếu chưa tồn tại
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    // Tạo tên file unique
+                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    // Lưu file
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    model.FileDinhKem = uniqueFileName;
                 }
-                model.FileDinhKem = file.FileName; // Lưu tên file vào model
+
+                // Lưu thông tin nhân chứng
+                _context.NhanChungs.Add(model);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Thông tin nhân chứng đã được gửi thành công!";
+                return RedirectToAction("ChiTietBaiViet", "TimNguoi", new { id = model.TimNguoiId });
             }
-
-            // Lưu dữ liệu nhân chứng
-            _context.NhanChungs.Add(model);
-            await _context.SaveChangesAsync();
-
-            //return RedirectToAction("Success");
-
-            TempData["SuccessMessage"] = "Thông tin đã được gửi thành công!";
-            return RedirectToAction("ChiTietBaiViet", "TimNguoi", new { id = model.Id });
+            catch (Exception ex)
+            {
+                // Ghi log lỗi
+                _logger.LogError(ex, "Lỗi khi lưu thông tin nhân chứng");
+                ModelState.AddModelError("", "Đã xảy ra lỗi khi lưu thông tin. Vui lòng thử lại.");
+            }
         }
-        /*
-                ViewBag.NguoiMatTiches = _context.TimNguois.ToList(); // Load lại danh sách người mất tích nếu có lỗi
-                return View(model);*/
 
-        TempData["ErrorMessage"] = "Đã xảy ra lỗi. Vui lòng thử lại.";
-        return RedirectToAction("ChiTietBaiViet", "TimNguoi", new { id = model.Id });
+        // Nếu có lỗi, hiển thị lại form với thông báo
+        TempData["ErrorMessage"] = "Vui lòng kiểm tra lại thông tin nhập";
+        return View(model);
     }
 
     public IActionResult Success()

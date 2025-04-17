@@ -1,8 +1,10 @@
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebTimNguoiThatLac.Data;
 using WebTimNguoiThatLac.Middlewares;
 using WebTimNguoiThatLac.Models;
+using WebTimNguoiThatLac.Repositories;
 using WebTimNguoiThatLac.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +33,8 @@ builder.Services.AddScoped<WordExportService>();// Xuất File Đăng Kí
 
 builder.Services.AddTransient<EmailService>(); // email
 
+// Trong ConfigureServices (Startup.cs) hoặc Program.cs
+builder.Services.AddScoped<ITimNguoiRepository, EFTimNguoiRepository>();
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 .AddDefaultTokenProviders()

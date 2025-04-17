@@ -44,7 +44,7 @@ public class NhanChungController : Controller
         // Lưu thông tin vào ViewBag
         ViewBag.TenNguoiMatTich = timNguoi.HoTen;
         ViewBag.KhuVucMatTich = timNguoi.KhuVuc;
-        ViewBag.NgaySinh = timNguoi.NgaySinh;
+        ViewBag.NgaySinh = timNguoi.NgaySinh?.ToString("dd/MM/yyyy") ?? "Không có thông tin";
 
         // Lấy thông tin người dùng hiện tại
         var currentUser = await _userManager.GetUserAsync(User);

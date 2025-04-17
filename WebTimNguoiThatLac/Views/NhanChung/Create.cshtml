@@ -27,20 +27,23 @@
                         <input type="hidden" asp-for="TimNguoiId" />
 
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-
                         <!-- Thông tin người mất tích -->
                         <h5 class="mb-3">Thông tin người mất tích</h5>
                         <div class="row mb-4">
                             <div class="col-md-6 mb-3">
-                                <p><strong>Tên:</strong> @ViewBag.TenNguoiMatTich</p>
+                                <label class="form-label fw-bold">Họ tên</label>
+                                <input type="text" class="form-control" value="@ViewBag.TenNguoiMatTich" readonly />
                             </div>
                             <div class="col-md-6 mb-3">
-                                <p><strong>Khu vực:</strong> @ViewBag.KhuVucMatTich</p>
+                                <label class="form-label fw-bold">Khu vực</label>
+                                <input type="text" class="form-control" value="@ViewBag.KhuVucMatTich" readonly />
                             </div>
                             <div class="col-md-6 mb-3">
-                                <p><strong>Ngày sinh:</strong> @ViewBag.NgaySinh</p>
+                                <label class="form-label fw-bold">Ngày sinh</label>
+                                <input type="text" class="form-control" value="@ViewBag.NgaySinh" readonly />
                             </div>
                         </div>
+
                         <!-- Thông tin cá nhân -->
                         <h5 class="mb-3">Thông tin cá nhân</h5>
                         <div class="row mb-4">
@@ -51,15 +54,15 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label asp-for="Email" class="form-label fw-bold">Email *</label>
-                                <input asp-for="Email" class="form-control" type="email" required />
-                                <span asp-validation-for="Email" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
                                 <label asp-for="SoDienThoai" class="form-label fw-bold">Số điện thoại *</label>
                                 <input asp-for="SoDienThoai" class="form-control" required />
                                 <span asp-validation-for="SoDienThoai" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label asp-for="Email" class="form-label fw-bold">Email *</label>
+                                <input asp-for="Email" class="form-control" type="email" required />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
                             </div>
                         </div>
 

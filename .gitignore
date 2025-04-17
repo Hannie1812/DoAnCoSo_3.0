@@ -19,3 +19,7 @@ WebTimNguoiThatLac/Migrations/
 
 # appsettings.json
 WebTimNguoiThatLac/appsettings.json
+
+WebTimNguoiThatLac/obj/Debug/net8.0/WebTimNguoiThatLac.AssemblyInfo.cs
+WebTimNguoiThatLac/obj/Debug/net8.0/WebTimNguoiThatLac.AssemblyInfoInputs.cache
+WebTimNguoiThatLac/obj/Debug/net8.0/WebTimNguoiThatLac.GeneratedMSBuildEditorConfig.editorconfig

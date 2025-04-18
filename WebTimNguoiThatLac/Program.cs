@@ -1,5 +1,6 @@
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using WebTimNguoiThatLac.Data;
 using WebTimNguoiThatLac.Middlewares;
@@ -31,7 +32,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
 
 builder.Services.AddScoped<WordExportService>();// Xuất File Đăng Kí
 
-builder.Services.AddTransient<EmailService>(); // email
+builder.Services.AddTransient<IEmailSender, EmailService>(); // email
 
 // Trong ConfigureServices (Startup.cs) hoặc Program.cs
 builder.Services.AddScoped<ITimNguoiRepository, EFTimNguoiRepository>();

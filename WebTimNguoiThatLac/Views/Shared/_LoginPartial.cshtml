@@ -4,47 +4,60 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
-@if (SignInManager.IsSignedIn(User))
-{
-    <li class="nav-item dropdown">
-        <a class="nav-link text-dark dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            @{
-                var user = await UserManager.GetUserAsync(User);
-                var avatarUrl = user != null && !string.IsNullOrEmpty(user.HinhAnh) ? user.HinhAnh : "~/uploads/avatars/default-avatar.svg";
-            }
-            <img src="@Url.Content(avatarUrl)" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 2px solid #ddd;" alt="Avatar" />
-        </a>
-        <ul class="dropdown-menu" aria-labelledby="userDropdown">
-            @* Kiểm tra nếu người dùng là Admin thì hiển thị menu Manager *@
+<li class="nav-item dropdown">
+    <a class="nav-link text-dark dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        @{
+            var user = await UserManager.GetUserAsync(User);
+            var avatarUrl = user != null && !string.IsNullOrEmpty(user.HinhAnh)
+            ? user.HinhAnh
+            : "~/uploads/avatars/default-avatar.svg";
+        }
+        <img src="@Url.Content(avatarUrl)" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 2px solid #ddd;" alt="Avatar" />
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="userDropdown">
+        @if (SignInManager.IsSignedIn(User))
+        {
+            @* Nếu là Admin *@
             @if (User.IsInRole("Admin"))
             {
                 <li>
-                    <a class="dropdown-item" asp-area="Admin" asp-controller="Home" asp-action="Index">Quản lý</a>
-                    <li><hr class="dropdown-divider"></li>
+                    <a class="dropdown-item" asp-area="Admin" asp-controller="Home" asp-action="Index">
+                        <i class="fas fa-cog me-2"></i>Quản lý
+                    </a>
                 </li>
+                <li><hr class="dropdown-divider" /></li>
             }
-            <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index"><i class="fas fa-cog me-2"></i>Thiết lập tài khoản</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" asp-area="" asp-controller="NguoiDung" asp-action="BaiVietCuaToi"><i class="fas fa-newspaper me-2"></i>Bài viết của tôi</a></li>
-            <li><hr class="dropdown-divider"></li>
+
+            <li>
+                <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">
+                    <i class="fa-solid fa-circle-user me-2"></i>Thiết lập tài khoản
+                </a>
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+
+            <li>
+                <a class="dropdown-item" asp-action="ThongTinCaNhan" asp-controller="NguoiDung">
+                    <i class="fas fa-newspaper me-2"></i>Bài viết của tôi
+                </a>
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+
             <li>
                 <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                    <button id="logout" type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</button>
+                    <button id="logout" type="submit" class="dropdown-item">
+                        <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                    </button>
                 </form>
             </li>
-        </ul>
-    </li>
-}
-else
-{
-    <li class="nav-item dropdown">
-        <a class="nav-link text-dark dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="~/uploads/avatars/default-avatar.svg" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 2px solid #ddd;" alt="Avatar" />
-        </a>
-        <ul class="dropdown-menu" aria-labelledby="userDropdown">
-            <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Register"><i class="fas fa-user-plus me-2"></i>Đăng ký</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Login"><i class="fas fa-sign-in-alt me-2"></i>Đăng nhập</a></li>
-        </ul>
-    </li>
-}
+        }
+        else
+        {
+            <li>
+                <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Register">Đăng ký</a>
+            </li>
+            <li>
+                <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Login">Đăng nhập</a>
+            </li>
+        }
+    </ul>
+</li>

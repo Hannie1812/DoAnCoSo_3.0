@@ -37,6 +37,14 @@
 }
 else
 {
-    <a class="btn btn-link text-white dropdown-item" asp-area="Identity" asp-page="/Account/Register">Register</a>
-    <a class="btn btn-link text-white dropdown-item" asp-area="Identity" asp-page="/Account/Login">Login</a>
+    <li class="nav-item dropdown">
+        <a class="nav-link text-dark dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="~/uploads/avatars/default-avatar.svg" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 2px solid #ddd;" alt="Avatar" />
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="userDropdown">
+            <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Register"><i class="fas fa-user-plus me-2"></i>Đăng ký</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Login"><i class="fas fa-sign-in-alt me-2"></i>Đăng nhập</a></li>
+        </ul>
+    </li>
 }

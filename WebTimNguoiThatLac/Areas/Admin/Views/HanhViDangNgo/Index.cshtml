@@ -1,0 +1,311 @@
+﻿@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+@model X.PagedList.IPagedList<WebTimNguoiThatLac.Models.HanhViDangNgo>
+@{
+    ViewData["Title"] = "Quản lý hành vi đáng ngờ";
+    var status = ViewBag.Status as string ?? "all";
+}
+
+
+@section naviHeader {
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin" class="nav-link ">Trang Chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin/HanhViDangNgo" class="nav-link active">Quản lý hành vi đáng ngờ</a>
+        </li>
+    </ul>
+}
+
+ 
+
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header  bg-primary py-3 d-flex flex-column flex-md-row justify-content-between align-items-center">
+            <form method="get" class="form-inline mt-2 mt-md-0">
+                <div class="input-group">
+                    <input type="text" name="searchString" class="form-control" 
+                           placeholder="ID, Email, SĐT hoặc Username" 
+                           value="@ViewBag.SearchString">
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-light">
+                            <i class="fas fa-search"></i> Tìm
+                        </button>
+                    </div>
+                </div>
+                <input type="hidden" name="status" value="@status" />
+            </form>
+            
+            <div class="btn-group mt-2 mt-md-0">
+                <a asp-action="Index" asp-route-status="all" asp-route-searchString="@ViewBag.SearchString"
+                   class="btn btn-light @(status == "all" ? "active font-weight-bold" : "")">
+                    Tất cả (@Model.TotalItemCount)
+                </a>
+                <a asp-action="Index" asp-route-status="KhangNghi" asp-route-searchString="@ViewBag.SearchString"
+                   class="btn btn-light @(status == "KhangNghi" ? "active font-weight-bold" : "")">
+                    Kháng nghị
+                </a>
+                <a asp-action="Index" asp-route-status="ChuaXuLy" asp-route-searchString="@ViewBag.SearchString"
+                   class="btn btn-light @(status == "ChuaXuLy" ? "active font-weight-bold" : "")">
+                    Chưa xử lý
+                </a>
+            </div>
+        </div>
+        
+        <div class="card-body">
+            @if (TempData["Message"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["Message"]
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            }
+            
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" width="100%" cellspacing="0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Người dùng</th>
+                            <th>Hành động</th>
+                            <th>Thời gian</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+                                <td>
+                                    <div><strong>ID:</strong> @item.NguoiDungId</div>
+                                    @if (item.ApplicationUser != null)
+                                    {
+                                        <div><strong>Email:</strong> @item.ApplicationUser.Email</div>
+                                        <div><strong>Username:</strong> @item.ApplicationUser.UserName</div>
+                                    }
+                                </td>
+                                <td>@item.HanhDong</td>
+                                <td>@item.ThoiGian?.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>
+                                    @if (item.KhangNghi)
+                                    {
+                                        <span class="badge badge-warning">Kháng nghị</span>
+                                    }
+                                    @if (!item.DaXuLy)
+                                    {
+                                        <span class="badge badge-danger">Chưa xử lý</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-success">Đã xử lý</span>
+                                    }
+                                    @if (!item.DaXem)
+                                    {
+                                        <span class="badge badge-info">Mới</span>
+                                    }
+                                </td>
+                                <td>
+                                    <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#detailModal" 
+                                            onclick="loadDetail(@item.Id)">
+                                        <i class="fas fa-eye"></i> Chi tiết
+                                    </button>
+                                    @if (item.KhangNghi && !item.DaXuLy)
+                                    {
+                                        <button class="btn btn-warning btn-sm" onclick="openKhangNghiModal(@item.Id)">
+                                            <i class="fas fa-gavel"></i> Xử lý KN
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                
+                @if (!Model.Any())
+                {
+                    <div class="alert alert-info text-center">
+                        Không tìm thấy hành vi nào phù hợp
+                    </div>
+                }
+            </div>
+            
+            <!-- Phân trang -->
+            @Html.PagedListPager(Model, page => Url.Action("Index", new { 
+                page, 
+                searchString = ViewBag.SearchString,
+                status 
+            }), new PagedListRenderOptions {
+                LiElementClasses = new[] { "page-item" },
+                PageClasses = new[] { "page-link" },
+                Display = PagedListDisplayMode.IfNeeded,
+                MaximumPageNumbersToDisplay = 5,
+                ContainerDivClasses = new[] { "pagination justify-content-center mt-3" }
+            })
+        </div>
+    </div>
+</div>
+
+<!-- Modal Chi tiết -->
+<div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="detailModalLabel">Chi tiết hành vi đáng ngờ</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalContent">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-success" id="btnXuLy" style="display:none;">
+                    <i class="fas fa-check"></i> Xử lý
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xử lý kháng nghị -->
+<div class="modal fade" id="khangNghiModal" tabindex="-1" role="dialog" aria-labelledby="khangNghiModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title" id="khangNghiModalLabel">Xử lý kháng nghị</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="hanhViId" />
+                <div class="form-group">
+                    <label>Trạng thái kháng nghị:</label>
+                    <select class="form-control" id="trangThaiKhangNghi">
+                        <option value="Kháng Nghị Thành Công">Kháng Nghị Thành Công</option>
+                        <option value="Kháng Nghị Thất Bại">Kháng Nghị Thất Bại</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="btnXacNhanKhangNghi">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+
+            function openKhangNghiModal(id) {
+            $('#hanhViId').val(id);
+            $('#khangNghiModal').modal('show');
+        }
+
+        // Xử lý khi bấm nút xác nhận kháng nghị
+        $('#btnXacNhanKhangNghi').click(function() {
+            var id = $('#hanhViId').val();
+            var trangThai = $('#trangThaiKhangNghi').val();
+
+            $.post('/Admin/HanhViDangNgo/XuLyKhangNghi', {
+                id: id,
+                trangThaiKhangNghi: trangThai
+            })
+            .done(function() {
+                Swal.fire(
+                    'Thành công!',
+                    'Đã cập nhật trạng thái kháng nghị.',
+                    'success'
+                ).then(() => {
+                    location.reload();
+                });
+                $('#khangNghiModal').modal('hide');
+            })
+            .fail(function() {
+                Swal.fire(
+                    'Lỗi!',
+                    'Có lỗi xảy ra khi xử lý kháng nghị.',
+                    'error'
+                );
+            });
+        });
+
+
+        function loadDetail(id) {
+            $('#modalContent').html(`
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            `);
+            
+            $.get('/Admin/HanhViDangNgo/ChiTiet/' + id, function(data) {
+                $('#modalContent').html(data);
+                
+                // Hiển thị nút xử lý nếu chưa xử lý
+                if ($('#daXuLy').val() === 'False') {
+                    $('#btnXuLy').show().off('click').on('click', function() {
+                        confirmXuLy(id);
+                    });
+                } else {
+                    $('#btnXuLy').hide();
+                }
+            }).fail(function() {
+                $('#modalContent').html(`
+                    <div class="alert alert-danger text-center">
+                        Lỗi khi tải chi tiết hành vi
+                    </div>
+                `);
+            });
+        }
+        
+        function confirmXuLy(id) {
+            Swal.fire({
+                title: 'Xác nhận xử lý?',
+                text: "Bạn có chắc chắn muốn đánh dấu hành vi này là đã xử lý?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Đồng ý',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('/Admin/HanhViDangNgo/XuLy/' + id)
+                        .done(function() {
+                            Swal.fire(
+                                'Thành công!',
+                                'Hành vi đã được đánh dấu là đã xử lý.',
+                                'success'
+                            ).then(() => {
+                                location.reload();
+                            });
+                        })
+                        .fail(function() {
+                            Swal.fire(
+                                'Lỗi!',
+                                'Có lỗi xảy ra khi xử lý.',
+                                'error'
+                            );
+                        });
+                }
+            });
+        }
+    </script>
+}

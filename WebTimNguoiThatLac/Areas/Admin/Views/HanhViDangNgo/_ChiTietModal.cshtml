@@ -1,0 +1,103 @@
+﻿@model WebTimNguoiThatLac.Models.HanhViDangNgo
+
+<input type="hidden" id="daXuLy" value="@Model.DaXuLy.ToString()" />
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h5 class="font-weight-bold text-primary">Thông tin hành vi</h5>
+            <hr />
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>ID Hành vi:</strong></p>
+                    <p><strong>Hành động:</strong></p>
+                    <p><strong>Thời gian:</strong></p>
+                </div>
+                <div class="col-md-6">
+                    <p>@Model.Id</p>
+                    <p>@Model.HanhDong</p>
+                    <p>@Model.ThoiGian?.ToString("dd/MM/yyyy HH:mm:ss")</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <h5 class="font-weight-bold text-primary">Thông tin người dùng</h5>
+            <hr />
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>ID Người dùng:</strong></p>
+                    <p><strong>Email:</strong></p>
+                    <p><strong>Username:</strong></p>
+                    <p><strong>SĐT:</strong></p>
+                </div>
+                <div class="col-md-6">
+                    <p>@Model.NguoiDungId</p>
+                    <p>@(Model.ApplicationUser?.Email ?? "N/A")</p>
+                    <p>@(Model.ApplicationUser?.UserName ?? "N/A")</p>
+                    <p>@(Model.ApplicationUser?.PhoneNumber ?? "N/A")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <h5 class="font-weight-bold text-primary">Chi tiết hành vi</h5>
+            <hr />
+            <div class="border p-3 bg-light rounded">
+                @Model.ChiTiet
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <h5 class="font-weight-bold text-primary">Trạng thái</h5>
+            <hr />
+            <p><strong>Kháng nghị:</strong> 
+                @if (Model.KhangNghi)
+                {
+                        <span class="badge badge-warning">Có</span>
+                }
+                else
+                {
+                        <span class="badge badge-secondary">Không</span>
+                }
+            </p>
+            <p><strong>Đã xem:</strong> 
+                @if (Model.DaXem)
+                {
+                        <span class="badge badge-success">Đã xem</span>
+                }
+                else
+                {
+                        <span class="badge badge-danger">Chưa xem</span>
+                }
+            </p>
+            <p><strong>Đã xử lý:</strong> 
+                @if (Model.DaXuLy)
+                {
+                        <span class="badge badge-success">Đã xử lý</span>
+                }
+                else
+                {
+                        <span class="badge badge-danger">Chưa xử lý</span>
+                }
+            </p>
+            <p>
+                <strong>Trạng thái kháng nghị:</strong>
+                @if (!string.IsNullOrEmpty(Model.TrangThaiKhangNghi))
+                {
+                    <span class="badge @(Model.TrangThaiKhangNghi == "Kháng Nghị Thành Công" ? "badge-success" : "badge-danger")">
+                        @Model.TrangThaiKhangNghi
+                    </span>
+                }
+                else
+                {
+                    <span class="badge badge-secondary">Không có</span>
+                }
+            </p>
+        </div>
+    </div>
+</div>

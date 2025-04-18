@@ -17,6 +17,8 @@ namespace WebTimNguoiThatLac.Models
         public bool KhangNghi { get; set; } = false; // Mặc định là không kháng nghị
         public bool DaXem { get; set; } = false; // Mặc định là chưa xem
         public bool DaXuLy { get; set; } = false; // Mặc định là chưa xử lý
+        public string? TrangThaiKhangNghi { get; set; }  // Kháng Nghị Thất Bại, Kháng Nghị Thành Công
+
     }
 
 }

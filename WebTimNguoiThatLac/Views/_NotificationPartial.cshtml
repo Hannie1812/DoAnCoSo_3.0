@@ -1,6 +1,22 @@
 ﻿@using Humanizer
 @model IEnumerable<BinhLuan>
 
+
+<style>
+    .notification-dropdown {
+        display: none;
+    }
+
+    .unread {
+        background-color: #f8fbff;
+        border-left: 3px solid #0d6efd;
+    }
+
+    .notification-item:hover {
+        background-color: #f8f9fa !important;
+    }
+</style>
+
 <div class="dropdown-menu dropdown-menu-end p-0 shadow notification-dropdown"
      style="width: 380px; max-height: 70vh; overflow-y: auto;">
     <!-- Header -->
@@ -64,21 +80,6 @@
         </a>
     </div>
 </div>
-
-<style>
-    .notification-dropdown {
-        display: none;
-    }
-
-    .unread {
-        background-color: #f8fbff;
-        border-left: 3px solid #0d6efd;
-    }
-
-    .notification-item:hover {
-        background-color: #f8f9fa !important;
-    }
-</style>
 
 <script>
     $(document).ready(function() {

@@ -35,11 +35,11 @@ public class ThongBaoMoiViewComponent : ViewComponent
 
         var user = await _userManager.GetUserAsync((ClaimsPrincipal)User);
 
+        if (user == null || user.Id == null)
+        {
+            return View("_DanhSachThongBao", model);
+        }
         var userId = user.Id;
-        if (userId == null) return View("_DanhSachThongBao", model);
-
-
-
         // 1. Tin nhắn bài viết
         var postComments = await _db.BinhLuans
             .Include(b => b.ApplicationUser)

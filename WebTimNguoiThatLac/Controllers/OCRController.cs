@@ -25,40 +25,34 @@ namespace WebTimNguoiThatLac.Controllers
         public IActionResult ExtractCCCD(IFormFile imageFile)
         {
             if (imageFile == null || imageFile.Length == 0)
-            {
                 return BadRequest("Vui lòng chọn một ảnh hợp lệ.");
-            }
 
             try
             {
                 // Kiểm tra định dạng file
                 var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
                 string fileExtension = Path.GetExtension(imageFile.FileName).ToLower();
-                if (!Array.Exists(allowedExtensions, ext => ext == fileExtension))
-                {
+                if (!allowedExtensions.Contains(fileExtension))
                     return BadRequest("Chỉ chấp nhận file ảnh JPG, JPEG, PNG.");
-                }
 
-                // Tạo và lưu ảnh gốc
-                string uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/CCCD_NguoiDung");
-                Directory.CreateDirectory(uploadDir);
-                string originalFileName = $"{Guid.NewGuid()}_original{fileExtension}";
-                string originalFilePath = Path.Combine(uploadDir, originalFileName);
+                // Đọc ảnh từ stream
+                using var inputStream = imageFile.OpenReadStream();
+                using var originalImage = new Bitmap(inputStream);
 
-                using (var stream = new FileStream(originalFilePath, FileMode.Create))
-                {
-                    imageFile.CopyTo(stream);
-                }
+                // Tiền xử lý ảnh trực tiếp trên memory
+                using var preprocessedImage = PreprocessImage(originalImage);
 
-                // Tiền xử lý ảnh
-                string processedFilePath = PreprocessImage(originalFilePath);
+                // Lưu ảnh đã xử lý vào memory stream để OCR
+                using var ms = new MemoryStream();
+                preprocessedImage.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
 
-                // Xử lý OCR
+                ms.Position = 0;
+
                 string extractedText;
                 try
                 {
                     using var ocrEngine = new TesseractEngine(_tessDataPath, "vie", EngineMode.Default);
-                    using var img = Pix.LoadFromFile(processedFilePath);
+                    using var img = Pix.LoadFromMemory(ms.ToArray());
                     using var page = ocrEngine.Process(img);
                     extractedText = page.GetText();
                 }
@@ -69,11 +63,8 @@ namespace WebTimNguoiThatLac.Controllers
 
                 // Xử lý văn bản trích xuất
                 if (string.IsNullOrWhiteSpace(extractedText))
-                {
                     return BadRequest("Không thể đọc nội dung từ ảnh. Vui lòng thử với ảnh rõ nét hơn.");
-                }
 
-                // Trích xuất số CCCD và họ tên (giữ nguyên logic cũ)
                 string cleanedText = Regex.Replace(extractedText, @"\s+", "");
                 string cccd = Regex.Match(cleanedText, @"\d{12}").Value;
 
@@ -85,19 +76,10 @@ namespace WebTimNguoiThatLac.Controllers
                         .FirstOrDefault(v => v.Length == 12);
                 }
 
-                string fullName = ExtractFullName(extractedText);
-
-                // Kiểm tra và trả về kết quả (giữ nguyên logic cũ)
-                if (string.IsNullOrEmpty(cccd) && string.IsNullOrEmpty(fullName))
-                {
+                if (string.IsNullOrEmpty(cccd))
                     return BadRequest("Không thể nhận dạng thông tin từ ảnh.");
-                }
 
-                return Ok(new
-                {
-                    CCCD = string.IsNullOrEmpty(cccd) ? "Không tìm thấy" : cccd,
-                    HoTen = string.IsNullOrEmpty(fullName) ? "Không tìm thấy" : fullName.Trim()
-                });
+                return Ok(new { CCCD = cccd });
             }
             catch (Exception ex)
             {
@@ -105,37 +87,26 @@ namespace WebTimNguoiThatLac.Controllers
             }
         }
 
-        private string PreprocessImage(string imagePath)
+
+        private Bitmap PreprocessImage(Bitmap originalImage)
         {
-            string processedFilePath = Path.Combine(
-                Path.GetDirectoryName(imagePath),
-                $"{Path.GetFileNameWithoutExtension(imagePath)}_processed.jpg");
+            // Resize nếu ảnh quá nhỏ
+            var resizedImage = originalImage.Width < MinimumWidth || originalImage.Height < MinimumHeight
+                ? new Bitmap(originalImage, new Size(
+                    Math.Max(originalImage.Width * 2, MinimumWidth),
+                    Math.Max(originalImage.Height * 2, MinimumHeight)))
+                : new Bitmap(originalImage);
 
-            using (var originalImage = new Bitmap(imagePath))
-            {
-                // Resize nếu ảnh quá nhỏ
-                var resizedImage = originalImage.Width < MinimumWidth || originalImage.Height < MinimumHeight
-                    ? new Bitmap(originalImage, new Size(
-                        Math.Max(originalImage.Width * 2, MinimumWidth),
-                        Math.Max(originalImage.Height * 2, MinimumHeight)))
-                    : new Bitmap(originalImage);
+            // Chuyển sang grayscale
+            using var grayImage = ToGrayscale(resizedImage);
 
-                // Chuyển đổi sang grayscale
-                using (var grayImage = ToGrayscale(resizedImage))
-                {
-                    // Tăng contrast
-                    using (var highContrastImage = AdjustContrast(grayImage, 1.5f))
-                    {
-                        // Áp dụng threshold (nhị phân hóa)
-                        using (var binaryImage = ApplyThreshold(highContrastImage, 180))
-                        {
-                            binaryImage.Save(processedFilePath, System.Drawing.Imaging.ImageFormat.Jpeg);
-                        }
-                    }
-                }
-            }
+            // Tăng contrast
+            using var highContrast = AdjustContrast(grayImage, 1.5f);
 
-            return processedFilePath;
+            // Nhị phân hoá
+            var finalImage = ApplyThreshold(highContrast, 180);
+
+            return finalImage;
         }
 
         private Bitmap ToGrayscale(Bitmap original)
@@ -210,7 +181,7 @@ namespace WebTimNguoiThatLac.Controllers
             return binaryImage;
         }
 
-        private string ExtractFullName(string text)
+        /*private string ExtractFullName(string text)
         {
             // Giữ nguyên logic trích xuất họ tên như trước
             var nameMatch = Regex.Match(text,
@@ -230,6 +201,6 @@ namespace WebTimNguoiThatLac.Controllers
                 .OrderByDescending(line => line.Count(c => char.IsUpper(c)))
                 .ThenByDescending(line => line.Length)
                 .FirstOrDefault() ?? "Không tìm thấy";
-        }
+        }*/
     }
 }

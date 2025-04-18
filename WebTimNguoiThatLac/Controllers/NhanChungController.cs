@@ -64,10 +64,22 @@ public class NhanChungController : Controller
     [HttpPost]
     public async Task<IActionResult> Create(NhanChung model, IFormFile file)
     {
+        if (!ModelState.IsValid)
+        {
+            foreach (var state in ModelState)
+            {
+                foreach (var error in state.Value.Errors)
+                {
+                    _logger.LogError($"Lỗi ở {state.Key}: {error.ErrorMessage}");
+                }
+            }
+        }
         if (ModelState.IsValid)
         {
             try
             {
+                // Tự động gán ngày báo tin
+                model.NgayBaoTin = DateTime.Now;
                 // Xử lý file đính kèm nếu có
                 if (file != null && file.Length > 0)
                 {

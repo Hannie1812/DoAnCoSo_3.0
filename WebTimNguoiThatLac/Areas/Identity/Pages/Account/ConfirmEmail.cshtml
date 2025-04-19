@@ -1,8 +1,40 @@
 ﻿@page
 @model ConfirmEmailModel
 @{
-    ViewData["Title"] = "Confirm email";
+    ViewData["Title"] = "Xác nhận email";
 }
 
-<h1>@ViewData["Title"]</h1>
-<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">Thông báo</h4>
+                </div>
+                <div class="card-body text-center">
+                    <partial name="_StatusMessage" model="Model.StatusMessage" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hero-wrap {
+        position: relative;
+        background-size: cover;
+        background-position: center center;
+    }
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+    }
+    .card {
+        transition: transform 0.3s ease;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+</style>

@@ -15,6 +15,7 @@
     <Folder Include="wwwroot\uploads\BinhLuan\" />
     <Folder Include="wwwroot\uploads\CCCD_NguoiDung\" />
     <Folder Include="wwwroot\uploads\GioiThieu\" />
+    <Folder Include="wwwroot\uploads\AnhNhanChung\" />
     <Folder Include="wwwroot\uploads\TinTuc\" />
     <Folder Include="wwwroot\uploads\TrungBayHinhAnh\" />
     <Folder Include="wwwroot\wwwroot\DangKiTimKiem\" />

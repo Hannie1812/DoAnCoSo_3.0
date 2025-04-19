@@ -44,6 +44,8 @@
     }
 </style>
 
+
+
 <style>
     :root {
     --primary-color: #4361ee;
@@ -465,6 +467,10 @@
     }
     }
 </style>
+
+
+
+
 <div class="missing-person-container">
     <!-- Breadcrumb Navigation -->
     <nav aria-label="breadcrumb" class="breadcrumb-nav">
@@ -638,6 +644,9 @@
                             </a>
                             <a asp-action="XacNhanTimThay" asp-controller="TimNguoi" asp-route-id="@Model.Id" class="btn btn-outline-primary">
                                 <i class="fas fa-edit me-1"></i>Xác Nhận Đã Thấy
+                            </a>
+                            <a asp-action="Index" asp-controller="NhanChung" asp-route-id="@Model.Id" class="btn btn-outline-primary">
+								<i class="fas fa-edit me-1"></i>Nhân Chứng
                             </a>
                         }
                         @if (!isAuthor && user != null)
@@ -967,7 +976,6 @@
     @await Html.PartialAsync("_LayoutStickyCallButton", Model.Id)
 
 
-
 <script>
 
     function XuatDon(id) {
@@ -1160,6 +1168,9 @@
             submitBtn.disabled = false;
         });
     }
+
+    
+
 </script>
 @section Scripts {
     @if (TempData["FileContents"] != null)
@@ -1172,6 +1183,31 @@
         </script>
     }
     
+    @* Nhân chứng đã gửi thành công *@
+    @if (TempData["GuiNhanChungThanhCong"] != null)
+    {
+        <script>
+			alert('Đã gửi nhân chứng thành công 123456789 test nhớ xóa ');
+            $(document).ready(function() {
+                 showNotification1('success', '@Html.Raw(Json.Serialize(TempData["GuiNhanChungThanhCong"].ToString()))');
+              });
+
+             function showNotification1(type, message) {
+                 const notificationArea = document.getElementById('notification-area');
+                 const notification = document.createElement('div');
+                 notification.className = `notification ${type}`;
+                 notification.innerHTML = `
+                     <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
+                     ${message}
+                 `;
+                 notificationArea.appendChild(notification);
+                 setTimeout(() => notification.remove(), 5000);
+             }
+        </script>
+    }
+
+
+
     <script>
         function XacNhanXoaBinhLuan(id)
         {

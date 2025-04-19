@@ -698,10 +698,12 @@ namespace WebTimNguoiThatLac.Controllers
                 }
                 else
                 {
+                    TempData["ErrorMessage"] = "Bạn cần đăng nhập để thực hiện chức năng này.";
                     return RedirectToAction("Login", "Account");
                 }
             }
 
+            TempData["ErrorMessage"] = "Bạn cần đăng nhập để thực hiện chức năng này.";
             return RedirectToAction("Login", "Account");
         }
 

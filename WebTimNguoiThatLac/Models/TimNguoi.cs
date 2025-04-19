@@ -13,6 +13,7 @@ namespace WebTimNguoiThatLac.Models
             this.BinhLuans = new HashSet<BinhLuan>();
             this.BaoCaoBaiViets = new HashSet<BaoCaoBaiViet>();
             this.TimThayNguoiThatLacs = new HashSet<TimThayNguoiThatLac>();
+            this.NhanChungs = new HashSet<NhanChung>();
         }
 
         [Key]
@@ -41,5 +42,6 @@ namespace WebTimNguoiThatLac.Models
         public string? DonDangKiTrinhBao { get; set; }
         public ICollection<BaoCaoBaiViet> BaoCaoBaiViets { get; set; }
         public ICollection<TimThayNguoiThatLac> TimThayNguoiThatLacs { get; set; }
+        public ICollection<NhanChung> NhanChungs { get; set; }
     }
 }

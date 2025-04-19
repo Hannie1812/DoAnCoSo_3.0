@@ -9,33 +9,21 @@ namespace WebTimNguoiThatLac.Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
-        [MaxLength(100)]
-        public string HoTen { get; set; } // Tên nhân chứng
-
-        [EmailAddress]
+        public string? HoTen { get; set; } // Tên nhân chứng
         public string? Email { get; set; } // Email của nhân chứng (tùy chọn)
-
-        [Phone]
         public string? SoDienThoai { get; set; } // Số điện thoại của nhân chứng (tùy chọn)
 
-        [Required]
-        public DateTime ThoiGian { get; set; } // Thời gian nhân chứng nhìn thấy
+        public DateTime? ThoiGian { get; set; } // Thời gian nhân chứng nhìn thấy
 
-        [Required]
-        [MaxLength(200)]
-        public string DiaDiem { get; set; } // Địa điểm nhìn thấy
+        public string? DiaDiem { get; set; } // Địa điểm nhìn thấy
 
-        [Required]
-        public string MoTaManhMoi { get; set; } // Nội dung manh mối
+        public string? MoTaManhMoi { get; set; } // Nội dung manh mối
 
         public string? FileDinhKem { get; set; } // Đường dẫn tới file ảnh/video
-
-        [Required]
-        public int TimNguoiId { get; set; } // Liên kết với bảng TimNguoi (missing person)
+        public int? TimNguoiId { get; set; } // Liên kết với bảng TimNguoi (missing person)
 
         [ForeignKey("TimNguoiId")]
-        public TimNguoi TimNguoi { get; set; } // Thông tin người mất tích liên quan
+        public TimNguoi? TimNguoi { get; set; } // Thông tin người mất tích liên quan
         public DateTime NgayBaoTin { get; set; } = DateTime.Now;
     }
 }

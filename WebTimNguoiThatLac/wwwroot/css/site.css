@@ -117,3 +117,13 @@ body {
         transform: scale(1.1);
     }
 }
+.btn-facebook {
+    background-color: #1877F2;
+    color: white;
+    border: none;
+}
+
+    .btn-facebook:hover {
+        background-color: #155dbd;
+        color: white;
+    }

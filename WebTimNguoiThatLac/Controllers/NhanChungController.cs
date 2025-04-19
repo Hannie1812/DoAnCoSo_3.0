@@ -105,29 +105,14 @@ public class NhanChungController : Controller
 
         if (timNguoi == null)
         {
-            return NotFound();
+            return Json(new { success = false, message = "Bạn không có quyền xóa nhân chứng này" });
         }
 
         // Lưu thông tin vào ViewBag
         ViewBag.TenNguoiMatTich = timNguoi.HoTen;
         ViewBag.KhuVucMatTich = timNguoi.KhuVuc;
         ViewBag.NgaySinh = timNguoi.NgaySinh?.ToString("dd/MM/yyyy") ?? "Không có thông tin";
-
-        // Lấy thông tin người mất tích từ database
-        var timNguoi = await _context.TimNguois
-            .Where(t => t.Id == id)
-            .Select(t => new {
-                t.HoTen,
-                t.KhuVuc,
-                t.NgaySinh
-            })
-            .FirstOrDefaultAsync();
-
-        if (timNguoi == null)
-        {
-            return Json(new { success = false, message = "Bạn không có quyền xóa nhân chứng này" });
-        }
-
+        
         _context.NhanChungs.Remove(nhanChung);
         await _context.SaveChangesAsync();
 

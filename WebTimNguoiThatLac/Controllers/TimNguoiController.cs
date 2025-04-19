@@ -15,6 +15,7 @@ using WebTimNguoiThatLac.Data;
 using WebTimNguoiThatLac.Models;
 using WebTimNguoiThatLac.Services;
 using X.PagedList.Extensions;
+using WebTimNguoiThatLac.ViewModels;
 
 namespace WebTimNguoiThatLac.Controllers
 {
@@ -25,7 +26,7 @@ namespace WebTimNguoiThatLac.Controllers
         private UserManager<ApplicationUser> userManager;
 
         private readonly EmailService _emailService;
-
+        private readonly OtpService _otpService;
         private readonly ILogger<TimNguoiController> _logger;
 
         private static readonly IEnumerable<string> TinhThanhIEnumerable = new List<string>
@@ -95,12 +96,69 @@ namespace WebTimNguoiThatLac.Controllers
         "Phú Yên"
     };
 
-        public  TimNguoiController(ApplicationDbContext db, UserManager<ApplicationUser> userManager, EmailService emailService, ILogger<TimNguoiController> logger)
+        public TimNguoiController(ApplicationDbContext db, UserManager<ApplicationUser> userManager, EmailService emailService, OtpService otpService, ILogger<TimNguoiController> logger)
         {
             this.db = db;
             this.userManager = userManager;
             _emailService = emailService;
+            _otpService = otpService;
             _logger = logger;
+        }
+
+        [HttpGet]
+        public IActionResult VerifyOtp()
+        {
+            return View(new OtpVerificationViewModel());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> VerifyOtp(OtpVerificationViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            if (string.IsNullOrEmpty(model.OtpCode))
+            {
+                // Gửi mã OTP mới
+                await _otpService.GenerateAndSendOtpAsync(model.Email);
+                model.IsVerified = false;
+                return View(model);
+            }
+
+            // Xác thực mã OTP
+            var isValid = await _otpService.VerifyOtpAsync(model.Email, model.OtpCode);
+            if (!isValid)
+            {
+                ModelState.AddModelError(string.Empty, "Mã OTP không hợp lệ hoặc đã hết hạn");
+                model.IsVerified = false;
+                return View(model);
+            }
+
+            // Lưu email đã xác thực vào TempData
+            TempData["VerifiedEmail"] = model.Email;
+            return RedirectToAction("ThemNguoiCanTim");
+        }
+
+        
+        [HttpPost]
+        public async Task<IActionResult> SendOtp(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return BadRequest();
+            }
+            await _otpService.GenerateAndSendOtpAsync(email);
+            return Ok();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResendOtp(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+                return BadRequest();
+
+            await _otpService.GenerateAndSendOtpAsync(email);
+            return Ok();
         }
 
 
@@ -228,6 +286,12 @@ namespace WebTimNguoiThatLac.Controllers
         }
         public async Task<IActionResult> ThemNguoiCanTim()
         {
+            // Kiểm tra xem email đã được xác thực chưa
+            var verifiedEmail = TempData["VerifiedEmail"] as string;
+            if (string.IsNullOrEmpty(verifiedEmail))
+            {
+                return RedirectToAction("VerifyOtp");
+            }
             ViewBag.DanhSachTinhThanh = TinhThanhIEnumerable;
             return View();
         }
@@ -265,7 +329,7 @@ namespace WebTimNguoiThatLac.Controllers
                     db.AnhTimNguois.Add(x);
                     await db.SaveChangesAsync();
                 }
-                return RedirectToAction("ThongTinCaNhan", "NguoiDung");
+                return Redirect("/Identity/Account/Manage/Index");
             }
 
             ViewBag.DanhSachTinhThanh = TinhThanhIEnumerable;

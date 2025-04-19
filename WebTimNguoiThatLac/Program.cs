@@ -33,6 +33,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
 builder.Services.AddScoped<WordExportService>();// Xuất File Đăng Kí
 
 builder.Services.AddTransient<IEmailSender, EmailService>(); // email
+builder.Services.AddScoped<EmailService>(); // Đăng ký EmailService
+builder.Services.AddScoped<OtpService>(); // Đăng ký OtpService
 
 // Trong ConfigureServices (Startup.cs) hoặc Program.cs
 builder.Services.AddScoped<ITimNguoiRepository, EFTimNguoiRepository>();

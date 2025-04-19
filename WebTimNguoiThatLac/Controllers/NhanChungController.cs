@@ -16,16 +16,40 @@ public class NhanChungController : Controller
     private readonly ILogger<NhanChungController> _logger;
 
     public NhanChungController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, ITimNguoiRepository timNguoiRepository, ILogger<NhanChungController> logger)
+    public NhanChungController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, ITimNguoiRepository timNguoiRepository, ILogger<NhanChungController> logger)
     {
         _context = context;
         _userManager = userManager;
+        _timNguoiRepository = timNguoiRepository;
+        _logger = logger;
         _timNguoiRepository = timNguoiRepository;
         _logger = logger;
     }
 
     [HttpGet]
     public async Task<IActionResult> Create(int id) // id của bài viết tìm người
+    public async Task<IActionResult> Create(int id) // id của bài viết tìm người
     {
+        // Lấy thông tin người mất tích từ database
+        var timNguoi = await _context.TimNguois
+            .Where(t => t.Id == id)
+            .Select(t => new {
+                t.HoTen,
+                t.KhuVuc,
+                t.NgaySinh
+            })
+            .FirstOrDefaultAsync();
+
+        if (timNguoi == null)
+        {
+            return NotFound();
+        }
+
+        // Lưu thông tin vào ViewBag
+        ViewBag.TenNguoiMatTich = timNguoi.HoTen;
+        ViewBag.KhuVucMatTich = timNguoi.KhuVuc;
+        ViewBag.NgaySinh = timNguoi.NgaySinh?.ToString("dd/MM/yyyy") ?? "Không có thông tin";
+
         // Lấy thông tin người mất tích từ database
         var timNguoi = await _context.TimNguois
             .Where(t => t.Id == id)
@@ -50,8 +74,11 @@ public class NhanChungController : Controller
         var currentUser = await _userManager.GetUserAsync(User);
 
         // Tạo model với thông tin tự động điền
+        // Tạo model với thông tin tự động điền
         var model = new NhanChung
         {
+            TimNguoiId = id,
+            HoTen = currentUser?.FullName,
             TimNguoiId = id,
             HoTen = currentUser?.FullName,
             Email = currentUser?.Email,
@@ -63,7 +90,18 @@ public class NhanChungController : Controller
 
     [HttpPost]
     public async Task<IActionResult> Create(NhanChung model, IFormFile file)
+    public async Task<IActionResult> Create(NhanChung model, IFormFile file)
     {
+        if (!ModelState.IsValid)
+        {
+            foreach (var state in ModelState)
+            {
+                foreach (var error in state.Value.Errors)
+                {
+                    _logger.LogError($"Lỗi ở {state.Key}: {error.ErrorMessage}");
+                }
+            }
+        }
         if (ModelState.IsValid)
         {
             try
@@ -94,7 +132,24 @@ public class NhanChungController : Controller
                 // Lưu thông tin nhân chứng
                 _context.NhanChungs.Add(model);
                 await _context.SaveChangesAsync();
+                // Lưu thông tin nhân chứng
+                _context.NhanChungs.Add(model);
+                await _context.SaveChangesAsync();
 
+                TempData["SuccessMessage"] = "Thông tin nhân chứng đã được gửi thành công!";
+                return RedirectToAction("ChiTietBaiViet", "TimNguoi", new { id = model.TimNguoiId });
+            }
+            catch (Exception ex)
+            {
+                // Ghi log lỗi
+                _logger.LogError(ex, "Lỗi khi lưu thông tin nhân chứng");
+                ModelState.AddModelError("", "Đã xảy ra lỗi khi lưu thông tin. Vui lòng thử lại.");
+            }
+        }
+
+        // Nếu có lỗi, hiển thị lại form với thông báo
+        TempData["ErrorMessage"] = "Vui lòng kiểm tra lại thông tin nhập";
+        return View(model);
                 TempData["SuccessMessage"] = "Thông tin nhân chứng đã được gửi thành công!";
                 return RedirectToAction("ChiTietBaiViet", "TimNguoi", new { id = model.TimNguoiId });
             }

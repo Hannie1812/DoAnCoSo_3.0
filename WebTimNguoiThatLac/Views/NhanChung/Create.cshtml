@@ -69,6 +69,7 @@
                         <!-- Thông tin nhìn thấy -->
                         <h5 class="mb-3">Thông tin nhìn thấy</h5>
                         <div class="row mb-4">
+                            <input type="hidden" asp-for="TimNguoiId" />
                             <div class="col-md-6 mb-3">
                                 <label asp-for="ThoiGian" class="form-label fw-bold">Thời gian nhìn thấy *</label>
                                 <input asp-for="ThoiGian" type="datetime-local" class="form-control" required />

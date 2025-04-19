@@ -23,7 +23,7 @@ namespace WebTimNguoiThatLac.Controllers
     {
         private ApplicationDbContext db;
         
-        private UserManager<ApplicationUser> userManager;
+        private UserManager<ApplicationUser> _userManager;
 
         private readonly EmailService _emailService;
         private readonly OtpService _otpService;
@@ -99,16 +99,28 @@ namespace WebTimNguoiThatLac.Controllers
         public TimNguoiController(ApplicationDbContext db, UserManager<ApplicationUser> userManager, EmailService emailService, OtpService otpService, ILogger<TimNguoiController> logger)
         {
             this.db = db;
-            this.userManager = userManager;
+            _userManager = userManager;
             _emailService = emailService;
             _otpService = otpService;
             _logger = logger;
         }
 
         [HttpGet]
-        public IActionResult VerifyOtp()
+        public async Task<IActionResult> VerifyOtp()
         {
-            return View(new OtpVerificationViewModel());
+            string email = string.Empty;
+
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                email = user?.Email;
+            }
+
+            var model = new OtpVerificationViewModel
+            {
+                Email = email
+            };
+            return View(model);
         }
 
         [HttpPost]
@@ -204,7 +216,7 @@ namespace WebTimNguoiThatLac.Controllers
 
                 if(User.Identity.IsAuthenticated)
                 {
-                    var nguoiDung = await userManager.GetUserAsync(User);
+                    var nguoiDung = await _userManager.GetUserAsync(User);
                     nguoiDungId = nguoiDung.Id;
 
                     // Ghi lịch sử tìm kiếm
@@ -394,7 +406,7 @@ namespace WebTimNguoiThatLac.Controllers
             {
                 return Redirect("/Identity/Account/login");
             }
-            ApplicationUser x = await userManager.GetUserAsync(User);
+            ApplicationUser x = await _userManager.GetUserAsync(User);
             if(x != null)
             {
                 
@@ -402,7 +414,7 @@ namespace WebTimNguoiThatLac.Controllers
                     .Include(u => u.AnhTimNguois)
                     .Include(u => u.TimThayNguoiThatLacs)
                     .FirstOrDefault(i => i.Id == id);
-                ApplicationUser us = await userManager.FindByIdAsync(y.IdNguoiDung);
+                ApplicationUser us = await _userManager.FindByIdAsync(y.IdNguoiDung);
                 ViewBag.NguoiTim = us;
                 ViewBag.DSHinhAnh = await db.AnhTimNguois
                                                         .Where(i => i.IdNguoiCanTim == y.Id)
@@ -665,7 +677,7 @@ namespace WebTimNguoiThatLac.Controllers
                     return Json(new { success = false, message = "Không tìm thấy bình luận" });
                 }
 
-                var currentUser = await userManager.GetUserAsync(User);
+                var currentUser = await _userManager.GetUserAsync(User);
 
                 var baoCao = new BaoCaoBinhLuan
                 {
@@ -705,7 +717,7 @@ namespace WebTimNguoiThatLac.Controllers
 
             try
             {
-                var currentUser = await userManager.GetUserAsync(User);
+                var currentUser = await _userManager.GetUserAsync(User);
                 var baiViet = await db.TimNguois.FirstOrDefaultAsync(i => i.Id == MaBaiViet);
 
                 if (baiViet == null)
@@ -897,7 +909,7 @@ namespace WebTimNguoiThatLac.Controllers
 
             try
             {
-                var currentUser = await userManager.GetUserAsync(User);
+                var currentUser = await _userManager.GetUserAsync(User);
                 var binhluan = await db.BinhLuans
                     .Include(b => b.TimNguoi)
                     .Include(b => b.ApplicationUser)

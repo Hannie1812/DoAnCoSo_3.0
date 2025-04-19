@@ -22,7 +22,7 @@ namespace WebTimNguoiThatLac.Controllers
         }
         public async Task<IActionResult> Index(int Page = 1)
         {
-            if(User.Identity.IsAuthenticated)
+            if (User.Identity.IsAuthenticated)
             {
                 ApplicationUser us = await usManager.GetUserAsync(User);
 
@@ -40,5 +40,39 @@ namespace WebTimNguoiThatLac.Controllers
                 return RedirectToAction("Login", "Account");
             }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> MarkAsRead(int id)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                HanhViDangNgo? h = await db.HanhViDangNgos.FirstOrDefaultAsync(i => i.Id == id);
+                if (h != null)
+                {
+                    h.DaXem = true;
+                    await db.SaveChangesAsync();
+                    return Json(new { success = true });
+                }
+            }
+            return Json(new { success = false });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> KhangNghi(int id)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                HanhViDangNgo? h = await db.HanhViDangNgos.FirstOrDefaultAsync(i => i.Id == id);
+                if (h != null)
+                {
+                    h.KhangNghi = true;
+                    h.TrangThaiKhangNghi = "";
+                    await db.SaveChangesAsync();
+                    return Json(new { success = true });
+                }
+            }
+            return Json(new { success = false });
+        }
+
     }
 }

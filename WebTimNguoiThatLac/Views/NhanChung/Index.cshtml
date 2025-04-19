@@ -1,0 +1,386 @@
+﻿@model IPagedList<WebTimNguoiThatLac.Models.NhanChung>
+@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+
+@{
+    ViewData["Title"] = "Danh Sách Nhân Chứng";
+    int stt = (Model.PageNumber - 1) * Model.PageSize + 1;
+    int timNguoiId = ViewBag.TimNguoiId ?? 0;
+}
+
+<style>
+    :root {
+        --primary-color: #3498db;
+        --secondary-color: #2980b9;
+        --danger-color: #e74c3c;
+        --light-color: #ecf0f1;
+        --dark-color: #2c3e50;
+    }
+
+    .page-link {
+        color: var(--primary-color);
+        padding: 0.5rem 0.75rem;
+    }
+
+    .page-item.active .page-link {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+
+    .btn-outline-danger {
+        color: var(--danger-color);
+        border-color: var(--danger-color);
+    }
+
+        .btn-outline-danger:hover {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+    .card-header {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 1rem;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(52, 152, 219, 0.1);
+    }
+
+    .badge-info {
+        background-color: var(--primary-color);
+    }
+
+    .search-box {
+        border-radius: 1.25rem;
+        border: 1px solid #ddd;
+        padding: 0.5rem 1rem;
+        width: 100%;
+    }
+
+    .witness-card {
+        border-left: 0.25rem solid var(--primary-color);
+        transition: all 0.3s ease;
+    }
+
+        .witness-card:hover {
+            transform: translateY(-0.2rem);
+            box-shadow: 0 0.3rem 0.9rem rgba(0,0,0,0.1);
+        }
+
+    .file-preview {
+        max-width: 6rem;
+        max-height: 6rem;
+        cursor: pointer;
+        object-fit: cover;
+    }
+
+    .modal-header {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .empty-state {
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .contact-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .action-buttons {
+        white-space: nowrap;
+    }
+
+    @@media (max-width: 768px) {
+        .table-responsive {
+            border: 0;
+        }
+
+        .table thead {
+            display: none;
+        }
+
+        .table tr {
+            display: block;
+            margin-bottom: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+        }
+
+        .table td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+            .table td:before {
+                content: attr(data-label);
+                font-weight: bold;
+                margin-right: 1rem;
+                flex: 1;
+            }
+
+            .table td:last-child {
+                border-bottom: 0;
+            }
+
+        .action-buttons {
+            justify-content: flex-end;
+        }
+    }
+</style>
+
+<div class="container-fluid mt-3">
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-friends mr-2"></i>@ViewData["Title"]
+                    </h4>
+                    <a href="@Url.Action("Details", "TimNguoi", new { id = timNguoiId })" class="btn btn-light">
+                        <i class="fas fa-arrow-left mr-1"></i>Quay lại
+                    </a>
+                </div>
+                <div class="card-body">
+                    <form method="get" action="@Url.Action("Index")" class="mb-4">
+                        <input type="hidden" name="id" value="@timNguoiId" />
+                        <div class="row g-2">
+                            <div class="col-md-3 col-sm-6">
+                                <input type="text" name="searchHoTen" class="form-control search-box"
+                                       placeholder="Tìm theo tên..." value="@Context.Request.Query["searchHoTen"]">
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <input type="text" name="searchEmail" class="form-control search-box"
+                                       placeholder="Tìm theo email..." value="@Context.Request.Query["searchEmail"]">
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <input type="text" name="searchPhone" class="form-control search-box"
+                                       placeholder="Tìm theo điện thoại..." value="@Context.Request.Query["searchPhone"]">
+                            </div>
+                            <div class="col-md-3 col-sm-6 d-flex">
+                                <button type="submit" class="btn btn-primary flex-grow-1 mr-2">
+                                    <i class="fas fa-search mr-1"></i>Tìm kiếm
+                                </button>
+                                <a href="@Url.Action("Index", new { id = timNguoiId })" class="btn btn-outline-secondary">
+                                    <i class="fas fa-sync-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+
+                    @if (Model != null && Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-4">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th style="width: 5%">STT</th>
+                                        <th style="width: 15%">Nhân chứng</th>
+                                        <th style="width: 20%">Thông tin liên hệ</th>
+                                        <th style="width: 10%">Thời gian</th>
+                                        <th style="width: 15%">Địa điểm</th>
+                                        <th style="width: 10%">File đính kèm</th>
+                                        <th style="width: 15%">Ngày báo tin</th>
+                                        <th style="width: 10%">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr class="witness-card">
+                                            <td data-label="STT">@(stt++)</td>
+                                            <td data-label="Nhân chứng">
+                                                @if (!string.IsNullOrEmpty(item.HoTen))
+                                                {
+                                                    <strong>@item.HoTen</strong>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Không rõ</span>
+                                                }
+                                            </td>
+                                            <td data-label="Thông tin liên hệ" class="contact-info">
+                                                @if (!string.IsNullOrEmpty(item.Email))
+                                                {
+                                                    <span><i class="fas fa-envelope mr-1"></i> @item.Email</span>
+                                                }
+                                                @if (!string.IsNullOrEmpty(item.SoDienThoai))
+                                                {
+                                                    <span><i class="fas fa-phone mr-1"></i> @item.SoDienThoai</span>
+                                                }
+                                                @if (string.IsNullOrEmpty(item.Email) && string.IsNullOrEmpty(item.SoDienThoai))
+                                                {
+                                                    <span class="text-muted">Không có thông tin</span>
+                                                }
+                                            </td>
+                                            <td data-label="Thời gian">
+                                                @if (item.ThoiGian.HasValue)
+                                                {
+                                                    @item.ThoiGian.Value.ToString("dd/MM/yyyy HH:mm")
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Không rõ</span>
+                                                }
+                                            </td>
+                                            <td data-label="Địa điểm">
+                                                @if (!string.IsNullOrEmpty(item.DiaDiem))
+                                                {
+                                                    @item.DiaDiem
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Không rõ</span>
+                                                }
+                                            </td>
+                                            <td data-label="File đính kèm">
+                                                @if (!string.IsNullOrEmpty(item.FileDinhKem))
+                                                {
+                                                    <img src="@item.FileDinhKem" class="file-preview img-thumbnail"
+                                                         data-toggle="modal" data-target="#imageModal"
+                                                         data-image="@item.FileDinhKem">
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Không có</span>
+                                                }
+                                            </td>
+                                            <td data-label="Ngày báo tin">
+                                                @item.NgayBaoTin.ToString("dd/MM/yyyy HH:mm")
+                                            </td>
+                                            <td data-label="Thao tác" class="action-buttons">
+                                                <button class="btn btn-sm btn-outline-primary"
+                                                        data-toggle="modal" data-target="#detailModal"
+                                                        data-details="@item.MoTaManhMoi">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                @Html.PagedListPager(Model, page => Url.Action("Index", new
+                                    {
+                                        page = page,
+                                        id = timNguoiId,
+                                        searchHoTen = Context.Request.Query["searchHoTen"],
+                                        searchEmail = Context.Request.Query["searchEmail"],
+                                        searchPhone = Context.Request.Query["searchPhone"]
+                                    }),
+                                         new PagedListRenderOptions
+                            {
+                                LiElementClasses = new[] { "page-item" },
+                                PageClasses = new[] { "page-link" },
+                                UlElementClasses = new[] { "pagination justify-content-center" },
+                                DisplayLinkToFirstPage = PagedListDisplayMode.IfNeeded,
+                                DisplayLinkToLastPage = PagedListDisplayMode.IfNeeded,
+                                LinkToFirstPageFormat = "««",
+                                LinkToPreviousPageFormat = "«",
+                                LinkToNextPageFormat = "»",
+                                LinkToLastPageFormat = "»»",
+                                MaximumPageNumbersToDisplay = 5
+                            })
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-user-friends fa-3x text-muted mb-3"></i>
+                            </div>
+                            <h4 class="empty-state-title">Không tìm thấy nhân chứng nào</h4>
+                            <p class="empty-state-text mb-4">
+                                Hiện chưa có thông tin nhân chứng nào được báo cáo cho trường hợp này.
+                            </p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xem chi tiết -->
+<div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailModalLabel">Chi tiết mô tả manh mối</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalDetailContent">
+                <!-- Nội dung chi tiết sẽ được điền ở đây bằng JS -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xem ảnh -->
+<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid" style="max-height: 80vh;">
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Xử lý modal chi tiết
+            $('#detailModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var details = button.data('details');
+                var modal = $(this);
+
+                if (details && details.trim() !== '') {
+                    modal.find('.modal-body').text(details);
+                } else {
+                    modal.find('.modal-body').html('<p class="text-muted">Không có mô tả nào được cung cấp</p>');
+                }
+            });
+
+            // Xử lý modal ảnh
+            $('#imageModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var imageUrl = button.data('image');
+                $('#modalImage').attr('src', imageUrl);
+            });
+        });
+    </script>
+}

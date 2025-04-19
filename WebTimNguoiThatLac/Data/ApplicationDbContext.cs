@@ -7,7 +7,6 @@ namespace WebTimNguoiThatLac.Data
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
-
         public DbSet<TimNguoi> TimNguois { get; set; }
         public DbSet<AnhTimNguoi> AnhTimNguois { get; set; }
         public DbSet<BinhLuan> BinhLuans { get; set; }

@@ -1,54 +1,5 @@
 ﻿@model IEnumerable<WebTimNguoiThatLac.Models.BinhLuan>
 
-<div class="notification-component">
-    <!-- Bell Icon with Counter -->
-    <div class="bell-wrapper">
-        <i class="fas fa-bell bell-icon"></i>
-        @if (Model.Any())
-        {
-            <span class="notification-count">
-                @Model.Count()
-                <span class="sr-only">unread notifications</span>
-            </span>
-        }
-    </div>
-
-    <!-- Notification Dropdown -->
-    <div class="notification-dropdown">
-        <div class="dropdown-header">
-            <h6>Thông báo</h6>
-            <a href="@Url.Action("TatCaThongBao", "TimNguoi")" class="view-all">Xem tất cả</a>
-        </div>
-
-        <div class="notification-list">
-            @if (Model.Any())
-            {
-                foreach (var item in Model)
-                {
-                    <a href="/TimNguoi/ChiTietBaiTimNguoi?id=@item.IdBaiViet&idBinhLuan=@item.Id"
-                       class="notification-item">
-                        <div class="notification-content">
-                            <div class="notification-header">
-                                <strong class="username">@item.ApplicationUser?.UserName</strong>
-                                <span class="timestamp">@item.NgayBinhLuan.ToString("HH:mm dd/MM")</span>
-                            </div>
-                            <p class="message">@item.NoiDung</p>
-                            <small class="post-title">Bài viết: @item.TimNguoi?.TieuDe</small>
-                        </div>
-                    </a>
-                }
-            }
-            else
-            {
-                <div class="empty-notifications">
-                    <i class="far fa-bell-slash"></i>
-                    <p>Không có thông báo mới</p>
-                </div>
-            }
-        </div>
-    </div>
-</div>
-
 <style>
     /* Main Component Container */
     .notification-component {
@@ -259,3 +210,53 @@
         border-width: 0;
     }
 </style>
+
+<div class="notification-component">
+    <!-- Bell Icon with Counter -->
+    <div class="bell-wrapper">
+        <i class="fas fa-bell bell-icon"></i>
+        @if (Model.Any())
+        {
+            <span class="notification-count">
+                @Model.Count()
+                <span class="sr-only">unread notifications</span>
+            </span>
+        }
+    </div>
+
+    <!-- Notification Dropdown -->
+    <div class="notification-dropdown">
+        <div class="dropdown-header">
+            <h6>Thông báo</h6>
+            <a href="@Url.Action("TatCaThongBao", "TimNguoi")" class="view-all">Xem tất cả</a>
+        </div> 
+
+        <div class="notification-list">
+            @if (Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <a href="/TimNguoi/ChiTietBaiTimNguoi?id=@item.IdBaiViet&idBinhLuan=@item.Id"
+                       class="notification-item">
+                        <div class="notification-content">
+                            <div class="notification-header">
+                                <strong class="username">@item.ApplicationUser?.UserName</strong>
+                                <span class="timestamp">@item.NgayBinhLuan.ToString("HH:mm dd/MM")</span>
+                            </div>
+                            <p class="message">@item.NoiDung</p>
+                            <small class="post-title">Bài viết: @item.TimNguoi?.TieuDe</small>
+                        </div>
+                    </a>
+                }
+            }
+            else
+            {
+                <div class="empty-notifications">
+                    <i class="far fa-bell-slash"></i>
+                    <p>Không có thông báo mới</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+

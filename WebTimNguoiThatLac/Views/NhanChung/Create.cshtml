@@ -1,172 +1,563 @@
 ﻿@model WebTimNguoiThatLac.Models.NhanChung
-
 @{
-    ViewData["Title"] = "Gửi thông tin nhân chứng";
+    ViewData["Title"] = "Báo cáo nhân chứng";
+    var timNguoi = ViewBag.BaiTimNguoi as WebTimNguoiThatLac.Models.TimNguoi;
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <!-- Hiển thị thông báo -->
-            @if (TempData["SuccessMessage"] != null)
-            {
-                <div class="alert alert-success">@TempData["SuccessMessage"]</div>
-            }
-            @if (TempData["ErrorMessage"] != null)
-            {
-                <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
-            }
 
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h2 class="h4 mb-0">Gửi Thông Tin Nhân Chứng</h2>
+<!-- Thêm vào phần đầu trang -->
+<div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+@*
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+<style>
+    .notification {
+        padding: 15px 20px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        color: white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        animation: slideIn 0.3s, fadeOut 0.5s 4.5s;
+        transition: all 0.3s;
+    }
+
+        .notification.success {
+            background-color: #28a745;
+        }
+
+        .notification.error {
+            background-color: #dc3545;
+        }
+
+        .notification.warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .notification.info {
+            background-color: #17a2b8;
+        }
+
+    @@keyframes slideIn {
+        from {
+            transform: translateX(100%);
+        }
+
+        to {
+            transform: translateX(0);
+        }
+    }
+
+    @@keyframes fadeOut {
+        from {
+            opacity: 1;
+        }
+
+        to {
+            opacity: 0;
+        }
+    }
+</style>
+
+*@
+
+@if (timNguoi == null)
+{
+    <div class="alert alert-danger text-center my-5 py-4">
+        <i class="fas fa-exclamation-triangle fa-3x mb-3 text-danger"></i>
+        <h2 class="fw-bold">Không thể tải trang</h2>
+        <p class="lead">@TempData["ErrorMessage"]</p>
+        <a href="@Url.Action("Index", "Home")" class="btn btn-primary btn-lg mt-3">
+            <i class="fas fa-home me-2"></i> Về trang chủ
+        </a>
+    </div>
+    return;
+}
+
+<div class="container my-4">
+    
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <ol class="breadcrumb bg-transparent px-0">
+                    <li class="breadcrumb-item"><a href="/" class="text-decoration-none"><i class="fas fa-home me-1"></i>Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a href="/TimNguoi" class="text-decoration-none"><i class="fas fa-search me-1"></i>Nhân Chứng Tìm Người</a></li>
+                    <li class="breadcrumb-item active" aria-current="page"><i class="fas fa-user me-1"></i>@Model?.HoTen</li>
+                </ol>
+            </nav>
+            <!-- Header with back button -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">
+                    <i class="fas fa-user-shield text-primary me-2"></i>@ViewData["Title"]
+                </h2>
+                <a href="@Url.Action("ChiTietBaiViet", "TimNguoi", new { id = timNguoi.Id })"
+                   class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Quay lại
+                </a>
+            </div>
+
+            <!-- Missing person info card -->
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle text-primary me-2"></i>
+                        Thông tin người mất tích
+                    </h5>
                 </div>
-
                 <div class="card-body">
-                    <form asp-action="Create" method="post" enctype="multipart/form-data">
-                        <input type="hidden" asp-for="TimNguoiId" />
+                    <div class="row">
+                        <div class="col-md-4 mb-3 text-center">
+                            <div class="d-flex flex-column align-items-center">
+                                <div class="flex-shrink-0">
+                                    <img src="@(timNguoi.AnhTimNguois?.FirstOrDefault(j=> j.IdNguoiCanTim == timNguoi.Id  && j.TrangThai == 1)?.HinhAnh )"
+                                         class="rounded-circle" width="80" height="80" alt="Ảnh người mất tích">
+                                    <h6 class="my-1 fw-bold ">@timNguoi.HoTen</h6>
+                                     </div>
 
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-                        <!-- Thông tin người mất tích -->
-                        <h5 class="mb-3">Thông tin người mất tích</h5>
-                        <div class="row mb-4">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Họ tên</label>
-                                <input type="text" class="form-control" value="@ViewBag.TenNguoiMatTich" readonly />
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Khu vực</label>
-                                <input type="text" class="form-control" value="@ViewBag.KhuVucMatTich" readonly />
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Ngày sinh</label>
-                                <input type="text" class="form-control" value="@ViewBag.NgaySinh" readonly />
+                                <div class="flex-grow-1 ms-3">
+                                    <small class="text-muted">@timNguoi.TieuDe</small>
+                                </div>
                             </div>
                         </div>
-
-                        <!-- Thông tin cá nhân -->
-                        <h5 class="mb-3">Thông tin cá nhân</h5>
-                        <div class="row mb-4">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="HoTen" class="form-label fw-bold">Họ tên *</label>
-                                <input asp-for="HoTen" class="form-control" required />
-                                <span asp-validation-for="HoTen" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="SoDienThoai" class="form-label fw-bold">Số điện thoại *</label>
-                                <input asp-for="SoDienThoai" class="form-control" required />
-                                <span asp-validation-for="SoDienThoai" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-md-12 mb-3">
-                                <label asp-for="Email" class="form-label fw-bold">Email *</label>
-                                <input asp-for="Email" class="form-control" type="email" required />
-                                <span asp-validation-for="Email" class="text-danger small"></span>
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <small class="text-muted d-block fw-bold">Ngày mất tích</small>
+                                    <strong>@timNguoi.NgayMatTich?.ToString("dd/MM/yyyy")</strong>
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <small class="text-muted d-block fw-bold">Khu vực</small>
+                                    <strong>@timNguoi.KhuVuc</strong>
+                                </div>
+                                <div class="col-12">
+                                    <small class="text-muted d-block fw-bold">Đặc điểm nhận dạng</small>
+                                    <strong>@timNguoi.DaciemNhanDang</strong>
+                                </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
 
-                        <!-- Thông tin nhìn thấy -->
-                        <h5 class="mb-3">Thông tin nhìn thấy</h5>
-                        <div class="row mb-4">
-                            <input type="hidden" asp-for="TimNguoiId" />
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="ThoiGian" class="form-label fw-bold">Thời gian nhìn thấy *</label>
-                                <input asp-for="ThoiGian" type="datetime-local" class="form-control" required />
-                                <span asp-validation-for="ThoiGian" class="text-danger small"></span>
-                            </div>
+            <!-- Main form -->
+            <div class="card border-0 shadow">
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="TimNguoiId" value="@timNguoi.Id" />
 
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="DiaDiem" class="form-label fw-bold">Địa điểm nhìn thấy *</label>
-                                <input asp-for="DiaDiem" class="form-control" required />
-                                <span asp-validation-for="DiaDiem" class="text-danger small"></span>
-                            </div>
+                        <!-- Validation summary -->
+                        <div asp-validation-summary="All" class="alert alert-danger mb-4">
+                            <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+                            <h5 class="alert-heading"><i class="fas fa-exclamation-circle me-2"></i>Vui lòng kiểm tra lại thông tin</h5>
                         </div>
 
-                        <!-- Mô tả chi tiết -->
+                        <!-- Personal information section -->
                         <div class="mb-4">
-                            <label asp-for="MoTaManhMoi" class="form-label fw-bold">Mô tả chi tiết *</label>
-                            <textarea asp-for="MoTaManhMoi" class="form-control" rows="5" required></textarea>
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-user text-primary me-2"></i>
+                                Thông tin cá nhân
+                            </h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label asp-for="HoTen" class="form-label fw-bold"></label>
+                                    <input asp-for="HoTen" class="form-control" placeholder="Nhập họ tên đầy đủ" required />
+                                    <span asp-validation-for="HoTen" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="SoDienThoai" class="form-label fw-bold"></label>
+                                    <input asp-for="SoDienThoai" class="form-control" placeholder="Nhập số điện thoại" required />
+                                    <span asp-validation-for="SoDienThoai" class="text-danger small"></span>
+                                </div>
+                                <div class="col-12">
+                                    <label asp-for="Email" class="form-label fw-bold"></label>
+                                    <input asp-for="Email" class="form-control" type="email" placeholder="Nhập email (nếu có)" />
+                                    <span asp-validation-for="Email" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sighting information section -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-eye text-primary me-2"></i>
+                                Thông tin nhìn thấy
+                            </h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label asp-for="ThoiGian" class="form-label fw-bold"></label>
+                                    <input asp-for="ThoiGian" type="datetime-local" class="form-control" required />
+                                    <span asp-validation-for="ThoiGian" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="DiaDiem" class="form-label fw-bold"></label>
+                                    <input asp-for="DiaDiem" class="form-control" placeholder="Địa điểm cụ thể" required />
+                                    <span asp-validation-for="DiaDiem" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Description section -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-align-left text-primary me-2"></i>
+                                Mô tả chi tiết
+                            </h5>
+                            <label asp-for="MoTaManhMoi" class="form-label fw-bold"></label>
+                            <textarea asp-for="MoTaManhMoi" class="form-control" rows="5"
+                                      placeholder="Mô tả chi tiết về người được nhìn thấy (trang phục, tình trạng sức khỏe, hành động, phương tiện di chuyển...)" required></textarea>
+                            <div class="form-text">Vui lòng mô tả càng chi tiết càng tốt để hỗ trợ công tác tìm kiếm</div>
                             <span asp-validation-for="MoTaManhMoi" class="text-danger small"></span>
                         </div>
 
-                        <!-- File đính kèm -->
+                        <!-- File upload section with improved preview -->
                         <div class="mb-4">
-                            <label class="form-label fw-bold">Tệp đính kèm (nếu có)</label>
-                            <input type="file" name="file" class="form-control" accept="image/*,video/*" />
-                            <small class="text-muted">Chấp nhận ảnh (JPEG, PNG) hoặc video (MP4), tối đa 5MB</small>
-                            <div id="filePreview" class="mt-2"></div>
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-camera text-primary me-2"></i>
+                                Hình ảnh/Video minh chứng
+                            </h5>
+
+                            <div class="file-upload-area border rounded p-3 text-center">
+                                <div id="filePreviewContainer" class="mb-3" style="display:none;">
+                                    <div id="filePreview" class="position-relative d-inline-block">
+                                        <!-- Preview will be inserted here -->
+                                    </div>
+                                </div>
+
+                                <div id="uploadPrompt" class="py-4">
+                                    <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                    <p class="mb-2 fw-bold">Kéo thả file vào đây hoặc click để chọn file</p>
+                                    <p class="small text-muted">Chấp nhận ảnh (JPEG, PNG) hoặc video (MP4), tối đa 10MB</p>
+                                    <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="selectFileBtn">
+                                        <i class="fas fa-folder-open me-1"></i> Chọn file
+                                    </button>
+                                </div>
+
+                                <input type="file" name="file" id="fileInput" class="d-none" accept="image/*,video/*" required />
+
+                                <div class="mt-2">
+                                    <small id="fileName" class="text-muted"></small>
+                                    <small id="fileSize" class="d-block text-muted"></small>
+                                </div>
+                            </div>
+                            <span asp-validation-for="FileDinhKem" class="text-danger small"></span>
                         </div>
 
-                        <!-- Nút gửi -->
-                        <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-paper-plane me-2"></i> Gửi thông tin
+                        <!-- Submit button -->
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg py-3">
+                                <i class="fas fa-paper-plane me-2"></i> Gửi báo cáo
                             </button>
-                            <a href="@Url.Action("ChiTietBaiViet", "TimNguoi", new { id = Model.TimNguoiId })"
-                               class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-left me-2"></i> Quay lại
-                            </a>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Thông báo pháp lý -->
-            <div class="mt-3 alert alert-info">
-                <h6><i class="fas fa-info-circle me-2"></i>Lưu ý quan trọng</h6>
-                <p class="mb-1">- Thông tin bạn cung cấp sẽ được bảo mật</p>
-                <p class="mb-1">- Chỉ sử dụng cho mục đích tìm kiếm nhân đạo</p>
-                <p class="mb-0">- Vui lòng cung cấp thông tin chính xác</p>
+            <!-- Legal notice -->
+            <div class="alert alert-light mt-4 border">
+                <div class="d-flex">
+                    <div class="flex-shrink-0 text-primary">
+                        <i class="fas fa-shield-alt fa-2x"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h5 class="mb-2"><i class="fas fa-info-circle me-2"></i>Cam kết bảo mật</h5>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-1"><i class="fas fa-check-circle text-success me-2"></i> Thông tin của bạn sẽ được bảo mật</li>
+                            <li class="mb-1"><i class="fas fa-check-circle text-success me-2"></i> Chỉ sử dụng cho mục đích nhân đạo</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i> Cung cấp thông tin sai sự thật sẽ bị xử lý</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+@section Styles {
+    <style>
+        .file-upload-area {
+            border: 2px dashed #dee2e6;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+
+            .file-upload-area:hover {
+                border-color: #0d6efd;
+                background-color: #f0f7ff;
+            }
+
+            .file-upload-area.dragover {
+                border-color: #0d6efd;
+                background-color: #e7f1ff;
+            }
+
+        #filePreview {
+            max-width: 100%;
+            max-height: 300px;
+        }
+
+        .preview-image {
+            max-height: 250px;
+            border-radius: 4px;
+        }
+
+        .preview-video-icon {
+            font-size: 5rem;
+            color: #0d6efd;
+        }
+
+        .remove-file-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #dc3545;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+}
+
+
+
+
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script>
+        
+        document.addEventListener('DOMContentLoaded', function() {
+        // Hiển thị thông báo từ TempData
+            @if (ViewData["SuccessMessage"] != null)
+            {
+                <text>
+                                    showNotification('success', '@Html.Raw(ViewData["SuccessMessage"])');
+                </text>
+            }
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <text>
+                                    showNotification('error', '@Html.Raw(ViewData["ErrorMessage"])');
+                </text>
+            }
+            @if (ViewData["WarningMessage"] != null)
+            {
+                <text>
+                                    showNotification('warning', '@Html.Raw(ViewData["WarningMessage"])');
+                </text>
+            }
+            @if (ViewData["InfoMessage"] != null)
+            {
+                <text>
+                                    showNotification('info', '@Html.Raw(ViewData["InfoMessage"])');
+                </text>
+            }
+        });
+
+        
+        function showNotification(type, message)
+        {
+            alert(message);
+
+            const notificationArea = document.getElementById('notification-area');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                                            <i class="fas ${getIconForType(type)} me-2"></i>
+                                            ${message}
+                                        `;
+
+
+            notificationArea.appendChild(notification);
+
+            // Tự động xóa sau 5 giây
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+
+            // Tự động xóa khi nhấn vào
+            notification.addEventListener('click', () => {
+                notification.remove();
+            });
+
+            // Thêm hiệu ứng hover
+            notification.addEventListener('mouseover', () => {
+                notification.style.transform = 'scale(1.05)';
+            });
+            notification.addEventListener('mouseout', () => {
+                notification.style.transform = 'scale(1)';
+            });
+
+            // Thêm hiệu ứng slide-in
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 10);
+
+            if (type === 'success' && message.includes("Thông tin nhân chứng đã được gửi thành công!"))
+            {
+                console.log('Redirect condition met - redirecting to login');
+                setTimeout(() => {
+                    window.location.href = '/TimNguoi/ChiTietBaiTimNguoi/' + @timNguoi.Id;
+                }, 1000);
+            }
+
+        }
+
+
+        // Chọn biểu tượng dựa trên loại thông báo
+        function getIconForType(type) {
+            switch(type) {
+                case 'success': return 'fa-check-circle';
+                case 'error': return 'fa-times-circle';
+                case 'warning': return 'fa-exclamation-triangle';
+                case 'info': return 'fa-info-circle';
+                default: return 'fa-info-circle';
+            }
+        }
+
+
+
+    </script>
+    
 
     <script>
         $(document).ready(function() {
-            // Xem trước file
-            $("input[type='file']").change(function() {
-                const file = this.files[0];
-                const preview = $("#filePreview");
+            // File upload handling
+            const fileInput = $('#fileInput');
+            const filePreviewContainer = $('#filePreviewContainer');
+            const filePreview = $('#filePreview');
+            const uploadPrompt = $('#uploadPrompt');
+            const fileName = $('#fileName');
+            const fileSize = $('#fileSize');
+            const selectFileBtn = $('#selectFileBtn');
+            const fileUploadArea = $('.file-upload-area');
 
-                preview.empty();
+            // Click handler for select file button
+            selectFileBtn.on('click', function() {
+                fileInput.click();
+            });
 
-                if (file) {
-                    const reader = new FileReader();
+            // Drag and drop handling
+            fileUploadArea.on('dragover', function(e) {
+                e.preventDefault();
+                fileUploadArea.addClass('dragover');
+            });
 
-                    reader.onload = function(e) {
-                        if (file.type.startsWith("image/")) {
-                            preview.html(`<img src="${e.target.result}" class="img-thumbnail" style="max-height:200px;">`);
-                        } else if (file.type.startsWith("video/")) {
-                            preview.html(`
-                                <div class="alert alert-info">
-                                    <i class="fas fa-video me-2"></i>
-                                    Đã chọn video: ${file.name}
-                                </div>
-                            `);
-                        }
-                    };
+            fileUploadArea.on('dragleave', function(e) {
+                e.preventDefault();
+                fileUploadArea.removeClass('dragover');
+            });
 
-                    reader.readAsDataURL(file);
+            fileUploadArea.on('drop', function(e) {
+                e.preventDefault();
+                fileUploadArea.removeClass('dragover');
+                if (e.originalEvent.dataTransfer.files.length) {
+                    fileInput[0].files = e.originalEvent.dataTransfer.files;
+                    handleFileSelect(e.originalEvent.dataTransfer.files[0]);
                 }
             });
 
-            // Kiểm tra kích thước file
-            $("form").submit(function() {
-                const fileInput = $("input[type='file']")[0];
-                if (fileInput.files.length > 0) {
-                    const fileSize = fileInput.files[0].size / 1024 / 1024; // MB
-                    if (fileSize > 5) {
-                        alert("File đính kèm không được vượt quá 5MB");
-                        return false;
-                    }
+            // File input change handler
+            fileInput.on('change', function() {
+                if (this.files && this.files[0]) {
+                    handleFileSelect(this.files[0]);
                 }
-                return true;
+            });
+
+            // Handle file selection and preview
+            function handleFileSelect(file) {
+                // Validate file type
+                const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'video/mp4'];
+                if (!validTypes.includes(file.type)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Loại file không hợp lệ',
+                        text: 'Chỉ chấp nhận file ảnh (JPEG, PNG) hoặc video (MP4)',
+                        confirmButtonColor: '#0d6efd'
+                    });
+                    return;
+                }
+
+                // Validate file size (10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'File quá lớn',
+                        text: 'File đính kèm không được vượt quá 10MB',
+                        confirmButtonColor: '#0d6efd'
+                    });
+                    return;
+                }
+
+                // Update file info
+                fileName.text(file.name);
+                fileSize.text(formatFileSize(file.size));
+
+                // Show preview
+                uploadPrompt.hide();
+                filePreviewContainer.show();
+
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        filePreview.html(`
+                            <img src="${e.target.result}" class="preview-image img-thumbnail" alt="Preview">
+                            <button type="button" class="remove-file-btn" onclick="clearFileSelection()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        `);
+                    };
+                    reader.readAsDataURL(file);
+                } else if (file.type.startsWith('video/')) {
+                    filePreview.html(`
+                        <div class="text-center py-3">
+                            <i class="fas fa-video preview-video-icon"></i>
+                            <p class="mt-2 mb-0">${file.name}</p>
+                            <button type="button" class="btn btn-danger btn-sm mt-2" onclick="clearFileSelection()">
+                                <i class="fas fa-trash me-1"></i> Xóa file
+                            </button>
+                        </div>
+                    `);
+                }
+            }
+
+            // Format file size
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            // Clear file selection
+            window.clearFileSelection = function() {
+                fileInput.val('');
+                filePreviewContainer.hide();
+                uploadPrompt.show();
+                fileName.text('');
+                fileSize.text('');
+                filePreview.html('');
+            }
+
+            // Form submission validation
+            $('form').on('submit', function(e) {
+                if (!fileInput[0].files.length) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Thiếu file đính kèm',
+                        text: 'Vui lòng tải lên hình ảnh hoặc video minh chứng',
+                        confirmButtonColor: '#0d6efd'
+                    });
+                }
             });
         });
     </script>

@@ -1,9 +1,9 @@
 ﻿<!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
-            <a href="../../index3.html" class="brand-link">
-        <img src="~/clients/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-                <span class="brand-text font-weight-light">Admin</span>
+            <a href="/Admin/Home" class="brand-link">
+                <img src="~/logo/logo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text font-weight-light"><strong>SafeReturn</strong></span>
             </a>
 
             <!-- Sidebar -->
@@ -11,115 +11,109 @@
                 <!-- Sidebar user (optional) -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
-                <img src="~/clients/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                        <img src="~/clients/dist/img/AdminLTELogo.png" class="img-circle elevation-2" alt="User Image">
                     </div>
                     <div class="info">
-                        <a href="/Admin/Home" class="d-block">TimNguoiThan</a>
+                        <a href="#" class="d-block">Admin</a>
                     </div>
                 </div>
-
-              
 
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <!-- Add icons to the links using the .nav-icon class
                              with font-awesome or any other icon font library -->
-                        <li class="nav-header">XỬ LÝ CHUNG</li>
+                        <!-- Quản lý nội dung -->
+                        <li class="nav-header">QUẢN LÝ NỘI DUNG</li>
+                        <!-- Danh sách bài viết -->
+                        <li class="nav-item">
+                            <a href="/Admin/BaiViet/Index" class="nav-link">
+                                <i class="nav-icon fa fa-th-list" aria-hidden="true"></i> Danh sách bài tiết
+                            </a>
+                        </li>
+                        <!-- Danh sách báo cáo -->
                         <li class="nav-item">
                             <a href="#" class="nav-link">
-                                <i class="nav-icon fa fa-th-list" aria-hidden="true"></i>
+                                <i class="nav-icon fa fa-file-alt" aria-hidden="true"></i>
                                 <p>
-                                     Người mất tích
+                                     Danh sách báo cáo
                                     <i class="right fas fa-angle-left"></i>
                                     
                                 </p>
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                <a href="/Admin/BaiViet/Index" class="nav-link">
+                                <a href="/Admin/BaoCaoBaiViet/Index" class="nav-link">
                                         <i class="nav-icon fas fa fa-list-alt" aria-hidden="true"></i>
-                                        <p>Danh sách người mất tích</p>
+                                        Bài viết
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/Admin/TinTuc" class="nav-link">
-                                        @* <i class="far fa-circle nav-icon"></i> *@
-                                        <i class="nav-icon fa fa-comment" ></i>
-                                        <p>Tin Tức</p>
+                                <a href="/Admin/BaoCaoBinhLuan/Index" class="nav-link">
+                                        <i class="nav-icon fa fa-comments" ></i>
+                                        <p>Bình luận</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                <a href="/Admin/HanhViDangNgo/Index" class="nav-link">
+                                    <i class="nav-icon fa fa-exclamation-triangle"></i>
+                                        Hành vi đáng ngờ
                                     </a>
                                 </li>
                             </ul>
                         </li>
+                        <!-- Quản lý người dùng -->
+                        <li class="nav-header">QUẢN LÝ NGƯỜI DÙNG</li>
+                        <!-- Danh sách người dùng -->
+                        <li class="nav-item">
+                            <a href="/Admin/NguoiDung/Index" class="nav-link">
+                                <i class="fa fa-users nav-icon" aria-hidden="true"></i></i> Danh sách người dùng
+                            </a>
+                        </li>
+                        <!-- Danh sách người dùng liên hệ -->
+                        <li class="nav-item">
+                            <a href="/Admin/NguoiDungLienHe/Index" class="nav-link">
+                                <i class="nav-icon fa fa-envelope" aria-hidden="true"></i> 
+                                Liên hệ người dùng
+                            </a>
+                        </li>
+                        <!-- Quản lý website -->
+                        <li class="nav-header">QUẢN LÝ WEBSITE</li>
                         <li class="nav-item">
                             <a href="#" class="nav-link">
-                                <i class="nav-icon fa fa-desktop"></i>
+                            <i class="nav-icon fa fa-globe" aria-hidden="true"></i>
                                 <p>
                                     Quản Lý Website
-                                    <i class="fas fa-angle-left right"></i>
-                                    
+                                    <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="/Admin/GioiThieu" class="nav-link">
-                                        @* <i class="far fa-circle nav-icon"></i> *@
-                                <i class="fa fa-tasks nav-icon"></i>
-                                        <p>Giới Thiệu</p>
+                                    <a href="/Admin/GioiThieu/Index" class="nav-link">
+                                        <i class="nav-icon fa fa-info-circle"></i>
+                                        Giới Thiệu
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/Admin/QuangCao_adv" class="nav-link">
-                                        @* <i class="far fa-circle nav-icon"></i> *@
-                                <i class="nav-icon fa fa-book"></i>
-                                        <p>Quảng Cáo</p>
+                                    <a href="/Admin/TinTuc/Index" class="nav-link">
+                                        <i class="nav-icon fa fa-newspaper"></i>
+                                        Tin tức
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/Admin/DichVu_Service" class="nav-link">
-                                <i class="fa fa-comments nav-icon"></i>
-                                        <p>Dịch Vụ</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/Admin/UuDai" class="nav-link">
-                                <i class="fa fa-bell nav-icon"></i>
-                                        <p>Ưu Đãi</p>
+                                    <a href="/Admin/TrungBay/Index" class="nav-link">
+                                        <i class="nav-icon far fa-image"></i>
+                                        Hình ảnh trưng bày
                                     </a>
                                 </li>
                             </ul>
                         </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                @* <i class="nav-icon far fa-envelope"></i> *@
-                                <i class="nav-icon fa fa-user-md "></i>
-                                <p>
-                                     Quản Lý Bác Sĩ
-                                    <i class="fas fa-angle-left right"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="/Admin/ChuyenKhoa" class="nav-link">
-                                <i class="fa fa-globe nav-icon"></i>
-                                        <p>Chuyên Khoa</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/Admin/BacSi" class="nav-link">
-                                <i class="fa fa-users nav-icon"></i>
-                                        <p>Bác Sĩ</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nav-header">EXAMPLES dưới chưa làm</li>
+                        @* <li class="nav-header">EXAMPLES dưới chưa làm</li>
                         <li class="nav-item">
                             <a href="/Admin/DatLich" class="nav-link">
                                 <i class="nav-icon far fa-calendar-alt"></i>
                                 <p>
                                     Lịch Hẹn
-                                    @* <span class="badge badge-info right">2</span> *@
                                 </p>
                             </a>
                         </li>
@@ -390,7 +384,7 @@
                                     </a>
                                 </li>
                             </ul>
-                        </li>
+                        </li> *@
                         
                 </nav>
                 <!-- /.sidebar-menu -->

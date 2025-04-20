@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebTimNguoiThatLac.Areas.Admin.Models;
 using WebTimNguoiThatLac.Data;
 using WebTimNguoiThatLac.Models;
+using X.PagedList;
 using X.PagedList.Extensions;
 
 namespace WebTimNguoiThatLac.Areas.Admin.Controllers
@@ -28,7 +30,6 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 .Include(h => h.ApplicationUser)
                 .OrderByDescending(h => h.ThoiGian);
 
-            // Áp dụng bộ lọc tìm kiếm
             if (!string.IsNullOrEmpty(searchString))
             {
                 query = query.Where(h =>
@@ -36,11 +37,10 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     (h.ApplicationUser != null &&
                      (h.ApplicationUser.Email.Contains(searchString) ||
                       h.ApplicationUser.UserName.Contains(searchString) ||
-                      h.ApplicationUser.PhoneNumber.Contains(searchString)))
-                );
+                      h.ApplicationUser.PhoneNumber.Contains(searchString))
+                ));
             }
 
-            // Áp dụng bộ lọc trạng thái
             switch (status)
             {
                 case "KhangNghi":
@@ -72,7 +72,6 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            // Đánh dấu đã xem
             if (!hanhVi.DaXem)
             {
                 hanhVi.DaXem = true;
@@ -83,45 +82,62 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public IActionResult DaXem(int id)
+        public IActionResult XuLy(int id)
         {
-            var hanhVi = _context.HanhViDangNgos.Find(id);
-            if (hanhVi != null)
+            try
             {
-                hanhVi.DaXem = true;
+                var hanhVi = _context.HanhViDangNgos.Find(id);
+                if (hanhVi == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy hành vi" });
+                }
+
+                hanhVi.DaXuLy = true;
                 _context.SaveChanges();
-                return Ok();
+
+                return Json(new { success = true, message = "Đã đánh dấu là đã xử lý" });
             }
-            return NotFound();
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+            }
         }
 
         [HttpPost]
         public IActionResult XuLyKhangNghi(int id, string trangThaiKhangNghi)
         {
-            var hanhVi = _context.HanhViDangNgos.Find(id);
-            if (hanhVi != null)
+            try
             {
-                hanhVi.TrangThaiKhangNghi = trangThaiKhangNghi;
-                hanhVi.DaXuLy = true; // Đánh dấu là đã xử lý
-
-                if(trangThaiKhangNghi == "Kháng Nghị Thành Công")
+                var hanhVi = _context.HanhViDangNgos.Find(id);
+                if (hanhVi == null)
                 {
-                    ApplicationUser applicationUser = _context.Users.FirstOrDefault(u => u.Id == hanhVi.NguoiDungId);
-                    applicationUser.SoLanViPham--;
-                    if (applicationUser.SoLanViPham < 0)
-                    {
-                        applicationUser.SoLanViPham = 0;
-                    }
-                    
+                    return Json(new { success = false, message = "Không tìm thấy hành vi" });
                 }
-               
+
+                hanhVi.TrangThaiKhangNghi = trangThaiKhangNghi;
+                hanhVi.DaXuLy = true;
+
+                if (trangThaiKhangNghi == "Kháng Nghị Thành Công")
+                {
+                    var applicationUser = _context.Users.FirstOrDefault(u => u.Id == hanhVi.NguoiDungId);
+                    if (applicationUser != null)
+                    {
+                        applicationUser.SoLanViPham--;
+                        if (applicationUser.SoLanViPham < 0)
+                        {
+                            applicationUser.SoLanViPham = 0;
+                        }
+                    }
+                }
 
                 _context.SaveChanges();
 
-                TempData["Message"] = $"Đã xử lý kháng nghị: {trangThaiKhangNghi}";
-                return RedirectToAction("Index");
+                return Json(new { success = true, message = $"Đã xử lý kháng nghị: {trangThaiKhangNghi}" });
             }
-            return NotFound();
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+            }
         }
     }
 }

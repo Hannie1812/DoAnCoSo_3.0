@@ -107,6 +107,17 @@ public class NhanChungController : Controller
         {
             return Json(new { success = false, message = "Bạn không có quyền xóa nhân chứng này" });
         }
+<<<<<<< Updated upstream
+=======
+
+        // Lưu thông tin vào ViewBag
+        ViewBag.TenNguoiMatTich = timNguoi.HoTen;
+        ViewBag.KhuVucMatTich = timNguoi.KhuVuc;
+        ViewBag.NgaySinh = timNguoi.NgaySinh?.ToString("dd/MM/yyyy") ?? "Không có thông tin";
+
+
+        
+>>>>>>> Stashed changes
 
         _context.NhanChungs.Remove(nhanChung);
         await _context.SaveChangesAsync();

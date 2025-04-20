@@ -248,7 +248,13 @@ namespace WebTimNguoiThatLac.Controllers
                 db.Add(timNguoi);
                 await db.SaveChangesAsync();
                 int d = 0;
-                foreach(IFormFile i in DSHinhAnhCapNhat)
+                if(DSHinhAnhCapNhat.Count == 0)
+                {
+                    ModelState.AddModelError("Lỗi", "Chưa Có Hình Ảnh");
+                    ViewBag.DanhSachTinhThanh = TinhThanhIEnumerable;
+                    return View(timNguoi);
+                }
+                foreach (IFormFile i in DSHinhAnhCapNhat)
                 {
                     AnhTimNguoi x = new AnhTimNguoi();
                     x.IdNguoiCanTim = timNguoi.Id;
@@ -481,6 +487,12 @@ namespace WebTimNguoiThatLac.Controllers
             y.GioiTinh = x.GioiTinh;
             y.TrangThai = x.TrangThai;
             y.KhuVuc = x.KhuVuc;
+            y.NgaySinh = x.NgaySinh;
+            y.NgayMatTich = x.NgayMatTich;
+            y.HoTen = x.HoTen;
+            y.MoiQuanHe = x.MoiQuanHe;
+
+            await db.SaveChangesAsync();
 
             // Chỉ xử lý ảnh nếu có ảnh mới được chọn
             if (DSHinhAnhCapNhat != null && DSHinhAnhCapNhat.Count > 0)
@@ -502,20 +514,23 @@ namespace WebTimNguoiThatLac.Controllers
                         }
 
                         int d = 0;
-                        foreach (var i in DSHinhAnhCapNhat)
+                        foreach (IFormFile i in DSHinhAnhCapNhat)
                         {
-                            var z = new AnhTimNguoi
-                            {
-                                IdNguoiCanTim = y.Id,
-                                TrangThai = (d == 0) ? 1 : 0,
-                                HinhAnh = await SaveImage(i, "AnhNguoiCanTim")
-                            };
+                            var z = new AnhTimNguoi();
+
+                            z.IdNguoiCanTim = y.Id;
+                            z.TrangThai = (d == 0) ? 1 : 0;
+                            z.HinhAnh = await SaveImage(i, "AnhNguoiCanTim");
+                            
                             db.AnhTimNguois.Add(z);
+                            await db.SaveChangesAsync();
                             d++;
                         }
 
                         await db.SaveChangesAsync();
-                        return RedirectToAction("ChiTietBaiTimNguoi", new { id = x.Id }); // Quay lại trang chi tiết
+                        await transaction.CommitAsync(); // QUAN TRỌNG: Phải commit transaction
+
+
                     }
                     catch
                     {
@@ -528,6 +543,7 @@ namespace WebTimNguoiThatLac.Controllers
 
             // Lưu các thay đổi khác (luôn thực hiện)
             await db.SaveChangesAsync();
+
             return RedirectToAction("ChiTietBaiTimNguoi", new { id = x.Id });
         }
 

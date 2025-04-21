@@ -33,9 +33,23 @@
 
 <div>
     <form asp-action="index" asp-controller="NguoiDung" asp-area="Admin">
-        <div class="input-group mb-3">
-            <input name="TimKiem" value="@ViewBag.TimKiem" type="text" class="form-control" placeholder="Nhập tên Email, Tên Người Dùng, Số Điện Thoại cần tìm">
-            <button class="btn btn-primary">Tìm Kiếm</button>
+        <div class="row mb-3">
+            <div class="col-md-8">
+                <div class="input-group">
+                    <input name="TimKiem" value="@ViewBag.TimKiem" type="text" class="form-control" placeholder="Nhập tên họ và tên, email, số điện thoại cần tìm">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select name="Role" class="form-control">
+                    <option value="">-- Tất cả Role --</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Moderator">Moderator</option>
+                    <option value="Customer">Customer</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button class="btn btn-primary w-100">Tìm</button>
+            </div>
         </div>
     </form>
 </div>
@@ -55,22 +69,20 @@
             <thead>
                 <tr>
                     <th scope="col">STT</th>
-                    <th scope="col">Email @ViewData["Title"]</th>
-                    <th scope="col">CCCD @ViewData["Title"]</th>
-                    <th scope="col">Tên @ViewData["Title"]</th>
-                    <th scope="col">Địa Chỉ </th>
-                    <th scope="col">Ngày Sinh</th>
+                    <th scope="col">Họ và tên</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">CCCD</th>
                     <th scope="col">SDT</th>
-                    <th scope="col">Loại tài khoản</th>
+                    <th scope="col">Vai trò</th>
                     <th scope="col">Active</th>
-                    <th scope="col">Chức Năng</th>
+                    <th scope="col">Thao tác</th>
                 </tr>
             </thead>
             <tbody>
                 @if (Model == null || Model.Count() <= 0)
                 {
                     <tr>
-                        <td colspan="10">Chưa có @ViewData["Title"]</td>
+                        <td colspan="10">Chưa có người dùng</td>
                     </tr>
                 }
                 else
@@ -80,27 +92,17 @@
                     {
                         <tr id="Dong_ID_@i.Id">
                             <th scope="col" data-bs-toggle="modal" data-bs-target="#XemChiTietNguoiDung_@i.Id">@d</th>
+                            <td data-bs-toggle="modal" data-bs-target="#XemChiTietNguoiDung_@i.Id">@i.FullName</td>
                             <td data-bs-toggle="modal" data-bs-target="#XemChiTietNguoiDung_@i.Id">@i.Email</td>
                             <td data-bs-toggle="modal" data-bs-target="#XemChiTietNguoiDung_@i.Id">@i.CCCD</td>
-                            <td data-bs-toggle="modal" data-bs-target="#XemChiTietNguoiDung_@i.Id">@i.FullName</td>
-                            <td data-bs-toggle="modal" data-bs-target="#XemChiTietNguoiDung_@i.Id">@i.Address</td>
-                            <td data-bs-toggle="modal" data-bs-target="#XemChiTietNguoiDung_@i.Id">@i.NgaySinh</td>
                             <td data-bs-toggle="modal" data-bs-target="#XemChiTietNguoiDung_@i.Id">@i.PhoneNumber</td>
                             <td data-bs-toggle="modal" data-bs-target="#XemChiTietNguoiDung_@i.Id">
                                 @{
-                                    // var x = db.UserRoles.Where(j => j.UserId == i.Id).ToList();
-                                    // var dsrole = db.Roles.ToList();
-                                    // foreach(var z in dsrole)
-                                    // {
-                                    //     foreach(var y in x)
-                                    //     {
-                                    //         if (z.Id == y.RoleId)
-                                    //         {
-                                    //             <p>@z.Name</p>
-                                    //         }
-                                    //     }
-                                        
-                                    // }
+                                    var roles = await UserManager.GetRolesAsync(i);
+                                    foreach (var role in roles)
+                                    {
+                                        <span class="badge bg-primary me-1">@role</span>
+                                    }
                                 }
                                 
                             </td>
@@ -297,4 +299,4 @@
         });
 
     </script>
-}   
+}

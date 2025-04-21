@@ -30,11 +30,19 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
            
         }
        
-        public async Task<IActionResult> Index(string TimKiem = "", int Page = 1)
+        public async Task<IActionResult> Index(string TimKiem = "", string Role = "", int Page = 1)
         {
             IEnumerable<ApplicationUser> ds = await db.Users.ToListAsync();
             ViewBag.TimKiem = TimKiem;
+            ViewBag.Role = Role;
             int sodongtren1trang = 5;
+
+            // Lọc theo role nếu được chọn
+            if (!string.IsNullOrEmpty(Role))
+            {
+                var usersInRole = await userManager.GetUsersInRoleAsync(Role);
+                ds = ds.Where(u => usersInRole.Contains(u));
+            }
 
             if (TimKiem.IsNullOrEmpty())
             {

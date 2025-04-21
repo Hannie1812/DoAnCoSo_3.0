@@ -55,6 +55,13 @@
 </div>
 
 <div class="card container-fluid ">
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
     <div class="card-header d-flex ">
         <div>
             <h2 class="card-title">Danh Sách @ViewData["Title"]</h2>

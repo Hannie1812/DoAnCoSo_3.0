@@ -74,6 +74,7 @@
                     <th scope="col">CCCD</th>
                     <th scope="col">SDT</th>
                     <th scope="col">Vai trò</th>
+                    <th scope="col">Số lần vi phạm</th>
                     <th scope="col">Active</th>
                     <th scope="col">Thao tác</th>
                 </tr>
@@ -90,6 +91,7 @@
                     int d = 1;
                     foreach (WebTimNguoiThatLac.Models.ApplicationUser i in Model)
                     {
+                        var soViPham = db.BaoCaoBaiViets.Count(x => x.MaNguoiBaoCao == i.Id) + db.BaoCaoBinhLuans.Count(x => x.MaNguoiBaoCao == i.Id);
                         <tr id="Dong_ID_@i.Id">
                             <th scope="col" data-bs-toggle="modal" data-bs-target="#XemChiTietNguoiDung_@i.Id">@d</th>
                             <td data-bs-toggle="modal" data-bs-target="#XemChiTietNguoiDung_@i.Id">@i.FullName</td>
@@ -104,8 +106,8 @@
                                         <span class="badge bg-primary me-1">@role</span>
                                     }
                                 }
-                                
                             </td>
+                            <td data-bs-toggle="modal" data-bs-target="#XemChiTietNguoiDung_@i.Id">@soViPham</td>
                             @if (@i.Active == true)
                             {
                                 <td class="trangthaiActive" id="active_id_@i.Id">

@@ -117,6 +117,8 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 hanhVi.TrangThaiKhangNghi = trangThaiKhangNghi;
                 hanhVi.DaXuLy = true;
 
+                
+
                 if (trangThaiKhangNghi == "Kháng Nghị Thành Công")
                 {
                     var applicationUser = _context.Users.FirstOrDefault(u => u.Id == hanhVi.NguoiDungId);
@@ -126,6 +128,45 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                         if (applicationUser.SoLanViPham < 0)
                         {
                             applicationUser.SoLanViPham = 0;
+                        }
+                    }
+
+                    if(hanhVi.LoaiViPham == "Bình Luận" && hanhVi.IdLoiViPham >0)
+                    {
+                        BinhLuan binhLuan = _context.BinhLuans.Find(hanhVi.IdLoiViPham);
+                        if (binhLuan != null)
+                        {
+                            binhLuan.Active = true;
+                            // các báo cáo bình luận liên quan
+                            var baoCaoBinhLuans = _context.BaoCaoBinhLuans
+                                .Where(b => b.MaBinhLuan == binhLuan.Id)
+                                .ToList();
+
+                            foreach (var baoCao in baoCaoBinhLuans)
+                            {
+                                baoCao.check = true;
+                                baoCao.DaDoc = true;
+                            }
+                                _context.SaveChanges();
+                        }
+                    }
+
+                    if (hanhVi.LoaiViPham == "Bài Viết" && hanhVi.IdLoiViPham >0)
+                    {
+                        TimNguoi timNguoi = _context.TimNguois.FirstOrDefault(i => i.Id == hanhVi.IdLoiViPham);
+                        if (timNguoi != null)
+                        {
+                            timNguoi.active = true;
+                            // các báo cáo bài viết liên quan
+                            var baoCaoBaiViets = _context.BaoCaoBaiViets
+                                .Where(b => b.MaBaiViet == timNguoi.Id)
+                                .ToList();
+                            foreach (var baoCao in baoCaoBaiViets)
+                            {
+                                baoCao.check = true;
+                                baoCao.DaDoc = true;
+                            }
+                            _context.SaveChanges();
                         }
                     }
                 }

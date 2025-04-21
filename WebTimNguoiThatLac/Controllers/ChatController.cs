@@ -34,6 +34,12 @@ namespace WebTimNguoiThatLac.Controllers
             {
                 return RedirectToAction("Login", "Account", new {area = "Identity"});
             }
+            var nguoiDung = await _userManager.GetUserAsync(User);
+            if (nguoiDung.Active == false)
+            {
+                return RedirectToAction("Login", "Account", new { area = "Identity" });
+            }
+
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             // Lấy danh sách hộp thoại - SỬA LẠI CÁC ĐIỀU KIỆN
@@ -96,6 +102,11 @@ namespace WebTimNguoiThatLac.Controllers
         {
             // Kiểm tra người dùng đã đăng nhập chưa
             if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Login", "Account", new { area = "Identity" });
+            }
+            var nguoiDung = await _userManager.GetUserAsync(User);
+            if (nguoiDung.Active == false)
             {
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
             }
@@ -191,6 +202,7 @@ namespace WebTimNguoiThatLac.Controllers
         public async Task<IActionResult> GuiTinNhan(int hopThoaiId, string noiDung, IFormFile? file)
         {
             var nguoiGuiId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
 
             // Kiểm tra người dùng có trong hộp thoại không - SỬA ĐIỀU KIỆN
             var isValid = await _context.NguoiThamGias

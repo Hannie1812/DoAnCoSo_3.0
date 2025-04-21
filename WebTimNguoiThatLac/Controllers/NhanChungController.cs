@@ -39,11 +39,13 @@ public class NhanChungController : Controller
         }
 
         ApplicationUser us = await _userManager.GetUserAsync(User);
-        if (us == null)
+        if (us == null || us.Active == false)
         {
             TempData["ErrorMessage"] = "Vui lòng đăng nhập để tiếp tục";
             return RedirectToAction("Login", "Account");
         }
+
+
 
         int pageSize = 5; // Số lượng item trên mỗi trang
         ViewBag.TimNguoiId = id; // Lưu id để sử dụng trong view
@@ -87,7 +89,7 @@ public class NhanChungController : Controller
     [HttpPost]
     public async Task<IActionResult> Delete(int id)
     {
-        if (!User.Identity.IsAuthenticated)
+        if (!User.Identity.IsAuthenticated )
         {
             return Json(new { success = false, message = "Unauthorized" });
         }

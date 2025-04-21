@@ -219,6 +219,15 @@ namespace WebTimNguoiThatLac.Controllers
                     var nguoiDung = await _userManager.GetUserAsync(User);
                     nguoiDungId = nguoiDung.Id;
 
+                    if(nguoiDung.Active == false)
+                    {
+
+                        // Ghi log
+                        _logger.LogWarning($"Tài khoản {nguoiDung.Email} đã bị vô hiệu hóa do vi phạm quy định.");
+                        TempData["Warning"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
+                        return Redirect("/Identity/Account/Login");
+                    }
+
                     // Ghi lịch sử tìm kiếm
                     LichSuTimKiem lichSu = new LichSuTimKiem
                     {
@@ -304,6 +313,22 @@ namespace WebTimNguoiThatLac.Controllers
             {
                 return RedirectToAction("VerifyOtp");
             }
+            if (User.Identity.IsAuthenticated)
+            {
+                var nguoiDung = await _userManager.GetUserAsync(User);
+                if (nguoiDung == null || nguoiDung.Active == false)
+                {
+                    // Ghi log
+                    _logger.LogWarning($"Tài khoản {nguoiDung.Email} đã bị vô hiệu hóa do vi phạm quy định.");
+                    TempData["WarningMessage"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
+                    return Redirect("/Identity/Account/Login");
+                }
+            }
+            else
+            {
+                TempData["WarningMessage"] = "Bạn cần đăng nhập để thực hiện chức năng này.";
+                return Redirect("/Identity/Account/Login");
+            }
             ViewBag.DanhSachTinhThanh = TinhThanhIEnumerable;
             return View();
         }
@@ -312,6 +337,15 @@ namespace WebTimNguoiThatLac.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ThemNguoiCanTim(TimNguoi timNguoi, List<IFormFile> DSHinhAnhCapNhat)
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                var nguoiDung = await _userManager.GetUserAsync(User);
+                if (nguoiDung == null || nguoiDung.Active == false)
+                {
+                    TempData["Warning"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
+                    return Redirect("/Identity/Account/Login");
+                }
+            }
             if (ModelState.IsValid)
             {
                 if(DSHinhAnhCapNhat == null)
@@ -410,6 +444,7 @@ namespace WebTimNguoiThatLac.Controllers
         {
             if(User.Identity.IsAuthenticated == false)
             {
+                TempData["WarningMessage"] = "Bạn cần đăng nhập để thực hiện xem chi tiết để bảo vệ thông tin cá nhân chức năng này.";
                 return Redirect("/Identity/Account/login");
             }
             ApplicationUser x = await _userManager.GetUserAsync(User);
@@ -453,12 +488,14 @@ namespace WebTimNguoiThatLac.Controllers
             {
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Lấy ID của người dùng hiện tại
                                                                              // Lấy thông tin bài viết
+                
                 var baiViet = await db.TimNguois
                     .Include(x => x.ApplicationUser)
                     .FirstOrDefaultAsync(x => x.Id == IdBaiViet);
 
                 if(baiViet == null || baiViet.ApplicationUser.Email == null)
                 {
+                    TempData["Warning"] = "Bài viết không tồn tại hoặc không có thông tin người dùng.";
                     return RedirectToAction("Index", "Home");
                 }
                 // Xử lý upload hình ảnh
@@ -493,6 +530,7 @@ namespace WebTimNguoiThatLac.Controllers
 
                     return RedirectToAction("ChiTietBaiTimNguoi", new { id = IdBaiViet });
                 }
+                TempData["Warning"] = "Có lỗi xảy ra khi thêm bình luận. Vui lòng thử lại.";
                 return RedirectToAction("ChiTietBaiTimNguoi", new { id = IdBaiViet }); // Quay lại trang chi tiết
 
                
@@ -535,7 +573,7 @@ namespace WebTimNguoiThatLac.Controllers
             {
                 return RedirectToAction("Login", "Account");
             }
-
+            var nguoiDung = await _userManager.GetUserAsync(User);
             var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
             TimNguoi y = db.TimNguois
                                 .Include(u => u.ApplicationUser)
@@ -543,7 +581,7 @@ namespace WebTimNguoiThatLac.Controllers
                                 .Include(u => u.BinhLuans)
                                 .FirstOrDefault(i => i.Id == x.Id);
 
-            if (y == null || y.IdNguoiDung != userid)
+            if (y == null || y.IdNguoiDung != userid || nguoiDung.Active == false)
             {
                 return RedirectToAction("Login", "Account");
             }
@@ -682,7 +720,11 @@ namespace WebTimNguoiThatLac.Controllers
             {
                 return Json(new { success = false, message = "Vui lòng đăng nhập để thực hiện báo cáo" });
             }
-
+            var nguoiDung = await _userManager.GetUserAsync(User);
+            if (nguoiDung == null || nguoiDung.Active == false)
+            {
+                return Json(new { success = false, message = "Tài khoản không hợp lệ" });
+            }
             try
             {
                 var binhLuan = await db.BinhLuans
@@ -737,6 +779,11 @@ namespace WebTimNguoiThatLac.Controllers
             {
                 var currentUser = await _userManager.GetUserAsync(User);
                 var baiViet = await db.TimNguois.FirstOrDefaultAsync(i => i.Id == MaBaiViet);
+
+                if (currentUser == null || currentUser.Active == false)
+                {
+                    return Json(new { success = false, message = "Tài khoản không hợp lệ" });
+                }
 
                 if (baiViet == null)
                 {

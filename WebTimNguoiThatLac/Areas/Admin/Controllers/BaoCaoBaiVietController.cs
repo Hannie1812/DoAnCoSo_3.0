@@ -73,6 +73,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         {
             // Lấy danh sách bài viết có số báo cáo >= ngưỡng
             var problematicPosts = await _context.BaoCaoBaiViets
+                .Where(b => !b.check)
                 .GroupBy(b => b.TimNguoi.Id)
                 .Where(g => g.Count() >= ReportThreshold)
                 .Select(g => g.Key)
@@ -81,11 +82,55 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             // Vô hiệu hóa các bài viết này
             foreach (var postId in problematicPosts)
             {
-                var post = await _context.TimNguois.FindAsync(postId);
+                var post = await _context.TimNguois.Include(z => z.ApplicationUser).FirstOrDefaultAsync(i => i.Id == postId);
                 if (post != null && post.active)
                 {
                     post.active = false;
                     _context.Update(post);
+
+                    // Gửi email thông báo cho người dùng
+                    var user = await _context.Users.FirstOrDefaultAsync(m => m.Id == post.ApplicationUser.Id);
+                    if (user != null)
+                    {
+                        await _emailService.SendEmailAsync(
+                            user.Email,
+                            $"Bài Viết {post.HoTen} đã bị ẩn",
+                            $"Bài viết của bạn đã bị ẩn do có nhiều báo cáo. Vui lòng kiểm tra lại nội dung bài viết của bạn."
+                        );
+
+
+                        // Gửi thông báo cho người dùng
+                        user.SoLanViPham += 1;
+                        if (user.SoLanViPham >= 3)
+                        {
+                            user.Active = false;
+
+                            await _emailService.SendEmailAsync(
+                                user.Email,
+                                "Tài Khoản Bị Khóa",
+                                "Tài khoản của bạn đã bị khóa do vi phạm nhiều lần. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết."
+                            );
+
+                            HanhViDangNgo hanhVi = new HanhViDangNgo
+                            {
+                                NguoiDungId = user.Id,
+                                HanhDong = $"bài viết {post.TieuDe} bị báo cáo nhiều lần",
+                                ThoiGian = DateTime.Now,
+                                IdLoiViPham = post.Id,
+                                LoaiViPham = "Bài Viết",
+
+                            };
+
+
+                            _context.HanhViDangNgos.Add(hanhVi);
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+
+
+                    // Cập nhật số lần vi phạm
+
+                    await _context.SaveChangesAsync();
                 }
             }
 
@@ -177,6 +222,10 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 var post = await _context.TimNguois
                                                     .Include(u => u.ApplicationUser)
                                                     .FirstOrDefaultAsync(i => i.Id == postId);
+                
+                var baocao = await _context.BaoCaoBaiViets
+                                                    .Include(u => u.ApplicationUser)
+                                                    .FirstOrDefaultAsync(i => i.Id == ReportId);
                 if (post == null)
                 {
                     return NotFound();
@@ -201,9 +250,27 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     );
                 }
 
+                
                 post.active = !post.active;
                 _context.Update(post);
                 await _context.SaveChangesAsync();
+
+
+                if(post.active == true)
+                {
+                    
+                    var reports = await _context.BaoCaoBaiViets
+                        .Where(b => b.MaBaiViet == postId)
+                        .ToListAsync();
+                    _context.BaoCaoBaiViets.RemoveRange(reports);
+
+                    foreach (var report in reports)
+                    {
+                        report.check = true; // Đánh dấu là đã xử lý
+                    }
+                    await _context.SaveChangesAsync();
+                }
+                
                 TempData["SuccessMessage"] = $"Đã {(post.active ? "kích hoạt" : "vô hiệu hóa")} bài viết thành công";
                 return RedirectToAction("Details", new { id = ReportId });
             }

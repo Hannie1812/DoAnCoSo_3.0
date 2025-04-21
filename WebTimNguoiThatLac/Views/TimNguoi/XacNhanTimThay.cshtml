@@ -7,6 +7,9 @@
     ApplicationUser us = await UserManager.GetUserAsync(User);
 }
 
+<!-- Notification Area -->
+<!-- Thêm vào phần đầu trang -->
+<div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
 
 <section class="ftco-section">
     <div class="container">
@@ -32,6 +35,7 @@
                                         <label class="font-weight-bold">Tên người đã tìm thấy</label>
                                         <input asp-for="HoTen" class="form-control form-control-lg"
                                                value="@ViewBag.TimNguoi.HoTen" readonly />
+                                        <span asp-validation-for="HoTen" class="text-danger"></span>
                                     </div>
 
                                     <div class="form-group">
@@ -173,40 +177,7 @@
             padding: 5px;
         }
 
-        #toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-        }
-
-        .toastify {
-            padding: 12px 20px;
-            color: white;
-            border-radius: 4px;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-            animation: slideInRight 0.5s, fadeOut 0.5s 2.5s;
-        }
-
-        @@keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-            }
-
-            to {
-                transform: translateX(0);
-            }
-        }
-
-        @@keyframes fadeOut {
-            from {
-                opacity: 1;
-            }
-
-            to {
-                opacity: 0;
-            }
-        }
+        
     </style>
 }
 
@@ -214,8 +185,101 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    @* <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script> *@
     <script src="~/clients/plugins/summernote/summernote-bs4.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+        // Hiển thị thông báo từ TempData
+        @if (ViewData["SuccessMessage"] != null)
+        {
+            <text>
+                                        showNotification('success', '@Html.Raw(ViewData["SuccessMessage"])');
+            </text>
+        }
+        @if (ViewData["ErrorMessage"] != null)
+        {
+            <text>
+                                        showNotification('error', '@Html.Raw(ViewData["ErrorMessage"])');
+            </text>
+        }
+        @if (ViewData["WarningMessage"] != null)
+        {
+            <text>
+                                        showNotification('warning', '@Html.Raw(ViewData["WarningMessage"])');
+            </text>
+        }
+        @if (ViewData["InfoMessage"] != null)
+        {
+            <text>
+                                        showNotification('info', '@Html.Raw(ViewData["InfoMessage"])');
+            </text>
+        }
+        });
+
+
+        function showNotification(type, message)
+        {
+            alert(message);
+
+            const notificationArea = document.getElementById('notification-area');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                                            <i class="fas ${getIconForType(type)} me-2"></i>
+                                            ${message}
+                                        `;
+
+
+            notificationArea.appendChild(notification);
+
+            // Tự động xóa sau 5 giây
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+
+            // Tự động xóa khi nhấn vào
+            notification.addEventListener('click', () => {
+                notification.remove();
+            });
+
+            // Thêm hiệu ứng hover
+            notification.addEventListener('mouseover', () => {
+                notification.style.transform = 'scale(1.05)';
+            });
+            notification.addEventListener('mouseout', () => {
+                notification.style.transform = 'scale(1)';
+            });
+
+            // Thêm hiệu ứng slide-in
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 10);
+
+            
+
+        }
+
+
+        // Chọn biểu tượng dựa trên loại thông báo
+        function getIconForType(type) {
+            switch(type) {
+                case 'success': return 'fa-check-circle';
+                case 'error': return 'fa-times-circle';
+                case 'warning': return 'fa-exclamation-triangle';
+                case 'info': return 'fa-info-circle';
+                default: return 'fa-info-circle';
+            }
+        }
+
+
+
+    </script>
+
     <script>
         $(document).ready(function() {
             // Khởi tạo Summernote
@@ -277,7 +341,8 @@
                     contentType: false,
                     success: function(response) {
                         if (response.success) {
-                            showToast('Xác nhận thành công! Đang tải file...', 'success');
+                            // showToast('Xác nhận thành công! Đang tải file...', 'success');
+							showNotification('success', 'Xác nhận thành công! Đang tải file...');
 
                             // Tạo iframe ẩn để tải file
                             var iframe = document.createElement('iframe');
@@ -290,7 +355,9 @@
                                 window.location.href = response.redirectUrl;
                             }, 2000);
                         } else {
-                            showToast(response.message || 'Có lỗi xảy ra', 'error');
+                            // showToast(response.message || 'Có lỗi xảy ra', 'error');
+
+							showNotification('error', response.message || 'Có lỗi xảy ra');
 
                             // Hiển thị lỗi validation
                             if (response.errors && response.errors.length > 0) {
@@ -305,7 +372,10 @@
                         }
                     },
                     error: function(xhr) {
-                        showToast('Lỗi kết nối đến server', 'error');
+                        // showToast('Lỗi kết nối đến server', 'error');
+
+						showNotification('error', 'Lỗi kết nối đến server');
+
                         console.error(xhr.responseText);
                     },
                     complete: function() {
@@ -313,21 +383,8 @@
                     }
                 });
             });
-
-            // Hàm hiển thị toast thông báo
-            function showToast(message, type) {
-                var backgroundColor = type === 'success' ? '#4CAF50' : '#f44336';
-
-                Toastify({
-                    text: message,
-                    duration: 3000,
-                    close: true,
-                    gravity: "top",
-                    position: "right",
-                    backgroundColor: backgroundColor,
-                    stopOnFocus: true
-                }).showToast();
-            }
         });
     </script>
+
+
 }

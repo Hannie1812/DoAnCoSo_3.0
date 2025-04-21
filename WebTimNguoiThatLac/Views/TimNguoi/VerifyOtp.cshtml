@@ -1,0 +1,90 @@
+@model WebTimNguoiThatLac.ViewModels.OtpVerificationViewModel
+@{
+    ViewData["Title"] = "Xác thực email";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Xác thực email</h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-4">Vui lòng nhập địa chỉ email của bạn để nhận mã xác thực OTP.</p>
+                    
+                    <form id="otpForm" method="post" asp-action="VerifyOtp">
+                        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                        
+                        <div class="form-floating mb-3">
+                            <input asp-for="Email" class="form-control" autocomplete="email" aria-required="true" placeholder="name@example.com" />
+                            <label asp-for="Email" class="form-label">Email</label>
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        @if (Model?.IsVerified == false)
+                        {
+                            <div class="form-floating mb-3">
+                                <input asp-for="OtpCode" class="form-control" aria-required="true" placeholder="123456" />
+                                <label asp-for="OtpCode" class="form-label">Mã OTP</label>
+                                <span asp-validation-for="OtpCode" class="text-danger"></span>
+                            </div>
+                        }
+                        <div class="d-grid gap-2">
+                            <button type="button" id="sendOtp" class="btn btn-primary">Gửi mã OTP</button>
+                            <button type="submit" id="verifyOtp" class="btn btn-success">Xác thực OTP</button>
+                            <button type="button" id="resendOtp" class="btn btn-warning">Gửi lại mã</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            function showOtpInputAndButtons() {
+                $("#OtpCode").closest(".form-floating").show();
+                $("#sendOtp").hide();
+                $("#resendOtp").show();
+                $("#verifyOtp").show();
+            }
+            function hideOtpInputAndButtons() {
+                $("#OtpCode").closest(".form-floating").hide();
+                $("#resendOtp").hide();
+                $("#verifyOtp").hide();
+                $("#sendOtp").show();
+            }
+            function sendOtp(url) {
+                var email = $("#Email").val();
+                if (email) {
+                    $.post(url, { email: email })
+                        .done(function () {
+                            alert("Mã OTP đã được gửi đến email của bạn.");
+                            showOtpInputAndButtons();
+                        })
+                        .fail(function () {
+                            alert("Có lỗi xảy ra khi gửi mã OTP. Vui lòng thử lại.");
+                        });
+                } else {
+                    alert("Vui lòng nhập địa chỉ email.");
+                }
+            }
+            // Ẩn các nút và input OTP ban đầu nếu chưa có mã
+            if (!$("#OtpCode").val()) {
+                hideOtpInputAndButtons();
+            } else {
+                showOtpInputAndButtons();
+            }
+            $("#sendOtp").click(function () {
+                sendOtp("/TimNguoi/SendOtp");
+            });
+            $("#resendOtp").click(function () {
+                sendOtp("/TimNguoi/ResendOtp");
+            });
+        });
+    </script>
+}

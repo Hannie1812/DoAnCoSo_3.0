@@ -17,463 +17,502 @@
 
     CacAdmin a = new CacAdmin(db);
     string idAdmin = a.IdAdmin();
-
-
 }
-
-
 
 <!-- Notification Area -->
 <div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
-<style>
-    .description-section {
-    margin-bottom: 1.5rem;
-    }
-
-    .section-title {
-    font-weight: 600;
-    color: var(--dark-color);
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    }
-
-    .identification-container {
-    transition: all 0.3s ease;
-    }
-
-    .identification-container:hover {
-    box-shadow: 0 2px 8px rgba(67, 97, 238, 0.15);
-    }
-
-    .info-value {
-    line-height: 1.6;
-    color: var(--dark-color);
-    }
-</style>
-
-
 
 <style>
     :root {
-    --primary-color: #4361ee;
-    --primary-hover: #3a56d4;
-    --secondary-color: #3f37c9;
-    --success-color: #4cc9f0;
-    --danger-color: #f72585;
-    --warning-color: #f8961e;
-    --info-color: #4895ef;
-    --light-color: #f8f9fa;
-    --dark-color: #212529;
-    --border-radius: 12px;
-    --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    --transition: all 0.3s ease;
+        --primary-color: #4361ee;
+        --primary-hover: #3a56d4;
+        --secondary-color: #3f37c9;
+        --success-color: #4cc9f0;
+        --danger-color: #f72585;
+        --warning-color: #f8961e;
+        --info-color: #4895ef;
+        --light-color: #f8f9fa;
+        --dark-color: #212529;
+        --border-radius: 12px;
+        --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        --transition: all 0.3s ease;
     }
 
     /* Notification Styles */
     .notification {
-    padding: 15px 20px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    color: white;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    animation: slideIn 0.3s, fadeOut 0.5s 4.5s;
-    transition: all 0.3s;
+        padding: 15px 20px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        color: white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        animation: slideIn 0.3s, fadeOut 0.5s 4.5s;
+        transition: all 0.3s;
     }
 
-    .notification.success {
-    background-color: #28a745;
-    }
+        .notification.success {
+            background-color: #28a745;
+        }
 
-    .notification.error {
-    background-color: #dc3545;
-    }
+        .notification.error {
+            background-color: #dc3545;
+        }
 
     @@keyframes slideIn {
-    from {
-    transform: translateX(100%);
-    }
+        from {
+            transform: translateX(100%);
+        }
 
-    to {
-    transform: translateX(0);
-    }
+        to {
+            transform: translateX(0);
+        }
     }
 
     @@keyframes fadeOut {
-    from {
-    opacity: 1;
-    }
+        from {
+            opacity: 1;
+        }
 
-    to {
-    opacity: 0;
-    }
+        to {
+            opacity: 0;
+        }
     }
 
     /* Main Container */
     .missing-person-container {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 15px;
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 15px;
     }
 
     /* Image Section */
     .image-main-container {
-    position: relative;
-    height: 400px;
-    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
-    border-radius: var(--border-radius);
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 1rem;
+        position: relative;
+        height: 400px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
     }
 
     .main-image {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    transition: transform 0.5s ease;
-    cursor: zoom-in;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        transition: transform 0.5s ease;
+        cursor: zoom-in;
     }
 
-    .main-image.zoomed {
-    transform: scale(1.5);
-    cursor: zoom-out;
-    }
+        .main-image.zoomed {
+            transform: scale(1.5);
+            cursor: zoom-out;
+        }
 
     .image-actions {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    display: flex;
-    gap: 10px;
-    z-index: 10;
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        display: flex;
+        gap: 10px;
+        z-index: 10;
     }
 
     .image-action-btn {
-    width: 40px;
-    height: 40px;
-    background: rgba(0,0,0,0.6);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: var(--transition);
+        width: 40px;
+        height: 40px;
+        background: rgba(0,0,0,0.6);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
     }
 
-    .image-action-btn:hover {
-    background: var(--primary-color);
-    transform: scale(1.1);
-    }
+        .image-action-btn:hover {
+            background: var(--primary-color);
+            transform: scale(1.1);
+        }
 
     /* Gallery Styles */
     .gallery-container {
-    background: white;
-    padding: 1.5rem;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    margin-bottom: 2rem;
+        background: white;
+        padding: 1.5rem;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        margin-bottom: 2rem;
     }
 
     .gallery-scroll {
-    display: flex;
-    gap: 0.8rem;
-    padding-bottom: 0.5rem;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
+        display: flex;
+        gap: 0.8rem;
+        padding-bottom: 0.5rem;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
     }
 
     .gallery-thumbnail {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 8px;
-    border: 3px solid white;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-    cursor: pointer;
-    transition: var(--transition);
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 3px solid white;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        cursor: pointer;
+        transition: var(--transition);
     }
 
-    .gallery-thumbnail:hover {
-    transform: scale(1.05);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    border-color: var(--primary-color);
-    }
+        .gallery-thumbnail:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border-color: var(--primary-color);
+        }
 
     /* Info Section */
     .info-basic-container {
-    background: white;
-    padding: 2rem;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    height: 100%;
+        background: white;
+        padding: 2rem;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        height: 100%;
     }
 
     .info-title {
-    font-weight: 700;
-    color: var(--primary-color);
-    margin-bottom: 0.75rem;
-    font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 0.75rem;
+        font-size: 1.8rem;
     }
 
     .status-badge {
-    font-size: 0.9rem;
-    padding: 0.5rem 1.25rem;
-    border-radius: 50px;
-    font-weight: 500;
-    display: inline-flex;
-    align-items: center;
+        font-size: 0.9rem;
+        padding: 0.5rem 1.25rem;
+        border-radius: 50px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
     }
 
     .status-searching {
-    background-color: #fff3cd;
-    color: #856404;
+        background-color: #fff3cd;
+        color: #856404;
     }
 
     .status-found {
-    background-color: #d4edda;
-    color: #155724;
+        background-color: #d4edda;
+        color: #155724;
     }
 
     .status-other {
-    background-color: #e2e3e5;
-    color: #383d41;
+        background-color: #e2e3e5;
+        color: #383d41;
     }
 
     .info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1rem;
-    margin: 1.5rem 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
     }
 
     .info-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background-color: rgba(248, 249, 250, 0.6);
-    border-radius: 10px;
-    transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background-color: rgba(248, 249, 250, 0.6);
+        border-radius: 10px;
+        transition: var(--transition);
     }
 
-    .info-item:hover {
-    background-color: rgba(13, 110, 253, 0.05);
-    transform: translateY(-3px);
-    }
+        .info-item:hover {
+            background-color: rgba(13, 110, 253, 0.05);
+            transform: translateY(-3px);
+        }
 
     .info-icon {
-    width: 42px;
-    height: 42px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(13, 110, 253, 0.1);
-    color: var(--primary-color);
-    border-radius: 10px;
-    flex-shrink: 0;
-    font-size: 1.1rem;
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(13, 110, 253, 0.1);
+        color: var(--primary-color);
+        border-radius: 10px;
+        flex-shrink: 0;
+        font-size: 1.1rem;
     }
 
     .info-label {
-    font-weight: 600;
-    color: #6c757d;
-    font-size: 0.9rem;
-    margin-bottom: 0.25rem;
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
     }
 
     .info-value {
-    color: var(--dark-color);
-    font-weight: 500;
-    font-size: 1.05rem;
+        color: var(--dark-color);
+        font-weight: 500;
+        font-size: 1.05rem;
     }
 
     /* Description Section */
     .description-section {
-    background: white;
-    padding: 2rem;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    margin-bottom: 2rem;
+        background: white;
+        padding: 2rem;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        margin-bottom: 2rem;
     }
 
     .description-container {
-    background-color: rgba(248, 249, 250, 0.6);
-    border-radius: 10px;
-    padding: 1.75rem;
-    border-left: 4px solid var(--primary-color);
-    line-height: 1.7;
+        background-color: rgba(248, 249, 250, 0.6);
+        border-radius: 10px;
+        padding: 1.75rem;
+        border-left: 4px solid var(--primary-color);
+        line-height: 1.7;
     }
 
     /* Action Buttons */
     .action-buttons {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-    margin-top: 1.5rem;
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-top: 1.5rem;
     }
 
     .btn {
-    padding: 0.6rem 1.25rem;
-    border-radius: 50px;
-    font-weight: 500;
-    transition: var(--transition);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
+        padding: 0.6rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        min-width: 150px;
     }
+
+        .btn i {
+            margin-right: 8px;
+        }
 
     .btn-primary {
-    background-color: var(--primary-color);
-    color: white;
+        background-color: var(--primary-color);
+        color: white;
     }
 
-    .btn-primary:hover {
-    background-color: var(--secondary-color);
-    color: white;
-    transform: translateY(-2px);
-    }
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
 
     .btn-outline-primary {
-    border: 1px solid var(--primary-color);
-    color: var(--primary-color);
-    background: transparent;
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+        background: transparent;
     }
 
-    .btn-outline-primary:hover {
-    background-color: var(--primary-color);
-    color: white;
-    }
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
 
     .btn-outline-danger {
-    border: 1px solid var(--danger-color);
-    color: var(--danger-color);
-    background: transparent;
+        border: 1px solid var(--danger-color);
+        color: var(--danger-color);
+        background: transparent;
     }
 
-    .btn-outline-danger:hover {
-    background-color: var(--danger-color);
-    color: white;
-    }
+        .btn-outline-danger:hover {
+            background-color: var(--danger-color);
+            color: white;
+        }
 
     .btn-success {
-    background-color: #25D366;
-    color: white;
+        background-color: #25D366;
+        color: white;
     }
 
-    .btn-success:hover {
-    background-color: #128C7E;
-    color: white;
+        .btn-success:hover {
+            background-color: #128C7E;
+            color: white;
+        }
+
+    .btn-info {
+        background-color: #17a2b8;
+        color: white;
     }
+
+        .btn-info:hover {
+            background-color: #138496;
+            color: white;
+        }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            color: white;
+        }
 
     /* Comments Section */
     .comments-card {
-    border-radius: var(--border-radius);
-    overflow: hidden;
-    box-shadow: var(--box-shadow);
-    border: none;
-    background: white;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--box-shadow);
+        border: none;
+        background: white;
     }
 
     .comment-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background-color: var(--primary-color);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    flex-shrink: 0;
-    font-size: 1.1rem;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        flex-shrink: 0;
+        font-size: 1.1rem;
     }
 
     .comment-image {
-    max-width: 250px;
-    max-height: 250px;
-    border-radius: 8px;
-    cursor: zoom-in;
-    transition: transform 0.2s ease;
-    object-fit: cover;
+        max-width: 250px;
+        max-height: 250px;
+        border-radius: 8px;
+        cursor: zoom-in;
+        transition: transform 0.2s ease;
+        object-fit: cover;
     }
 
-    .comment-image:hover {
-    transform: scale(1.03);
+        .comment-image:hover {
+            transform: scale(1.03);
+        }
+
+    /* Image Preview */
+    .image-preview-container {
+        margin-top: 10px;
+        display: none;
+    }
+
+    .image-preview {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: 8px;
+        margin-top: 10px;
     }
 
     /* Responsive Adjustments */
     @@media (max-width: 992px) {
-    .image-main-container {
-    min-height: 350px;
-    }
+        .image-main-container {
+            min-height: 350px;
+        }
     }
 
     @@media (max-width: 768px) {
-    .info-grid {
-    grid-template-columns: 1fr;
-    }
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
 
-    .gallery-thumbnail {
-    width: 90px;
-    height: 90px;
-    }
+        .gallery-thumbnail {
+            width: 90px;
+            height: 90px;
+        }
+
+        .btn {
+            width: 100%;
+        }
     }
 </style>
+
+
+
+@* báo cáo bình luận  *@
 <style>
-    .comments-card {
+/* Custom Report Modal Styles */
+.report-modal .modal-content {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.report-modal .modal-header {
+    padding: 1rem 1.5rem;
+    border-bottom: none;
+}
+
+.report-modal .modal-body {
+    padding: 1.5rem;
+}
+
+.report-modal .form-select-lg {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
     transition: all 0.3s ease;
-    }
+}
 
-    .comment-item {
-    transition: background-color 0.2s ease;
-    }
+.report-modal .form-select-lg:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
 
-    .comment-item:hover {
-    background-color: rgba(248, 249, 250, 0.8);
-    }
+.report-modal .form-control {
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+}
 
-    .comment-avatar {
-    flex-shrink: 0;
-    }
+.report-modal .btn {
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 500;
+}
 
-    .comment-image {
-    transition: transform 0.2s ease;
-    }
+.report-modal .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
 
-    .comment-image:hover {
-    transform: scale(1.02);
-    }
+.report-modal .btn-danger:hover {
+    background-color: #bb2d3b;
+    border-color: #b02a37;
+}
 
-    .comment-content {
-    white-space: pre-line;
-    word-break: break-word;
-    }
+/* Dropdown item with icons */
+.report-modal .dropdown-item {
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+}
 
-    .dropdown-menu {
-    min-width: 150px;
-    }
+/* Custom select options with icons */
+.report-modal option {
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+}
 
-    .no-comments {
-    border-radius: 0 0 12px 12px;
-    }
+/* Make the select options look better */
+.report-modal select option {
+    padding: 8px 12px;
+    margin: 2px 0;
+    border-radius: 4px;
+}
 
-    /* Responsive adjustments */
-    @@media (max-width: 576px) {
-    .comment-form .d-flex {
-    flex-direction: column;
-    }
+.report-modal select option:hover {
+    background-color: #f8f9fa;
+}
 
-    .comment-form button {
-    margin-top: 1rem;
-    width: 100%;
-    }
-    }
 </style>
 
 
@@ -542,10 +581,10 @@
                                 <div class="gallery-item">
                                     <div class="position-relative">
                                         <img src="@img.HinhAnh"
-                                        class="gallery-thumbnail"
-                                        onclick="changeMainImage('@img.HinhAnh')"
-                                        alt="Ảnh liên quan"
-                                        loading="lazy">
+                                             class="gallery-thumbnail"
+                                             onclick="changeMainImage('@img.HinhAnh')"
+                                             alt="Ảnh liên quan"
+                                             loading="lazy">
                                         @if (img.TrangThai == 1)
                                         {
                                             <span class="badge bg-success rounded-circle p-1" style="position: absolute; top: -5px; right: -5px;">
@@ -627,6 +666,19 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-calendar-day"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Ngày đăng bài</div>
+                                <div class="info-value">@Model.NgayDang.ToString("dd/MM/yyyy")</div>
+                                <small class="text-muted">
+                                    <i class="far fa-clock me-1"></i>
+                                    @(Math.Abs((DateTime.Now - Model.NgayDang).TotalDays).ToString("0")) ngày trước
+                                </small>
+                            </div>
+                        </div>
 
                         <div class="info-item">
                             <div class="info-icon">
@@ -636,8 +688,16 @@
                                 <div class="info-label">Ngày mất tích</div>
                                 <div class="info-value">@Model.NgayMatTich?.ToString("dd/MM/yyyy")</div>
                                 <small class="text-muted">
-                                    <i class="far fa-clock me-1"></i>
-                                    @((DateTime.Now - Model.NgayMatTich)?.Days.ToString()) ngày trước
+                                    @if (Model.NgayMatTich == null)
+                                    {
+                                        <span class="text-danger">Chưa xác định</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-success">
+                                            @(Math.Abs((DateTime.Now - Model.NgayMatTich.Value).TotalDays).ToString("0")) ngày trước
+                                        </span>
+                                    }
                                 </small>
                             </div>
                         </div>
@@ -645,44 +705,46 @@
 
                     <!-- Action Buttons -->
                     <div class="action-buttons">
-                        @if (isAuthor)
+                        @if (isAuthor || user.IsAdmin)
                         {
-                            <a href="/TimNguoi/CapNhatBaiViet?id=@Model.Id" class="btn btn-outline-primary">
-                                <i class="fas fa-edit me-1"></i> Chỉnh sửa
+                            <a href="/TimNguoi/CapNhatBaiViet?id=@Model.Id" class="btn btn-primary">
+                                <i class="fas fa-edit"></i> Chỉnh sửa
                             </a>
-                            <a asp-action="XacNhanTimThay" asp-controller="TimNguoi" asp-route-id="@Model.Id" class="btn btn-outline-primary">
-                                <i class="fas fa-edit me-1"></i>Xác Nhận Đã Thấy
-                            </a>
-                            <a asp-action="Index" asp-controller="NhanChung" asp-route-id="@Model.Id" class="btn btn-outline-primary">
-								<i class="fas fa-edit me-1"></i>Nhân Chứng
-                            </a>
-                        }
-                        @if (!isAuthor && user != null)
-                        {
-                            <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#reportPostModal">
-                                <i class="fas fa-flag me-1"></i> Báo cáo
+
+                            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmFoundModal">
+                                <i class="fas fa-check-circle"></i> Xác nhận đã thấy
                             </button>
-                        }
-                        @if (!isAuthor && user != null)
-                        {
-                            <a href="@Url.Action("BatDauChat", "Chat", new { nguoiNhanId = Model.IdNguoiDung })"
-                            class="btn btn-success">
-                                <i class="fas fa-comment me-1"></i> Liên hệ
+
+                            <a asp-action="Index" asp-controller="NhanChung" asp-route-id="@Model.Id" class="btn btn-info">
+                                <i class="fas fa-user-friends"></i> Nhân chứng
                             </a>
                         }
-						@if (idAdmin != null)
-						{
-							<a href="@Url.Action("BatDauChat", "Chat", new { nguoiNhanId = idAdmin })"
-                                    class="btn btn-outline-primary">
+
+                        @if (!isAuthor && user != null)
+                        {
+                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#reportPostModal">
+                                <i class="fas fa-flag"></i> Báo cáo
+                            </button>
+
+                            <a href="@Url.Action("BatDauChat", "Chat", new { nguoiNhanId = Model.IdNguoiDung })"
+                               class="btn btn-success">
+                                <i class="fas fa-comment"></i> Liên hệ
+                            </a>
+                        }
+
+                        @if (idAdmin != null && user != null && user.IsAdmin == false)
+                        {
+                            <a href="@Url.Action("BatDauChat", "Chat", new { nguoiNhanId = idAdmin })"
+                               class="btn btn-outline-primary">
                                 <i class="fas fa-headset"></i> Liên hệ Admin
                             </a>
-						}
-                       
+                        }
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Identification Section -->
         <div class="description-section mt-4">
             <h5 class="section-title">
                 <div class="info-icon me-3">
@@ -713,7 +775,6 @@
                 </div>
             </div>
         </div>
-
 
         <!-- Comments Section -->
         <div class="comments-card bg-white rounded-3 shadow-sm mb-4 border">
@@ -767,10 +828,21 @@
                                 <!-- Avatar -->
                                 <div class="me-3">
                                     <div class="comment-avatar bg-primary text-white d-flex align-items-center justify-content-center rounded-circle"
-                                    style="width: 48px; height: 48px; font-size: 1.2rem;">
-                                        @if (!string.IsNullOrEmpty(binhLuan.ApplicationUser?.FullName))
+                                         style="width: 48px; height: 48px; font-size: 1.2rem;">
+                                        @* @if (!string.IsNullOrEmpty(binhLuan.ApplicationUser?.FullName)) *@
+                                        @* { *@
+                                        @*     @binhLuan.ApplicationUser.FullName[0] *@
+                                        @* } *@
+                                        @* else *@
+                                        @* { *@
+                                        @*     <i class="fas fa-user"></i> *@
+                                        @* } *@
+                                        @if (!string.IsNullOrEmpty(binhLuan.ApplicationUser?.HinhAnh))
                                         {
-                                            @binhLuan.ApplicationUser.FullName[0]
+                                            <img src="@binhLuan.ApplicationUser?.HinhAnh" alt="Ảnh đại diện"
+                                                 class="rounded-circle border"
+                                                 width="50" height="50"
+                                                 style="object-fit: cover; border: 2px solid #ddd;" />
                                         }
                                         else
                                         {
@@ -807,27 +879,23 @@
                                                 <ul class="dropdown-menu dropdown-menu-end">
                                                     <li>
                                                         <button class="dropdown-item text-danger report-comment-btn"
-                                                        data-comment-id="@binhLuan.Id"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#reportCommentModal">
+                                                                data-comment-id="@binhLuan.Id"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#reportCommentModal">
                                                             <i class="fas fa-flag me-2"></i> Báo cáo
                                                         </button>
                                                     </li>
                                                     @if (isAuthor)
                                                     {
                                                         <li>
-                                                            <button class="dropdown-item text-danger "
+                                                            <button class="dropdown-item text-danger d-flex align-items-center"
                                                                     data-bs-toggle="modal"
-                                                                    data-bs-target="#XoaBinhLuan">
-                                                                <i class="fa fa-window-close-o me-2"></i> Xóa Bình Luận
-                                                                
+                                                                    data-bs-target="#XoaBinhLuan-@binhLuan.Id">
+                                                                <i class="fas fa-trash-alt me-2"></i>
+                                                                Xóa bình luận
                                                             </button>
-
-                                                           
                                                         </li>
-                                                        
                                                     }
-                                                   
                                                 </ul>
                                             </div>
                                         }
@@ -852,21 +920,29 @@
                             </div>
                         </div>
 
-
-                        <!-- Modal Xóa Bình Luận -->
-                        <div class="modal fade" id="XoaBinhLuan" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Xác nhận xóa bình luận</h1>
+                        <div class="modal fade" id="XoaBinhLuan-@binhLuan.Id" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content border-0 shadow-lg">
+                                    <div class="modal-header border-0">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-danger text-white bg-opacity-10 p-2 rounded-circle me-3 d-flex justify-content-center align-item-center">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </div>
+                                            <h5 class="modal-title">Xác nhận xóa bình luận</h5>
+                                        </div>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
-                                    <div class="modal-body">
-                                        Bạn có chắc chắn muốn xóa bình luận này không?
+                                    <div class="modal-body py-4">
+                                        <p>Bạn có chắc chắn muốn xóa bình luận này không?</p>
                                     </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Thoát</button>
-                                        <button type="button" onclick="XacNhanXoaBinhLuan('@binhLuan.Id')" class="btn btn-primary" data-bs-dismiss="modal">Xóa Bình Luận</button>
+                                    <div class="modal-footer border-0">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                            <i class="fas fa-times me-1"></i> Hủy
+                                        </button>
+                                        <button type="button" onclick="XacNhanXoaBinhLuan('@binhLuan.Id')"
+                                                class="btn btn-danger" data-bs-dismiss="modal">
+                                            <i class="fas fa-trash-alt me-1"></i> Xóa
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -886,16 +962,37 @@
     }
 </div>
 
+<!-- Confirm Found Modal -->
+<div class="modal fade" id="confirmFoundModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-check-circle me-2 text-success"></i>Xác nhận đã tìm thấy
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn rằng người này đã được tìm thấy?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <a asp-action="XacNhanTimThay" asp-controller="TimNguoi" asp-route-id="@Model.Id"
+                   class="btn btn-success">
+                    <i class="fas fa-check me-1"></i> Xác nhận
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 
-
-<!-- Modals (giữ nguyên từ code gốc) -->
 <!-- Report Post Modal -->
 <div class="modal fade report-modal" id="reportPostModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <i class="fas fa-exclamation-triangle me-2"></i>Báo cáo bài viết
+                    <i class="fas fa-exclamation-triangle me-2 text-danger"></i>Báo cáo bài viết
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -918,16 +1015,24 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Hình ảnh minh chứng (nếu có)</label>
-                        <input type="file" id="reportPostImage" class="form-control" accept="image/*">
+                        <input type="file" id="reportPostImage" class="form-control" accept="image/*" onchange="previewReportImage(this)">
                         <div class="form-text">Tải lên hình ảnh minh chứng cho báo cáo của bạn</div>
+                        <div class="image-preview-container mt-2">
+                            <img id="reportPostImagePreview" class="image-preview" style="display: none;">
+                            <button type="button" class="btn btn-sm btn-danger mt-2" onclick="clearReportImage()" style="display: none;">
+                                <i class="fas fa-times me-1"></i> Xóa ảnh
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                 <button type="button" id="submitReportPost" class="btn btn-danger">
-                    <span class="submit-text">Gửi báo cáo</span>
-                    <span class="loading-spinner spinner-border-sm d-none"></span>
+                    <span class="submit-text">
+                        <i class="fas fa-paper-plane me-1"></i> Gửi báo cáo
+                    </span>
+                    <span class="loading-spinner spinner-border spinner-border-sm d-none"></span>
                 </button>
             </div>
         </div>
@@ -936,34 +1041,61 @@
 
 <!-- Report Comment Modal -->
 <div class="modal fade report-modal" id="reportCommentModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title">
                     <i class="fas fa-exclamation-triangle me-2"></i>Báo cáo bình luận
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-4">
                 <div id="reportCommentContent">
                     <input type="hidden" id="reportCommentId" />
-                    <div class="mb-3">
-                        <label class="form-label">Lý do báo cáo</label>
-                        <select id="reportCommentReason" class="form-select" required>
-                            <option value="">Chọn lý do...</option>
-                            <option value="Spam/quảng cáo">Spam/quảng cáo</option>
-                            <option value="Nội dung không phù hợp">Nội dung không phù hợp</option>
-                            <option value="Quấy rối/bắt nạt">Quấy rối/bắt nạt</option>
-                            <option value="Lý do khác">Lý do khác</option>
+
+                    <div class="alert alert-warning mb-4">
+                        <i class="fas fa-info-circle me-2"></i>Vui lòng chọn lý do báo cáo phù hợp
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold d-flex align-items-center">
+                            <i class="fas fa-flag me-2 text-danger"></i>Lý do báo cáo
+                        </label>
+                        <select id="reportCommentReason" class="form-select form-select-lg" required>
+                            <option value="" selected disabled>-- Chọn lý do --</option>
+                            <option value="Spam/quảng cáo">
+                                <i class="fas fa-ban me-2"></i>Spam/quảng cáo
+                            </option>
+                            <option value="Nội dung không phù hợp">
+                                <i class="fas fa-exclamation me-2"></i>Nội dung không phù hợp
+                            </option>
+                            <option value="Quấy rối/bắt nạt">
+                                <i class="fas fa-user-slash me-2"></i>Quấy rối/bắt nạt
+                            </option>
+                            <option value="Lý do khác">
+                                <i class="fas fa-ellipsis-h me-2"></i>Lý do khác
+                            </option>
                         </select>
                     </div>
+
+                    @* <div class="mb-3"> *@
+                    @*     <label class="form-label fw-bold d-flex align-items-center"> *@
+                    @*         <i class="fas fa-comment-dots me-2 text-danger"></i>Mô tả thêm (nếu có) *@
+                    @*     </label> *@
+                    @*     <textarea id="reportCommentDetails" class="form-control" rows="3" *@
+                    @*               placeholder="Mô tả chi tiết lý do báo cáo..."></textarea> *@
+                    @* </div> *@
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Hủy bỏ
+                </button>
                 <button type="button" id="submitReportComment" class="btn btn-danger">
-                    <span class="submit-text">Gửi báo cáo</span>
-                    <span class="loading-spinner spinner-border-sm d-none"></span>
+                    <span class="submit-text">
+                        <i class="fas fa-paper-plane me-1"></i> Gửi báo cáo
+                    </span>
+                    <span class="loading-spinner spinner-border spinner-border-sm d-none"></span>
                 </button>
             </div>
         </div>
@@ -984,263 +1116,287 @@
     </div>
 </div>
 
+@if (isAuthor == false)
+{
     @* Nút báo tin và gọi khẩn cấp *@
     @await Html.PartialAsync("_LayoutStickyCallButton", Model.Id)
+}
 
-
-<script>
-
-    function XuatDon(id) {
-            $.ajax({
-                type: "POST",
-                url: "TimNguoi/ExportToWord",
-                data: { id: id },
-                success: function(response) {
-                    // Tạo link tải file tự động
-                    var link = document.createElement('a');
-                    link.href = window.URL.createObjectURL(new Blob([response]));
-                    link.download = `DonTrinhBao_${id}_${new Date().toISOString()}.docx`;
-                    link.click();
-
-                    alert("Đã xuất file thành công và lưu vào hệ thống");
-                },
-                error: function() {
-                    alert("Lỗi khi xuất file");
-                }
-            });
-        }
-
-    // Notification Function
-    function showNotification(type, message) {
-        const notificationArea = document.getElementById('notification-area');
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.innerHTML = `
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
-            ${message}
-        `;
-        notificationArea.appendChild(notification);
-        setTimeout(() => notification.remove(), 5000);
-    }
-
-    // Image Functions
-    function zoomImage() {
-        const mainImg = document.getElementById('mainImage');
-        if (mainImg) mainImg.classList.toggle('zoomed');
-    }
-
-    function downloadImage(imageUrl) {
-        if (!imageUrl) return;
-        const link = document.createElement('a');
-        link.href = imageUrl;
-        link.download = 'hinh-anh-nguoi-mat-tich.jpg';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
-    function changeMainImage(src) {
-        const mainImg = document.getElementById('mainImage');
-        if (mainImg) {
-            mainImg.classList.remove('zoomed');
-            mainImg.style.opacity = 0;
-            setTimeout(() => {
-                mainImg.src = src;
-                mainImg.style.opacity = 1;
-            }, 300);
-        }
-    }
-
-    function showImageModal(src) {
-        const modal = new bootstrap.Modal(document.getElementById('imageModal'));
-        document.getElementById('modalImage').src = src;
-        modal.show();
-    }
-
-    // Comments Toggle
-    document.getElementById('toggleCommentsBtn')?.addEventListener('click', function() {
-        const commentSection = document.getElementById('commentSection');
-        if (commentSection) {
-            commentSection.classList.toggle('d-none');
-            this.innerHTML = commentSection.classList.contains('d-none')
-                ? '<i class="fas fa-comment me-1"></i> Xem bình luận'
-                : '<i class="fas fa-eye-slash me-1"></i> Ẩn bình luận';
-        }
-    });
-
-    // Report Handling
-    document.addEventListener('DOMContentLoaded', function() {
-        // Setup report buttons
-        document.getElementById('submitReportPost')?.addEventListener('click', submitPostReport);
-        document.getElementById('submitReportComment')?.addEventListener('click', submitCommentReport);
-
-        document.querySelectorAll('.report-comment-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.getElementById('reportCommentId').value = this.getAttribute('data-comment-id');
-            });
-        });
-
-        // Scroll to comments if hash present
-        if (window.location.hash === '#comments') {
-            const commentSection = document.getElementById('commentSection');
-            const toggleBtn = document.getElementById('toggleCommentsBtn');
-            if (commentSection && toggleBtn) {
-                commentSection.classList.remove('d-none');
-                toggleBtn.innerHTML = '<i class="fas fa-eye-slash me-1"></i> Ẩn bình luận';
-                setTimeout(() => commentSection.scrollIntoView({ behavior: 'smooth' }), 100);
-            }
-        }
-    });
-
-    function submitPostReport() {
-        const submitBtn = document.getElementById('submitReportPost');
-        const submitText = submitBtn.querySelector('.submit-text');
-        const spinner = submitBtn.querySelector('.loading-spinner');
-
-        submitText.classList.add('d-none');
-        spinner.classList.remove('d-none');
-        submitBtn.disabled = true;
-
-        const formData = new FormData();
-        formData.append('MaBaiViet', document.getElementById('reportPostId').value);
-        formData.append('LyDo', document.getElementById('reportPostReason').value);
-        formData.append('ChiTiet', document.getElementById('reportPostDetails').value);
-
-        const imageFile = document.getElementById('reportPostImage').files[0];
-        if (imageFile) formData.append('HinhAnhBaoCaoBaiViet', imageFile);
-
-        fetch('/TimNguoi/BaoCaoBaiViet', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showNotification('success', data.message || 'Báo cáo đã được gửi thành công!');
-                bootstrap.Modal.getInstance(document.getElementById('reportPostModal')).hide();
-                // Reset form
-                document.getElementById('reportPostReason').value = '';
-                document.getElementById('reportPostDetails').value = '';
-                document.getElementById('reportPostImage').value = '';
-            } else {
-                showNotification('error', data.message || 'Có lỗi xảy ra khi gửi báo cáo');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showNotification('error', 'Lỗi kết nối đến server');
-        })
-        .finally(() => {
-            submitText.classList.remove('d-none');
-            spinner.classList.add('d-none');
-            submitBtn.disabled = false;
-        });
-    }
-
-    function submitCommentReport() {
-        const submitBtn = document.getElementById('submitReportComment');
-        const submitText = submitBtn.querySelector('.submit-text');
-        const spinner = submitBtn.querySelector('.loading-spinner');
-
-        submitText.classList.add('d-none');
-        spinner.classList.remove('d-none');
-        submitBtn.disabled = true;
-
-        const formData = new FormData();
-        formData.append('MaBinhLuan', document.getElementById('reportCommentId').value);
-        formData.append('LyDo', document.getElementById('reportCommentReason').value);
-
-        fetch('/TimNguoi/BaoCaoBinhLuan', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showNotification('success', data.message || 'Báo cáo bình luận đã được gửi!');
-                bootstrap.Modal.getInstance(document.getElementById('reportCommentModal')).hide();
-                document.getElementById('reportCommentReason').value = '';
-            } else {
-                showNotification('error', data.message || 'Có lỗi xảy ra khi gửi báo cáo');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showNotification('error', 'Lỗi kết nối đến server');
-        })
-        .finally(() => {
-            submitText.classList.remove('d-none');
-            spinner.classList.add('d-none');
-            submitBtn.disabled = false;
-        });
-    }
-
-    
-
-</script>
 @section Scripts {
     @if (TempData["FileContents"] != null)
     {
         <script>
             $(document).ready(function() {
-                // Tự động mở cửa sổ tải file
                 window.open('@Url.Action("DownloadFile", "TimNguoi")', '_blank');
             });
         </script>
     }
-    
-    @* Nhân chứng đã gửi thành công *@
+
     @if (TempData["GuiNhanChungThanhCong"] != null)
     {
         <script>
-			alert('Đã gửi nhân chứng thành công 123456789 test nhớ xóa ');
             $(document).ready(function() {
-                 showNotification1('success', '@Html.Raw(Json.Serialize(TempData["GuiNhanChungThanhCong"].ToString()))');
-              });
+                showNotification1('success', '@Html.Raw(Json.Serialize(TempData["GuiNhanChungThanhCong"].ToString()))');
+            });
 
-             function showNotification1(type, message) {
-                 const notificationArea = document.getElementById('notification-area');
-                 const notification = document.createElement('div');
-                 notification.className = `notification ${type}`;
-                 notification.innerHTML = `
-                     <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
-                     ${message}
-                 `;
-                 notificationArea.appendChild(notification);
-                 setTimeout(() => notification.remove(), 5000);
-             }
+            function showNotification1(type, message) {
+                const notificationArea = document.getElementById('notification-area');
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.innerHTML = `
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
+                    ${message}
+                `;
+                notificationArea.appendChild(notification);
+                setTimeout(() => notification.remove(), 5000);
+            }
         </script>
     }
 
-
-
     <script>
-        function XacNhanXoaBinhLuan(id)
-        {
-			$.ajax({
-				type: "POST",
-				url: "/TimNguoi/XoaBinhLuan",
-				data: { id: id },
-				success: function(response) {
-					if (response.success) {
-						// Xóa bình luận khỏi giao diện
-						$("#comment-" + id).remove();
-						showNotification('success', 'Đã xóa bình luận thành công!');
+        // Hàm xử lý xóa bình luận
+        function XacNhanXoaBinhLuan(id) {
+            $.ajax({
+                type: "POST",
+                url: "/TimNguoi/XoaBinhLuan",
+                data: { id: id },
+                success: function(response) {
+                    if (response.success) {
+                        $("#comment-" + id).remove();
+                        showNotification('success', 'Đã xóa bình luận thành công!');
+                    } else {
+                        showNotification('error', 'Có lỗi xảy ra khi xóa bình luận');
+                    }
+                },
+                error: function() {
+                    showNotification('error', 'Lỗi kết nối đến server');
+                }
+            });
+        }
 
-					} else {
-						showNotification('error', 'Có lỗi xảy ra khi xóa bình luận');
-					}
-				},
-				error: function() {
-					showNotification('error', 'Lỗi kết nối đến server');
-				}
-			});
+        // Hàm xem trước hình ảnh báo cáo
+        function previewReportImage(input) {
+            const preview = document.getElementById('reportPostImagePreview');
+            const previewContainer = document.querySelector('.image-preview-container');
+            const clearBtn = document.querySelector('.image-preview-container button');
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    previewContainer.style.display = 'block';
+                    clearBtn.style.display = 'block';
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Hàm xóa hình ảnh báo cáo
+        function clearReportImage() {
+            const input = document.getElementById('reportPostImage');
+            const preview = document.getElementById('reportPostImagePreview');
+            const previewContainer = document.querySelector('.image-preview-container');
+            const clearBtn = document.querySelector('.image-preview-container button');
+
+            input.value = '';
+            preview.src = '';
+            preview.style.display = 'none';
+            clearBtn.style.display = 'none';
+        }
+
+        // Notification Function
+        function showNotification(type, message) {
+            const notificationArea = document.getElementById('notification-area');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
+                ${message}
+            `;
+            notificationArea.appendChild(notification);
+            setTimeout(() => notification.remove(), 5000);
+        }
+
+        // Image Functions
+        function zoomImage() {
+            const mainImg = document.getElementById('mainImage');
+            if (mainImg) mainImg.classList.toggle('zoomed');
+        }
+
+        function downloadImage(imageUrl) {
+            if (!imageUrl) return;
+            const link = document.createElement('a');
+            link.href = imageUrl;
+            link.download = 'hinh-anh-nguoi-mat-tich.jpg';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function changeMainImage(src) {
+            const mainImg = document.getElementById('mainImage');
+            if (mainImg) {
+                mainImg.classList.remove('zoomed');
+                mainImg.style.opacity = 0;
+                setTimeout(() => {
+                    mainImg.src = src;
+                    mainImg.style.opacity = 1;
+                }, 300);
+            }
+        }
+
+        function showImageModal(src) {
+            const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+            document.getElementById('modalImage').src = src;
+            modal.show();
+        }
+
+        // Comments Toggle
+        document.getElementById('toggleCommentsBtn')?.addEventListener('click', function() {
+            const commentSection = document.getElementById('commentSection');
+            if (commentSection) {
+                commentSection.classList.toggle('d-none');
+                this.innerHTML = commentSection.classList.contains('d-none')
+                    ? '<i class="fas fa-comment me-1"></i> Xem bình luận'
+                    : '<i class="fas fa-eye-slash me-1"></i> Ẩn bình luận';
+            }
+        });
+
+        // Report Handling
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup report buttons
+            document.getElementById('submitReportPost')?.addEventListener('click', submitPostReport);
+            document.getElementById('submitReportComment')?.addEventListener('click', submitCommentReport);
+
+            document.querySelectorAll('.report-comment-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.getElementById('reportCommentId').value = this.getAttribute('data-comment-id');
+                });
+            });
+
+            // Scroll to comments if hash present
+            if (window.location.hash === '#comments') {
+                const commentSection = document.getElementById('commentSection');
+                const toggleBtn = document.getElementById('toggleCommentsBtn');
+                if (commentSection && toggleBtn) {
+                    commentSection.classList.remove('d-none');
+                    toggleBtn.innerHTML = '<i class="fas fa-eye-slash me-1"></i> Ẩn bình luận';
+                    setTimeout(() => commentSection.scrollIntoView({ behavior: 'smooth' }), 100);
+                }
+            }
+        });
+
+        
+         function submitPostReport() {
+            const submitBtn = document.getElementById('submitReportPost');
+            const submitText = submitBtn.querySelector('.submit-text');
+            const spinner = submitBtn.querySelector('.loading-spinner');
+
+            submitText.classList.add('d-none');
+            spinner.classList.remove('d-none');
+            submitBtn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('MaBaiViet', document.getElementById('reportPostId').value);
+            formData.append('LyDo', document.getElementById('reportPostReason').value);
+            formData.append('ChiTiet', document.getElementById('reportPostDetails').value);
+
+            const imageFile = document.getElementById('reportPostImage').files[0];
+            if (imageFile) formData.append('HinhAnhBaoCaoBaiViet', imageFile);
+
+            // Sử dụng AJAX thay vì Fetch API
+            $.ajax({
+                url: '/TimNguoi/BaoCaoBaiViet',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(data) {
+                    showNotification('success', data.message || 'Báo cáo đã được gửi thành công!');
+
+                    // Đóng modal - cách tương thích với mọi phiên bản Bootstrap
+                    $('#reportPostModal').modal('hide');
+
+                    // Reset form
+                    document.getElementById('reportPostReason').value = '';
+                    document.getElementById('reportPostDetails').value = '';
+                    document.getElementById('reportPostImage').value = '';
+                    clearReportImage();
+                },
+                error: function(xhr, status, error) {
+                    let errorMsg = 'Có lỗi xảy ra khi gửi báo cáo';
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        errorMsg = response.message || errorMsg;
+                    } catch (e) {
+                        errorMsg = xhr.responseText || errorMsg;
+                    }
+                    showNotification('error', errorMsg);
+                },
+                complete: function() {
+                    submitText.classList.remove('d-none');
+                    spinner.classList.add('d-none');
+                    submitBtn.disabled = false;
+                }
+            });
+        }
+
+        function submitCommentReport() {
+            const submitBtn = document.getElementById('submitReportComment');
+            const submitText = submitBtn.querySelector('.submit-text');
+            const spinner = submitBtn.querySelector('.loading-spinner');
+
+            submitText.classList.add('d-none');
+            spinner.classList.remove('d-none');
+            submitBtn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('MaBinhLuan', document.getElementById('reportCommentId').value);
+            formData.append('LyDo', document.getElementById('reportCommentReason').value);
+
+            // Sử dụng AJAX thay vì Fetch API
+            $.ajax({
+                url: '/TimNguoi/BaoCaoBinhLuan',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(data) {
+                    if (data.success) {
+                        showNotification('success', data.message || 'Báo cáo bình luận đã được gửi!');
+                        $('#reportCommentModal').modal('hide');
+                        document.getElementById('reportCommentReason').value = '';
+                    } else {
+                        showNotification('error', data.message || 'Có lỗi xảy ra khi gửi báo cáo');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    let errorMsg = 'Có lỗi xảy ra khi gửi báo cáo';
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        errorMsg = response.message || errorMsg;
+                    } catch (e) {
+                        errorMsg = xhr.responseText || errorMsg;
+                    }
+                    showNotification('error', errorMsg);
+                },
+                complete: function() {
+                    submitText.classList.remove('d-none');
+                    spinner.classList.add('d-none');
+                    submitBtn.disabled = false;
+                }
+            });
         }
     </script>
+
+    
 }

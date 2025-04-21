@@ -9,20 +9,27 @@
     }
 }
 
-<h1>Manage your account</h1>
-
-<div>
-    <h2>Change your account settings</h2>
-    <hr />
-    <div class="row">
-        <div class="col-md-3">
-            <partial name="_ManageNav" />
-        </div>
-        <div class="col-md-9">
-            @RenderBody()
+<section class="ftco-section">
+    <div class="container">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Thiết lập tài khoản</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3" style="margin-top: 40px;">
+                        <div class="list-group">
+                            <partial name="_ManageNav" />
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        @RenderBody()
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+</section>
 
 @section Scripts {
     @RenderSection("Scripts", required: false)

@@ -77,6 +77,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
     <PackageReference Include="MimeKit" Version="4.11.0" />
+    <PackageReference Include="OpenCvSharp4" Version="4.10.0.20241108" />
     <PackageReference Include="Tesseract" Version="5.2.0" />
     <PackageReference Include="X.PagedList.Mvc.Core" Version="10.5.7" />
   </ItemGroup>

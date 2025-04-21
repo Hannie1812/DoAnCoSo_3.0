@@ -1,27 +1,126 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Profile";
+    ViewData["Title"] = "Thông Tin Cá Nhân";
     ViewData["ActivePage"] = ManageNavPages.Index;
 }
-
-<h3>@ViewData["Title"]</h3>
-<partial name="_StatusMessage" for="StatusMessage" />
-<div class="row">
-    <div class="col-md-6">
-        <form id="profile-form" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Username" class="form-control" placeholder="Please choose your username." disabled />
-                <label asp-for="Username" class="form-label"></label>
+@inject UserManager<ApplicationUser> UserManager
+    
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-lg ftco-animate fade-up">
+                <style>
+                    .form-control:focus {
+                        border-color: #80bdff;
+                        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+                    }
+                    .profile-img-container {
+                        position: relative;
+                        width: 200px;
+                        height: 200px;
+                        margin: 0 auto 2rem;
+                        border-radius: 50%;
+                        overflow: hidden;
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                        border: 3px solid #fff;
+                        transition: all 0.3s ease;
+                        cursor: pointer;
+                    }
+                    .profile-img-container:hover {
+                        transform: scale(1.05);
+                        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+                    }
+                    .profile-img-container img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        border-radius: 50%;
+                        transition: transform 0.3s ease;
+                    }
+                    .form-group {
+                        margin-bottom: 1.5rem;
+                        text-align: left;
+                    }
+                    .form-group label {
+                        display: block;
+                        text-align: left;
+                        margin-bottom: 0.5rem;
+                    }
+                    .form-group input {
+                        text-align: left;
+                    }
+                </style>
+                <div class="card-header bg-primary text-white d-flex">
+                    <div>
+                        <h2 class="card-title">Thông Tin Cá Nhân</h2>
+                    </div>
+                    <div class="ms-auto">
+                        <a asp-area="" asp-controller="TimNguoi" asp-action="ThemNguoiCanTim" class="btn btn-success">Thêm Bài tìm Kiếm</a>
+                        <a asp-area="" asp-controller="Chat" asp-action="Index" class="btn btn-info">Xem Tin Nhắn</a>
+                    </div>
+                </div>
+                <div class="card-body p-5">
+                    <partial name="_StatusMessage" for="StatusMessage" />
+                    <form id="profile-form" method="post" enctype="multipart/form-data" class="text-center">
+                        <div class="profile-img-container text-center" onclick="document.getElementById('Input_AvatarFile').click();">
+                            @{
+                                var user = await UserManager.GetUserAsync(User);
+                                var avatarUrl = user != null && !string.IsNullOrEmpty(user.HinhAnh) ? user.HinhAnh : "~/uploads/avatars/default-avatar.svg";
+                            }
+                            <img id="avatar-preview" src="@Url.Content(avatarUrl)" class="img-fluid rounded-circle" style="width: 200px; height: 200px; object-fit: cover;" onerror="this.src='@Url.Content("~/uploads/default-avatar.svg")'" />
+                        </div>
+                        <input type="file" id="Input_AvatarFile" name="Input.AvatarFile" accept="image/*" style="display: none;" onchange="previewImage(this)" />
+                        <script>
+                            function previewImage(input) {
+                                if (input.files && input.files[0]) {
+                                    var reader = new FileReader();
+                                    reader.onload = function(e) {
+                                        document.getElementById('avatar-preview').src = e.target.result;
+                                    }
+                                    reader.readAsDataURL(input.files[0]);
+                                }
+                            }
+                        </script>
+                        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                        <div class="form-group">
+                            <label class="form-label"><strong>Họ và tên:</strong></label>
+                            <input asp-for="Input.FullName" class="form-control" />
+                            <span asp-validation-for="Input.FullName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><strong>Email:</strong></label>
+                            <input asp-for="Email" class="form-control" disabled />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><strong>Số điện thoại:</strong></label>
+                            <input asp-for="Input.PhoneNumber" class="form-control" />
+                            <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><strong>Địa chỉ:</strong></label>
+                            <input asp-for="Input.Address" class="form-control" />
+                            <span asp-validation-for="Input.Address" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><strong>Ngày sinh:</strong></label>
+                            <input asp-for="Input.NgaySinh" class="form-control" type="date" />
+                            <span asp-validation-for="Input.NgaySinh" class="text-danger"></span>
+                        </div>
+                        <div class="text-center mt-4">
+                            <button id="update-profile-button" type="submit" class="btn btn-primary btn-lg px-4 shadow-sm hover-effect">Lưu thay đổi</button>
+                        </div>
+                        <style>
+                            .hover-effect:hover {
+                                transform: translateY(-2px);
+                                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                                transition: all 0.3s ease;
+                            }
+                        </style>
+                    </form>
+                </div>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Please enter your phone number."/>
-                <label asp-for="Input.PhoneNumber" class="form-label"></label>
-                <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
-            </div>
-            <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
-        </form>
+        </div>
     </div>
 </div>
 

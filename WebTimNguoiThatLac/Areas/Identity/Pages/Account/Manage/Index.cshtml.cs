@@ -64,6 +64,11 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account.Manage
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
+
+            [Required]
+            [Display(Name = "Họ và tên")]
+            public string FullName { get; set; }
+
             [Phone]
             [Display(Name = "Số điện thoại")]
             public string PhoneNumber { get; set; }
@@ -95,6 +100,7 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
+                FullName = user.FullName,
                 PhoneNumber = phoneNumber,
                 Address = user.Address,
                 NgaySinh = user.NgaySinh
@@ -127,6 +133,7 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
+            user.FullName = Input.FullName;
             user.Address = Input.Address;
             user.NgaySinh = Input.NgaySinh;
 
@@ -171,7 +178,7 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account.Manage
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
+            StatusMessage = "Cập nhật thông tin thành công.";
             return RedirectToPage();
         }
     }

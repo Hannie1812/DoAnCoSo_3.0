@@ -69,21 +69,20 @@ namespace WebTimNguoiThatLac.Controllers
                 return View(dsTrang);
             }
         }
-        public async Task<IActionResult> ThongTinCaNhan()
+        
+        public async Task<IActionResult> BaiVietCuaToi()
         {
-            ApplicationUser x = await _userManager.GetUserAsync(User);
-            List<TimNguoi> timNguois = await db.TimNguois.Include(u => u.AnhTimNguois).Where(i => i.IdNguoiDung == x.Id).ToListAsync();
-            ViewBag.CacBaiDang = timNguois;
-            return View(x);
-
-        }
-
-
-
-        public async Task<IActionResult> EditTaiKhoan()
-        {
-            ApplicationUser x = await _userManager.GetUserAsync(User);
-            return View(x);
+            var user = await _userManager.GetUserAsync(User);
+            if (user != null)
+            {
+                var baiViet = await db.TimNguois
+                    .Include(t => t.AnhTimNguois)
+                    .Where(t => t.IdNguoiDung == user.Id)
+                    .OrderByDescending(t => t.NgayDang)
+                    .ToListAsync();
+                return View(baiViet);
+            }
+            return RedirectToAction("Index", "Home");
         }
 
         // Đăng nhập bằng Google/Facebook

@@ -1,7 +1,24 @@
-﻿<!DOCTYPE html>
+﻿@using WebTimNguoiThatLac.Models
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+
+@{
+    ApplicationUser user = null;
+    if (User.Identity.IsAuthenticated)
+    {
+
+         user = await UserManager.GetUserAsync(User);
+    }
+}
+
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Welfare - Free Bootstrap 4 Template by Colorlib</title>
+    <link rel="icon" type="image/png" href="~/logo/logo.png">
+
+    <title>Safe Return</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -68,8 +85,8 @@
             <div class="container">
                 <div class="row no-gutters slider-text align-items-center justify-content-center" data-scrollax-parent="true">
                     <div class="col-md-7 ftco-animate text-center" data-scrollax=" properties: { translateY: '70%' }">
-                        <h1 class="mb-4" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">Doing Nothing is Not An Option of Our Life</h1>
-                        <p class="mb-5" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">Created by <a href="#">Colorlib.com</a></p>
+                        <h1 class="mb-4" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">Mỗi người mất tích là một trái tim đang chờ ngày đoàn tụ</h1>
+                        <p class="mb-5" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">Hãy cùng chúng tôi mang hy vọng trở về</p>
 
                         <p data-scrollax="properties: { translateY: '30%', opacity: 1.6 }"><a href="https://vimeo.com/45830194" class="btn btn-white btn-outline-white px-4 py-3 popup-vimeo"><span class="icon-play mr-2"></span>Watch Video</a></p>
                     </div>
@@ -100,8 +117,12 @@
 
     @RenderBody()
 
+	@if (user != null && user.IsAdmin == false)
+    {
+        @await Html.PartialAsync("_LayoutLienHeAdmin")
+    }
     
-    @await Html.PartialAsync("_LayoutLienHeAdmin")
+    
 
     <footer class="ftco-footer ftco-section img">
         <div class="overlay"></div>

@@ -1,14 +1,19 @@
 ﻿@page
 @model EmailModel
 @{
-    ViewData["Title"] = "Manage Email";
+    ViewData["Title"] = "Quản lý Email";
     ViewData["ActivePage"] = ManageNavPages.Email;
 }
 
-<h3>@ViewData["Title"]</h3>
-<partial name="_StatusMessage" for="StatusMessage" />
-<div class="row">
-    <div class="col-md-6">
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-lg ftco-animate fade-up">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="card-title">@ViewData["Title"]</h2>
+                </div>
+                <div class="card-body p-5">
+                    <partial name="_StatusMessage" for="StatusMessage" />
         <form id="email-form" method="post">
             <div asp-validation-summary="All" class="text-danger" role="alert"></div>
             @if (Model.IsEmailConfirmed)
@@ -16,17 +21,20 @@
                 <div class="form-floating mb-3 input-group">
                     <input asp-for="Email" class="form-control" placeholder="Please enter your email." disabled />
                         <div class="input-group-append">
-                            <span class="h-100 input-group-text text-success font-weight-bold">✓</span>
+                            <span class="h-100 input-group-text text-success font-weight-bold">✓ Đã xác thực</span>
                         </div>
                     <label asp-for="Email" class="form-label"></label>
                 </div>
             }
             else
             {
-                <div class="form-floating mb-3">
+                <div class="form-floating mb-3 input-group">
                     <input asp-for="Email" class="form-control" placeholder="Please enter your email." disabled />
+                        <div class="input-group-append">
+                            <button id="email-verification" type="submit" asp-page-handler="SendVerificationEmail" class="btn btn-warning">Xác thực email</button>
+                        </div>
                     <label asp-for="Email" class="form-label"></label>
-                    <button id="email-verification" type="submit" asp-page-handler="SendVerificationEmail" class="btn btn-link">Send verification email</button>
+                    <small class="text-muted">Email chưa được xác thực. Nhấn nút xác thực để nhận mã xác thực qua email.</small>
                 </div>
             }
             <div class="form-floating mb-3">
@@ -34,8 +42,11 @@
                 <label asp-for="Input.NewEmail" class="form-label"></label>
                 <span asp-validation-for="Input.NewEmail" class="text-danger"></span>
             </div>
-            <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="w-100 btn btn-lg btn-primary">Change email</button>
+            <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="w-100 btn btn-lg btn-primary">Thay đổi email</button>
         </form>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

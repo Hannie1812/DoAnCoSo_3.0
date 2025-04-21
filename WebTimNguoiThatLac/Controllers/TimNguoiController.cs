@@ -15,6 +15,7 @@ using WebTimNguoiThatLac.Data;
 using WebTimNguoiThatLac.Models;
 using WebTimNguoiThatLac.Services;
 using X.PagedList.Extensions;
+using WebTimNguoiThatLac.ViewModels;
 
 namespace WebTimNguoiThatLac.Controllers
 {
@@ -22,10 +23,10 @@ namespace WebTimNguoiThatLac.Controllers
     {
         private ApplicationDbContext db;
         
-        private UserManager<ApplicationUser> userManager;
+        private UserManager<ApplicationUser> _userManager;
 
         private readonly EmailService _emailService;
-
+        private readonly OtpService _otpService;
         private readonly ILogger<TimNguoiController> _logger;
 
         private static readonly IEnumerable<string> TinhThanhIEnumerable = new List<string>
@@ -95,12 +96,81 @@ namespace WebTimNguoiThatLac.Controllers
         "Phú Yên"
     };
 
-        public  TimNguoiController(ApplicationDbContext db, UserManager<ApplicationUser> userManager, EmailService emailService, ILogger<TimNguoiController> logger)
+        public TimNguoiController(ApplicationDbContext db, UserManager<ApplicationUser> userManager, EmailService emailService, OtpService otpService, ILogger<TimNguoiController> logger)
         {
             this.db = db;
-            this.userManager = userManager;
+            _userManager = userManager;
             _emailService = emailService;
+            _otpService = otpService;
             _logger = logger;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> VerifyOtp()
+        {
+            string email = string.Empty;
+
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                email = user?.Email;
+            }
+
+            var model = new OtpVerificationViewModel
+            {
+                Email = email
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> VerifyOtp(OtpVerificationViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            if (string.IsNullOrEmpty(model.OtpCode))
+            {
+                // Gửi mã OTP mới
+                await _otpService.GenerateAndSendOtpAsync(model.Email);
+                model.IsVerified = false;
+                return View(model);
+            }
+
+            // Xác thực mã OTP
+            var isValid = await _otpService.VerifyOtpAsync(model.Email, model.OtpCode);
+            if (!isValid)
+            {
+                ModelState.AddModelError(string.Empty, "Mã OTP không hợp lệ hoặc đã hết hạn");
+                model.IsVerified = false;
+                return View(model);
+            }
+
+            // Lưu email đã xác thực vào TempData
+            TempData["VerifiedEmail"] = model.Email;
+            return RedirectToAction("ThemNguoiCanTim");
+        }
+
+        
+        [HttpPost]
+        public async Task<IActionResult> SendOtp(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return BadRequest();
+            }
+            await _otpService.GenerateAndSendOtpAsync(email);
+            return Ok();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResendOtp(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+                return BadRequest();
+
+            await _otpService.GenerateAndSendOtpAsync(email);
+            return Ok();
         }
 
 
@@ -146,7 +216,7 @@ namespace WebTimNguoiThatLac.Controllers
 
                 if(User.Identity.IsAuthenticated)
                 {
-                    var nguoiDung = await userManager.GetUserAsync(User);
+                    var nguoiDung = await _userManager.GetUserAsync(User);
                     nguoiDungId = nguoiDung.Id;
 
                     // Ghi lịch sử tìm kiếm
@@ -228,6 +298,12 @@ namespace WebTimNguoiThatLac.Controllers
         }
         public async Task<IActionResult> ThemNguoiCanTim()
         {
+            // Kiểm tra xem email đã được xác thực chưa
+            var verifiedEmail = TempData["VerifiedEmail"] as string;
+            if (string.IsNullOrEmpty(verifiedEmail))
+            {
+                return RedirectToAction("VerifyOtp");
+            }
             ViewBag.DanhSachTinhThanh = TinhThanhIEnumerable;
             return View();
         }
@@ -271,7 +347,7 @@ namespace WebTimNguoiThatLac.Controllers
                     db.AnhTimNguois.Add(x);
                     await db.SaveChangesAsync();
                 }
-                return RedirectToAction("ThongTinCaNhan", "NguoiDung");
+                return Redirect("/Identity/Account/Manage/Index");
             }
 
             ViewBag.DanhSachTinhThanh = TinhThanhIEnumerable;
@@ -336,7 +412,7 @@ namespace WebTimNguoiThatLac.Controllers
             {
                 return Redirect("/Identity/Account/login");
             }
-            ApplicationUser x = await userManager.GetUserAsync(User);
+            ApplicationUser x = await _userManager.GetUserAsync(User);
             if(x != null)
             {
                 
@@ -344,7 +420,7 @@ namespace WebTimNguoiThatLac.Controllers
                     .Include(u => u.AnhTimNguois)
                     .Include(u => u.TimThayNguoiThatLacs)
                     .FirstOrDefault(i => i.Id == id);
-                ApplicationUser us = await userManager.FindByIdAsync(y.IdNguoiDung);
+                ApplicationUser us = await _userManager.FindByIdAsync(y.IdNguoiDung);
                 ViewBag.NguoiTim = us;
                 ViewBag.DSHinhAnh = await db.AnhTimNguois
                                                         .Where(i => i.IdNguoiCanTim == y.Id)
@@ -452,6 +528,7 @@ namespace WebTimNguoiThatLac.Controllers
         }
 
         [HttpPost]
+        
         public async Task<IActionResult> CapNhatBaiViet(TimNguoi x, List<IFormFile>? DSHinhAnhCapNhat)
         {
             if (!User.Identity.IsAuthenticated)
@@ -617,7 +694,7 @@ namespace WebTimNguoiThatLac.Controllers
                     return Json(new { success = false, message = "Không tìm thấy bình luận" });
                 }
 
-                var currentUser = await userManager.GetUserAsync(User);
+                var currentUser = await _userManager.GetUserAsync(User);
 
                 var baoCao = new BaoCaoBinhLuan
                 {
@@ -648,6 +725,7 @@ namespace WebTimNguoiThatLac.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Produces("application/json")] // Thêm attribute này
         public async Task<IActionResult> BaoCaoBaiViet(int MaBaiViet, string LyDo,string ChiTiet, IFormFile? HinhAnhBaoCaoBaiViet)
         {
             if (!User.Identity.IsAuthenticated)
@@ -657,13 +735,23 @@ namespace WebTimNguoiThatLac.Controllers
 
             try
             {
-                var currentUser = await userManager.GetUserAsync(User);
+                var currentUser = await _userManager.GetUserAsync(User);
                 var baiViet = await db.TimNguois.FirstOrDefaultAsync(i => i.Id == MaBaiViet);
 
                 if (baiViet == null)
                 {
                     return Json(new { success = false, message = "Không tìm thấy bài viết" });
                 }
+
+                // Kiểm tra nếu người dùng đã báo cáo bài này trước đó
+                var existingReport = await db.BaoCaoBaiViets
+                    .AnyAsync(r => r.MaBaiViet == MaBaiViet && r.MaNguoiBaoCao == currentUser.Id);
+
+                if (existingReport)
+                {
+                    return Conflict(new { success = false, message = "Bạn đã báo cáo bài viết này trước đó" });
+                }
+
                 BaoCaoBaiViet x = new BaoCaoBaiViet();
                 x.MaBaiViet = MaBaiViet;
                 x.LyDo = LyDo;
@@ -849,7 +937,7 @@ namespace WebTimNguoiThatLac.Controllers
 
             try
             {
-                var currentUser = await userManager.GetUserAsync(User);
+                var currentUser = await _userManager.GetUserAsync(User);
                 var binhluan = await db.BinhLuans
                     .Include(b => b.TimNguoi)
                     .Include(b => b.ApplicationUser)

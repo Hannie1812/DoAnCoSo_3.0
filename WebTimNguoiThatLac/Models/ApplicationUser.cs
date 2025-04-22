@@ -19,7 +19,12 @@ namespace WebTimNguoiThatLac.Models
         public string? Address { get; set; }
         public DateTime? NgaySinh { get; set; }
         public bool Active { get; set; } = true;
-        public string? CCCD { get; set; }
+        private string? _cccd;
+        public string? CCCD
+        {
+            get => _cccd == null ? null : WebTimNguoiThatLac.BoTro.Filter.DecryptCCCD(_cccd);
+            set => _cccd = value == null ? null : WebTimNguoiThatLac.BoTro.Filter.EncryptCCCD(value);
+        }
         public string? HinhAnh { get; set; }
         public int SoLanViPham { get; set; } = 0; // 👉 Đếm số lần vi phạm
 

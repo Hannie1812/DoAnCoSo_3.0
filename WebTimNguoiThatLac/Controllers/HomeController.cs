@@ -101,6 +101,7 @@ namespace WebTimNguoiThatLac.Controllers
                 else
                 {
                     ModelState.AddModelError("", "Hãy Nhập Đủ Thông Tin");
+                    TempData["Warning"] = "Vui Lòng Nhập Đủ Thông Tin";
                 }
                 return View(lh);
             }

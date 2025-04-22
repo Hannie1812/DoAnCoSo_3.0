@@ -122,12 +122,16 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
                     if (x.Active == true)
                     {
                         _logger.LogInformation("User logged in.");
-                        return LocalRedirect(returnUrl);
+                        return LocalRedirect(returnUrl); // đang test
+
                     }
                     else
                     {
                         ModelState.AddModelError(string.Empty, "Tài khoản bị khóa");
-                        return Page();
+                        TempData["WarningMessage"] = "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
+                        //return Page();// đang tets
+
+                        return RedirectToAction("Index", "LoiViPham", new {area =""});
                     }
 
                 }

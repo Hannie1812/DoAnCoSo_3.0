@@ -32,13 +32,14 @@ namespace WebTimNguoiThatLac.Controllers
             // Kiểm tra người dùng đã đăng nhập chưa
             if (!User.Identity.IsAuthenticated)
             {
+                TempData["WarningMessage"] = "Vui lòng đăng nhập để sử dụng chức năng này.";
                 return RedirectToAction("Login", "Account", new {area = "Identity"});
             }
             var nguoiDung = await _userManager.GetUserAsync(User);
-            if (nguoiDung.Active == false)
-            {
-                return RedirectToAction("Login", "Account", new { area = "Identity" });
-            }
+            // kiểm tra hộp thoại có đang nhắn với admin không 
+            
+
+
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -60,6 +61,9 @@ namespace WebTimNguoiThatLac.Controllers
                     .Include(t => t.HopThoaiTinNhan)
                     .Where(t => t.IsRead == false && t.MaNguoiGui != userId)
                     .ToListAsync();
+
+                
+             
 
                 foreach (TinNhan i in unreadMessages)
                 {
@@ -92,7 +96,27 @@ namespace WebTimNguoiThatLac.Controllers
                 AdminId = cacAdmin.IdAdmin(),
             };
 
+            if (nguoiDung.Active == false)
+            {
 
+                if (hopThoaiId == null)
+                {
+                    TempData["WarningMessage"] = "Vui lòng đăng nhập để sử dụng chức năng này.";
+                    return RedirectToAction("Login", "Account", new { area = "Identity" });
+                }
+                else
+                {
+                    var isAdmin = await _context.NguoiThamGias
+                                            .FirstOrDefaultAsync(i => i.MaHopThoaiTinNhan == hopThoaiId && i.IsAdmin == true);
+
+                    if (isAdmin == null)
+                    {
+                        TempData["WarningMessage"] = "Chỉ được phép nhắn với admin";
+                        return RedirectToAction("Login", "Account", new { area = "Identity" });
+                    }
+                }
+
+            }
 
             return View(viewModel);
         }
@@ -103,13 +127,14 @@ namespace WebTimNguoiThatLac.Controllers
             // Kiểm tra người dùng đã đăng nhập chưa
             if (!User.Identity.IsAuthenticated)
             {
+                TempData["WarningMessage"] = "Vui lòng đăng nhập để sử dụng chức năng này.";
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
             }
             var nguoiDung = await _userManager.GetUserAsync(User);
-            if (nguoiDung.Active == false)
-            {
-                return RedirectToAction("Login", "Account", new { area = "Identity" });
-            }
+            //if (nguoiDung.Active == false)
+            //{
+            //    return RedirectToAction("Login", "Account", new { area = "Identity" });
+            //}
             var nguoiGuiId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             // Kiểm tra đã có hộp thoại nào chưa (thêm AsNoTracking)

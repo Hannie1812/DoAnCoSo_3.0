@@ -18,7 +18,7 @@
         @if (SignInManager.IsSignedIn(User))
         {
             @* Nếu là Admin *@
-            @if (User.IsInRole("Admin"))
+            @if (User.IsInRole("Admin") || User.IsInRole("Moderator"))
             {
                 <li>
                     <a class="dropdown-item" asp-area="Admin" asp-controller="Home" asp-action="Index">

@@ -114,6 +114,12 @@ namespace WebTimNguoiThatLac.Controllers
             {
                 var user = await _userManager.GetUserAsync(User);
                 email = user?.Email;
+                if (user != null && await _userManager.IsInRoleAsync(user, "Admin") && await _userManager.IsInRoleAsync(user, "Moderator"))
+                {
+                    // Nếu là admin thì bỏ qua xác thực OTP, chuyển thẳng đến ThemNguoiCanTim
+                    TempData["VerifiedEmail"] = user.Email;
+                    return RedirectToAction("ThemNguoiCanTim");
+                }
             }
 
             var model = new OtpVerificationViewModel
@@ -313,7 +319,24 @@ namespace WebTimNguoiThatLac.Controllers
             var verifiedEmail = TempData["VerifiedEmail"] as string;
             if (string.IsNullOrEmpty(verifiedEmail))
             {
-                return RedirectToAction("VerifyOtp");
+                if (User.Identity.IsAuthenticated)
+                {
+                    var nguoiDung = await _userManager.GetUserAsync(User);
+                    if (nguoiDung != null && await _userManager.IsInRoleAsync(nguoiDung, "Admin"))
+                    {
+                        // Nếu là admin thì cho phép vào luôn
+                        verifiedEmail = nguoiDung.Email;
+                        TempData["VerifiedEmail"] = verifiedEmail;
+                    }
+                    else
+                    {
+                        return RedirectToAction("VerifyOtp");
+                    }
+                }
+                else
+                {
+                    return RedirectToAction("VerifyOtp");
+                }
             }
             if (User.Identity.IsAuthenticated)
             {

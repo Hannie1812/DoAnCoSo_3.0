@@ -1,11 +1,10 @@
-﻿@using X.PagedList;
-@using X.PagedList.Mvc.Core;
-@model X.PagedList.IPagedList<WebTimNguoiThatLac.Models.HanhViDangNgo>
+﻿@using X.PagedList
+@using X.PagedList.Mvc.Core
+@model IPagedList<WebTimNguoiThatLac.Models.HanhViDangNgo>
 @{
     ViewData["Title"] = "Quản lý hành vi đáng ngờ";
     var status = ViewBag.Status as string ?? "all";
 }
-
 
 @section naviHeader {
     <!-- Left navbar links -->
@@ -14,7 +13,7 @@
             <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="/Admin" class="nav-link ">Trang Chủ</a>
+            <a href="/Admin" class="nav-link">Trang Chủ</a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
             <a href="/Admin/HanhViDangNgo" class="nav-link active">Quản lý hành vi đáng ngờ</a>
@@ -22,15 +21,13 @@
     </ul>
 }
 
- 
-
 <div class="container-fluid">
     <div class="card shadow mb-4">
-        <div class="card-header  bg-primary py-3 d-flex flex-column flex-md-row justify-content-between align-items-center">
+        <div class="card-header bg-primary py-3 d-flex flex-column flex-md-row justify-content-between align-items-center">
             <form method="get" class="form-inline mt-2 mt-md-0">
                 <div class="input-group">
-                    <input type="text" name="searchString" class="form-control" 
-                           placeholder="ID, Email, SĐT hoặc Username" 
+                    <input type="text" name="searchString" class="form-control"
+                           placeholder="ID, Email, SĐT hoặc Username"
                            value="@ViewBag.SearchString">
                     <div class="input-group-append">
                         <button type="submit" class="btn btn-light">
@@ -40,7 +37,7 @@
                 </div>
                 <input type="hidden" name="status" value="@status" />
             </form>
-            
+
             <div class="btn-group mt-2 mt-md-0">
                 <a asp-action="Index" asp-route-status="all" asp-route-searchString="@ViewBag.SearchString"
                    class="btn btn-light @(status == "all" ? "active font-weight-bold" : "")">
@@ -56,7 +53,7 @@
                 </a>
             </div>
         </div>
-        
+
         <div class="card-body">
             @if (TempData["Message"] != null)
             {
@@ -67,7 +64,7 @@
                     </button>
                 </div>
             }
-            
+
             <div class="table-responsive">
                 <table class="table table-bordered table-hover" width="100%" cellspacing="0">
                     <thead class="thead-light">
@@ -114,7 +111,7 @@
                                     }
                                 </td>
                                 <td>
-                                    <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#detailModal" 
+                                    <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#detailModal"
                                             onclick="loadDetail(@item.Id)">
                                         <i class="fas fa-eye"></i> Chi tiết
                                     </button>
@@ -129,7 +126,7 @@
                         }
                     </tbody>
                 </table>
-                
+
                 @if (!Model.Any())
                 {
                     <div class="alert alert-info text-center">
@@ -137,19 +134,21 @@
                     </div>
                 }
             </div>
-            
+
             <!-- Phân trang -->
-            @Html.PagedListPager(Model, page => Url.Action("Index", new { 
-                page, 
-                searchString = ViewBag.SearchString,
-                status 
-            }), new PagedListRenderOptions {
-                LiElementClasses = new[] { "page-item" },
-                PageClasses = new[] { "page-link" },
-                Display = PagedListDisplayMode.IfNeeded,
-                MaximumPageNumbersToDisplay = 5,
-                ContainerDivClasses = new[] { "pagination justify-content-center mt-3" }
-            })
+            @Html.PagedListPager(Model, page => Url.Action("Index", new
+                {
+                    page,
+                    searchString = ViewBag.SearchString,
+                    status
+                }), new PagedListRenderOptions
+       {
+           LiElementClasses = new[] { "page-item" },
+           PageClasses = new[] { "page-link" },
+           Display = PagedListDisplayMode.IfNeeded,
+           MaximumPageNumbersToDisplay = 5,
+           ContainerDivClasses = new[] { "pagination justify-content-center mt-3" }
+       })
         </div>
     </div>
 </div>
@@ -210,41 +209,38 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-
-            function openKhangNghiModal(id) {
+        function openKhangNghiModal(id) {
             $('#hanhViId').val(id);
             $('#khangNghiModal').modal('show');
         }
 
-        // Xử lý khi bấm nút xác nhận kháng nghị
         $('#btnXacNhanKhangNghi').click(function() {
-            var id = $('#hanhViId').val();
-            var trangThai = $('#trangThaiKhangNghi').val();
+            var id = $('#hanhViId').val(); // Lấy ID hành vi từ input ẩn
+            var trangThai = $('#trangThaiKhangNghi').val(); // Lấy trạng thái kháng nghị đã chọn
 
             $.post('/Admin/HanhViDangNgo/XuLyKhangNghi', {
                 id: id,
                 trangThaiKhangNghi: trangThai
             })
-            .done(function() {
-                Swal.fire(
-                    'Thành công!',
-                    'Đã cập nhật trạng thái kháng nghị.',
-                    'success'
-                ).then(() => {
-                    location.reload();
-                });
-                $('#khangNghiModal').modal('hide');
+            .done(function(response) { // Nếu gọi API thành công
+                if (response.success) {
+                    Swal.fire({
+                        title: 'Thành công!',        // Tiêu đề popup
+                        text: response.message,     // Thông báo từ backend trả về
+                        icon: 'success'             // Biểu tượng: success / error / warning / info / question
+                    }).then(() => {
+                        location.reload(); // Sau khi bấm OK -> reload trang
+                    });
+                } else {
+                    Swal.fire('Lỗi!', response.message, 'error'); // Nếu backend trả về lỗi
+                }
             })
-            .fail(function() {
-                Swal.fire(
-                    'Lỗi!',
-                    'Có lỗi xảy ra khi xử lý kháng nghị.',
-                    'error'
-                );
+            .fail(function() { // Nếu gọi API thất bại (server lỗi, không kết nối, v.v.)
+                Swal.fire('Lỗi!', 'Có lỗi xảy ra khi gửi yêu cầu', 'error');
             });
         });
-
 
         function loadDetail(id) {
             $('#modalContent').html(`
@@ -254,11 +250,10 @@
                     </div>
                 </div>
             `);
-            
+
             $.get('/Admin/HanhViDangNgo/ChiTiet/' + id, function(data) {
                 $('#modalContent').html(data);
-                
-                // Hiển thị nút xử lý nếu chưa xử lý
+
                 if ($('#daXuLy').val() === 'False') {
                     $('#btnXuLy').show().off('click').on('click', function() {
                         confirmXuLy(id);
@@ -274,7 +269,7 @@
                 `);
             });
         }
-        
+
         function confirmXuLy(id) {
             Swal.fire({
                 title: 'Xác nhận xử lý?',
@@ -288,24 +283,31 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.post('/Admin/HanhViDangNgo/XuLy/' + id)
-                        .done(function() {
-                            Swal.fire(
-                                'Thành công!',
-                                'Hành vi đã được đánh dấu là đã xử lý.',
-                                'success'
-                            ).then(() => {
-                                location.reload();
-                            });
+                        .done(function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    title: 'Thành công!',
+                                    text: response.message,
+                                    icon: 'success'
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire('Lỗi!', response.message, 'error');
+                            }
                         })
                         .fail(function() {
-                            Swal.fire(
-                                'Lỗi!',
-                                'Có lỗi xảy ra khi xử lý.',
-                                'error'
-                            );
+                            Swal.fire('Lỗi!', 'Có lỗi xảy ra khi xử lý', 'error');
                         });
                 }
             });
         }
+
+        // Tự động đóng thông báo sau 5 giây
+        $(document).ready(function() {
+            setTimeout(function() {
+                $(".alert").alert('close');
+            }, 5000);
+        });
     </script>
 }

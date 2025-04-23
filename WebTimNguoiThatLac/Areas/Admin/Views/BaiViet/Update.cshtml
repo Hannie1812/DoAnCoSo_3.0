@@ -1,0 +1,454 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using WebTimNguoiThatLac.Data
+@model WebTimNguoiThatLac.Models.TimNguoi
+
+
+@{
+    ViewData["Title"] = "Cập Nhật Bài Viết";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <style>
+        .card {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            border-bottom: none;
+        }
+
+        .img-thumbnail {
+            transition: all 0.3s ease;
+        }
+
+            .img-thumbnail:hover {
+                transform: scale(1.05);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            }
+
+        #previewContainer img {
+            max-width: 120px;
+            max-height: 120px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .custom-file-label::after {
+            content: "Duyệt";
+        }
+    </style>
+
+    <link rel="stylesheet" href="~/Templet/css/notification.css">
+
+}
+
+
+@section naviHeader {
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin" class="nav-link ">Trang Chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin/BaiViet" class="nav-link active">Bài Viết</a>
+        </li>
+    </ul>
+}
+
+<div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="card-title mb-0"><i class="fas fa-edit mr-2"></i>@ViewData["Title"]</h2>
+                </div>
+                <div class="card-body p-4">
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            @TempData["ErrorMessage"]
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    }
+
+                    <form asp-action="Update" asp-area="Admin" asp-controller="BaiViet" enctype="multipart/form-data" method="post" class="needs-validation" novalidate>
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="IdNguoiDung" />
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="row">
+                            <!-- Thông tin cơ bản -->
+                            <div class="col-md-6">
+                                <h4 class="mb-3 text-primary"><i class="fas fa-info-circle mr-2"></i>Thông tin cơ bản</h4>
+
+                                <div class="form-group">
+                                    <label asp-for="HoTen" class="font-weight-bold">Họ và Tên</label>
+                                    <input asp-for="HoTen" class="form-control" placeholder="Nhập họ và tên" required />
+                                    <span asp-validation-for="HoTen" class="text-danger small"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="TieuDe" class="font-weight-bold">Tiêu đề tin</label>
+                                    <input asp-for="TieuDe" class="form-control" placeholder="Nhập tiêu đề tin" required />
+                                    <span asp-validation-for="TieuDe" class="text-danger small"></span>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label asp-for="NgaySinh" class="font-weight-bold">Ngày sinh</label>
+                                        <input asp-for="NgaySinh" type="date" class="form-control" required />
+                                        <span asp-validation-for="NgaySinh" class="text-danger small"></span>
+                                    </div>
+
+                                    <div class="form-group col-md-6">
+                                        <label asp-for="NgayMatTich" class="font-weight-bold">Ngày mất tích</label>
+                                        <input asp-for="NgayMatTich" type="date" class="form-control" required />
+                                        <span asp-validation-for="NgayMatTich" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="MoiQuanHe" class="font-weight-bold">Mối quan hệ</label>
+                                    <input asp-for="MoiQuanHe" class="form-control" placeholder="Mối quan hệ của bạn với người mất tích" required />
+                                    <span asp-validation-for="MoiQuanHe" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <!-- Thông tin bổ sung -->
+                            <div class="col-md-6">
+                                <h4 class="mb-3 text-primary"><i class="fas fa-info-circle mr-2"></i>Thông tin bổ sung</h4>
+
+                                <div class="form-group">
+                                    <label asp-for="DaciemNhanDang" class="font-weight-bold">Đặc điểm nhận dạng</label>
+                                    <textarea asp-for="DaciemNhanDang" class="form-control" rows="3" placeholder="Mô tả đặc điểm nhận dạng" required></textarea>
+                                    <span asp-validation-for="DaciemNhanDang" class="text-danger small"></span>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label asp-for="TrangThai" class="font-weight-bold">Trạng thái</label>
+                                        <select asp-for="TrangThai" class="form-control" required>
+                                            <option value="Đã Tìm Thấy">Đã Tìm Thấy</option>
+                                            <option value="Đang Tìm Kiếm">Đang Tìm Kiếm</option>
+                                            <option value="Cần hỗ trợ từ cộng đồng">Cần hỗ trợ từ cộng đồng</option>
+                                        </select>
+                                        <span asp-validation-for="TrangThai" class="text-danger small"></span>
+                                    </div>
+
+                                    <div class="form-group col-md-6">
+                                        <label asp-for="GioiTinh" class="font-weight-bold">Giới tính</label>
+                                        <select asp-for="GioiTinh" class="form-control" required>
+                                            <option value="1">Nam</option>
+                                            <option value="2">Nữ</option>
+                                        </select>
+                                        <span asp-validation-for="GioiTinh" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="KhuVuc" class="font-weight-bold">Khu vực</label>
+                                    <select asp-for="KhuVuc" class="form-control" required>
+                                        @foreach (string i in ViewBag.DanhSachTinhThanh)
+                                        {
+                                            <option value="@i" selected="@(i == Model.KhuVuc)">@i</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="KhuVuc" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mô tả -->
+                        <div class="form-group mt-4">
+                            <label asp-for="MoTa" class="font-weight-bold">Nội dung chi tiết</label>
+                            <textarea asp-for="MoTa" id="compose-textarea" class="form-control" rows="5" placeholder="Nhập nội dung chi tiết..." required></textarea>
+                            <span asp-validation-for="MoTa" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Hình ảnh -->
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0"><i class="fas fa-images mr-2"></i>Hình ảnh hiện tại</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        @if (ViewBag.DanhSachHinhAnh != null && ViewBag.DanhSachHinhAnh.Count > 0)
+                                        {
+                                            <div class="d-flex flex-wrap">
+                                                @foreach (WebTimNguoiThatLac.Models.AnhTimNguoi i in ViewBag.DanhSachHinhAnh)
+                                                {
+                                                    <div class="position-relative m-2">
+                                                        <img src="@i.HinhAnh" class="img-thumbnail" width="120" alt="Hình ảnh hiện tại" />
+                                                        @if (i.TrangThai == 1)
+                                                        {
+                                                            <span class="badge badge-success position-absolute" style="top: 5px; right: 5px;">Ảnh chính</span>
+                                                        }
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <p class="text-muted">Chưa có hình ảnh nào</p>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0"><i class="fas fa-upload mr-2"></i>Cập nhật hình ảnh mới</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <div class="custom-file">
+                                                <input type="file" multiple name="DSHinhAnhCapNhat" id="AnhVuaTai" class="custom-file-input" accept="image/*">
+                                                <label class="custom-file-label" for="AnhVuaTai">Chọn hình ảnh...</label>
+                                                <small class="form-text text-muted">Có thể chọn nhiều ảnh cùng lúc (tối đa 5MB/ảnh)</small>
+                                            </div>
+                                        </div>
+                                        <div class="alert alert-warning">
+                                            <i class="fas fa-exclamation-triangle mr-2"></i>Lưu ý: Khi tải lên ảnh mới, tất cả ảnh cũ sẽ bị xóa.
+                                        </div>
+                                        <div id="previewContainer" class="d-flex flex-wrap"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nút submit -->
+                        <div class="form-group mt-4 text-right">
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="fas fa-save mr-2"></i>Cập nhật
+                            </button>
+                            <a asp-action="ThongTinCaNhan" asp-controller="NguoiDung" class="btn btn-outline-secondary px-4">
+                                <i class="fas fa-times mr-2"></i>Hủy bỏ
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <!-- Summernote -->
+    <script src="~/clients/plugins/summernote/summernote-bs4.min.js"></script>
+
+    <!-- Bootstrap File Input -->
+    <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js"></script>
+
+    <script>
+        $(function () {
+            // Khởi tạo Summernote
+            $('#compose-textarea').summernote({
+
+            });
+
+            // Khởi tạo custom file input
+            bsCustomFileInput.init();
+
+            // Xử lý preview ảnh
+            $('#AnhVuaTai').change(function(e) {
+                const files = e.target.files;
+                const previewContainer = $('#previewContainer');
+                previewContainer.empty();
+
+
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+
+                    // Kiểm tra kích thước file (tối đa 5MB)
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert(`File ${file.name} vượt quá kích thước cho phép (5MB)!`);
+                        $(this).val('');
+                        previewContainer.empty();
+                        return;
+                    }
+
+                    // Kiểm tra loại file
+                    if (!file.type.match('image.*')) {
+                        alert(`File ${file.name} không phải là hình ảnh!`);
+                        $(this).val('');
+                        previewContainer.empty();
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewContainer.append(
+                            `<div class="position-relative">
+                                <img src="${e.target.result}" class="img-thumbnail" alt="Preview ${i+1}" />
+                                <span class="badge badge-primary position-absolute" style="top: 5px; right: 5px;">${i+1}</span>
+                            </div>`
+                        );
+                    }
+                    reader.readAsDataURL(file);
+                }
+
+                // Cập nhật label
+                const label = $(this).next('.custom-file-label');
+                if (files.length > 1) {
+                    label.text(`${files.length} files selected`);
+                } else if (files.length === 1) {
+                    label.text(files[0].name);
+                }
+            });
+
+            // Thêm validation cho form
+            (function() {
+                'use strict';
+                window.addEventListener('load', function() {
+                    var forms = document.getElementsByClassName('needs-validation');
+                    var validation = Array.prototype.filter.call(forms, function(form) {
+                        form.addEventListener('submit', function(event) {
+                            if (form.checkValidity() === false) {
+                                event.preventDefault();
+                                event.stopPropagation();
+                            }
+                            form.classList.add('was-validated');
+                        }, false);
+                    });
+                }, false);
+            })();
+        });
+    </script>
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function()
+        {
+            // Hiển thị thông báo từ ViewData
+            @if (ViewData["SuccessMessage"] != null)
+            {
+                <text>
+                            showNotification('success', '@Html.Raw(ViewData["SuccessMessage"])');
+                </text>
+            }
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <text>
+                                        showNotification('error', '@Html.Raw(ViewData["ErrorMessage"])');
+                </text>
+            }
+            @if (ViewData["WarningMessage"] != null)
+            {
+                <text>
+                                   showNotification('warning', '@Html.Raw(ViewData["WarningMessage"])');
+                </text>
+            }
+            @if (ViewData["InfoMessage"] != null)
+            {
+                <text>
+                                   showNotification('info', '@Html.Raw(ViewData["InfoMessage"])');
+                </text>
+            }
+            // TEMPDATE 
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <text>
+                            showNotification('success', '@Html.Raw(TempData["SuccessMessage"])');
+                </text>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <text>
+                            showNotification('error', '@Html.Raw(TempData["ErrorMessage"])');
+                </text>
+            }
+            @if (TempData["WarningMessage"] != null)
+            {
+                <text>
+                           showNotification('warning', '@Html.Raw(TempData["WarningMessage"])');
+                </text>
+            }
+            @if (TempData["InfoMessage"] != null)
+            {
+                <text>
+                           showNotification('info', '@Html.Raw(TempData["InfoMessage"])');
+                </text>
+            }
+
+        });
+
+
+        function showNotification(type, message)
+        {
+            // alert(message);
+
+            const notificationArea = document.getElementById('notification-area');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                                            <i class="fas ${getIconForType(type)} me-2"></i>
+                                            ${message}
+                                        `;
+
+
+            notificationArea.appendChild(notification);
+
+            // Tự động xóa sau 5 giây
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+
+            // Tự động xóa khi nhấn vào
+            notification.addEventListener('click', () => {
+                notification.remove();
+            });
+
+            // Thêm hiệu ứng hover
+            notification.addEventListener('mouseover', () => {
+                notification.style.transform = 'scale(1.05)';
+            });
+            notification.addEventListener('mouseout', () => {
+                notification.style.transform = 'scale(1)';
+            });
+
+            // Thêm hiệu ứng slide-in
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 10);
+
+
+
+        }
+
+
+        // Chọn biểu tượng dựa trên loại thông báo
+        function getIconForType(type) {
+            switch(type) {
+                case 'success': return 'fa-check-circle';
+                case 'error': return 'fa-times-circle';
+                case 'warning': return 'fa-exclamation-triangle';
+                case 'info': return 'fa-info-circle';
+                default: return 'fa-info-circle';
+            }
+        }
+
+
+
+    </script>
+
+    
+}

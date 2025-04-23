@@ -1,4 +1,19 @@
-﻿<!DOCTYPE html>
+﻿@using WebTimNguoiThatLac.Models
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+
+@{
+    ApplicationUser user = null;
+    if (User.Identity.IsAuthenticated)
+    {
+
+         user = await UserManager.GetUserAsync(User);
+    }
+}
+
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <link rel="icon" type="image/png" href="~/logo/logo.png">
@@ -102,6 +117,10 @@
 
     @RenderBody()
 
+	@if (user != null && user.IsAdmin == false)
+    {
+        @await Html.PartialAsync("_LayoutLienHeAdmin")
+    }
     
     
 
@@ -211,46 +230,47 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
     <script src="~/Templet/js/google-map.js"></script>
     <script src="~/Templet/js/main.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Cập nhật số lượng thông báo
-            function updateNotificationCount() {
-                $.get('@Url.Action("DemBinhLuanChuaDoc", "TimNguoi")', function(data) {
-                    $('#notificationBadge').text(data.count);
-                    if (data.count > 0) {
-                        $('#notificationBadge').removeClass('d-none');
-                    } else {
-                        $('#notificationBadge').addClass('d-none');
-                    }
-                });
-            }
 
-            // Tải lại danh sách thông báo
-            function loadNotifications() {
-                $('#notificationContainer').load('@Url.Action("LayBinhLuanChuaDoc", "TimNguoi")');
-            }
+    @* <script> *@
+    @*     $(document).ready(function() { *@
+    @*         // Cập nhật số lượng thông báo *@
+    @*         function updateNotificationCount() { *@
+    @*             $.get('@Url.Action("DemBinhLuanChuaDoc", "TimNguoi")', function(data) { *@
+    @*                 $('#notificationBadge').text(data.count); *@
+    @*                 if (data.count > 0) { *@
+    @*                     $('#notificationBadge').removeClass('d-none'); *@
+    @*                 } else { *@
+    @*                     $('#notificationBadge').addClass('d-none'); *@
+    @*                 } *@
+    @*             }); *@
+    @*         } *@
 
-            // Cập nhật khi dropdown được mở
-            $('#notificationDropdown').on('click', function() {
-                loadNotifications();
-            });
+    @*         // Tải lại danh sách thông báo *@
+    @*         function loadNotifications() { *@
+    @*             $('#notificationContainer').load('@Url.Action("LayBinhLuanChuaDoc", "TimNguoi")'); *@
+    @*         } *@
 
-            // Đánh dấu đã đọc khi click vào thông báo
-            $(document).on('click', '.notification-item', function(e) {
-                e.preventDefault();
-                var commentId = $(this).data('comment-id');
-                var url = $(this).attr('href');
+    @*         // Cập nhật khi dropdown được mở *@
+    @*         $('#notificationDropdown').on('click', function() { *@
+    @*             loadNotifications(); *@
+    @*         }); *@
 
-                $.post('@Url.Action("DanhDauDaDoc", "TimNguoi")', { id: commentId }, function() {
-                    window.location.href = url;
-                });
-            });
+    @*         // Đánh dấu đã đọc khi click vào thông báo *@
+    @*         $(document).on('click', '.notification-item', function(e) { *@
+    @*             e.preventDefault(); *@
+    @*             var commentId = $(this).data('comment-id'); *@
+    @*             var url = $(this).attr('href'); *@
 
-            // Kiểm tra thông báo mới mỗi 30 giây
-            updateNotificationCount();
-            setInterval(updateNotificationCount, 30000);
-        });
-    </script>
+    @*             $.post('@Url.Action("DanhDauDaDoc", "TimNguoi")', { id: commentId }, function() { *@
+    @*                 window.location.href = url; *@
+    @*             }); *@
+    @*         }); *@
+
+    @*         // Kiểm tra thông báo mới mỗi 30 giây *@
+    @*         updateNotificationCount(); *@
+    @*         setInterval(updateNotificationCount, 30000); *@
+    @*     }); *@
+    @* </script> *@
 
     <!-- owl -->
     <!-- jQuery (Owl cần jQuery để hoạt động) -->
@@ -358,7 +378,7 @@
 
         function showNotification(type, message)
         {
-            alert(message);
+            // alert(message);
 
             const notificationArea = document.getElementById('notification-area');
             const notification = document.createElement('div');
@@ -413,6 +433,13 @@
 
 
 
+    </script>
+    <script src="~/clients/plugins/summernote/summernote-bs4.min.js"></script>
+    <script>
+        $(function () {
+          //Add text editor
+          $('#compose-textarea').summernote()
+        })
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

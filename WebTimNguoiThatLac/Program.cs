@@ -56,10 +56,20 @@ builder.Services.ConfigureApplicationCookie(options =>
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+
+
+// Đăng ký Session (cần cho SessionId) -> Ghi log
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Thời gian hết hạn session
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+
 var app = builder.Build();
 
 
-app.UseMiddleware<GhiLogNguoiDungMiddleware>(); // Ghi log người dùng
 
 
 // Configure the HTTP request pipeline.
@@ -80,6 +90,13 @@ app.UseAuthentication(); //n�y
 app.UseAuthorization();
 
 app.MapRazorPages(); // n�y
+
+
+
+// Sử dụng Session (cần cho SessionId)
+app.UseSession();
+
+app.UseMiddleware<GhiLogNguoiDungMiddleware>(); // Ghi log người dùng
 
 app.MapControllerRoute(
     name: "areas",

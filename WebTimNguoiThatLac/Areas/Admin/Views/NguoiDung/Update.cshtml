@@ -56,7 +56,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        <label asp-for="PhoneNumber">Địa Chỉ</label>
+                        <label asp-for="PhoneNumber">Số điện thoại</label>
                         <input asp-for="PhoneNumber" type="number" class="form-control" placeholder="Nhập SDT">
                     </div>
                     <div class="col-md-6">
@@ -66,29 +66,9 @@
                 </div>
                 <div class="row">
                     <div class="col-12">
-                        <label >Loại tài khoản</label>
-                        <select name="LoaiTaiKhoan" class="form-control"  asp-items="ViewBag.DanhSachRole">
+                        <label>Loại tài khoản</label>
+                        <select name="LoaiTaiKhoan" class="form-control" asp-items="ViewBag.DanhSachRole">
                             <option value="">-- Hãy Chọn Role --</option>
-                            @foreach (var x in ViewBag.DanhSachRole)
-                            {
-                                if (ViewBag.RoleHienTai != null)
-                                {
-                                    if (x.Value == ViewBag.RoleHienTai)
-                                    {
-                                        <option value="@x.Value" selected>@x.Value</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@x.Value">@x.Value</option>
-                                    }
-                                   
-                                }
-                                else
-                                {
-                                    <option value="@x.Value">@x.Value</option>
-                                }
-
-                            }
                         </select>
                     </div>
                 </div>

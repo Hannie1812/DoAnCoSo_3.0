@@ -39,11 +39,13 @@ public class NhanChungController : Controller
         }
 
         ApplicationUser us = await _userManager.GetUserAsync(User);
-        if (us == null)
+        if (us == null || us.Active == false)
         {
             TempData["ErrorMessage"] = "Vui lòng đăng nhập để tiếp tục";
             return RedirectToAction("Login", "Account");
         }
+
+
 
         int pageSize = 5; // Số lượng item trên mỗi trang
         ViewBag.TimNguoiId = id; // Lưu id để sử dụng trong view
@@ -87,7 +89,7 @@ public class NhanChungController : Controller
     [HttpPost]
     public async Task<IActionResult> Delete(int id)
     {
-        if (!User.Identity.IsAuthenticated)
+        if (!User.Identity.IsAuthenticated )
         {
             return Json(new { success = false, message = "Unauthorized" });
         }
@@ -108,52 +110,51 @@ public class NhanChungController : Controller
             return Json(new { success = false, message = "Bạn không có quyền xóa nhân chứng này" });
         }
 
+
         // Lưu thông tin vào ViewBag
         ViewBag.TenNguoiMatTich = timNguoi.HoTen;
         ViewBag.KhuVucMatTich = timNguoi.KhuVuc;
         ViewBag.NgaySinh = timNguoi.NgaySinh?.ToString("dd/MM/yyyy") ?? "Không có thông tin";
-        
+
+        // Lưu thông tin vào ViewBag
+        ViewBag.TenNguoiMatTich = timNguoi.HoTen;
+        ViewBag.KhuVucMatTich = timNguoi.KhuVuc;
+        ViewBag.NgaySinh = timNguoi.NgaySinh?.ToString("dd/MM/yyyy") ?? "Không có thông tin";
+
+        // Xóa file đính kèm nếu có
+        if (!string.IsNullOrEmpty(nhanChung.FileDinhKem))
+        {
+            DeleteImage(nhanChung.FileDinhKem, "AnhNhanChung");
+        }
+
         _context.NhanChungs.Remove(nhanChung);
+
         await _context.SaveChangesAsync();
 
         return Json(new { success = true, message = "Đã xóa nhân chứng thành công" });
     }
 
-    public async Task<IActionResult> GetDetails(int id)
+    public async Task<IActionResult> Detail(int id)
     {
-        if (!User.Identity.IsAuthenticated)
-        {
-            return Json(new { success = false, message = "Unauthorized" });
-        }
-
         var nhanChung = await _context.NhanChungs
             .Include(n => n.TimNguoi)
+                .ThenInclude(t => t.ApplicationUser)
             .FirstOrDefaultAsync(n => n.Id == id);
 
         if (nhanChung == null)
         {
-            return Json(new { success = false, message = "Nhân chứng không tồn tại" });
+            return RedirectToAction("Index", "NhanChung");
         }
 
-        // Verify ownership
-        var userId = _userManager.GetUserId(User);
-        if (nhanChung.TimNguoi.IdNguoiDung != userId)
+        // Kiểm tra quyền xem (chỉ chủ bài viết hoặc admin)
+        var currentUser = await _userManager.GetUserAsync(User);
+        if (nhanChung.TimNguoi.IdNguoiDung != currentUser.Id && !User.IsInRole("Admin"))
         {
-            return Json(new { success = false, message = "Bạn không có quyền xem thông tin này" });
+            return RedirectToAction("Index", "Home");
         }
 
-        return Json(new
-        {
-            success = true,
-            hoTen = nhanChung.HoTen,
-            email = nhanChung.Email,
-            soDienThoai = nhanChung.SoDienThoai,
-            thoiGian = nhanChung.ThoiGian?.ToString("dd/MM/yyyy HH:mm"),
-            diaDiem = nhanChung.DiaDiem,
-            moTa = nhanChung.MoTaManhMoi,
-            fileDinhKem = nhanChung.FileDinhKem,
-            ngayBaoTin = nhanChung.NgayBaoTin.ToString("dd/MM/yyyy HH:mm")
-        });
+        ViewBag.TimNguoi = nhanChung.TimNguoi;
+        return View(nhanChung);
     }
 
 

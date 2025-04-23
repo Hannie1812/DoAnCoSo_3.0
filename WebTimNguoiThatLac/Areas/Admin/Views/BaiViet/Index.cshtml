@@ -30,6 +30,10 @@
     </ul>
 }
 
+<link rel="stylesheet" href="~/Templet/css/notification.css">
+
+<div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
 
 <div>
     <form asp-action="index" asp-controller="BaiViet" asp-area="Admin">
@@ -116,6 +120,12 @@
                                    asp-action="Update"
                                    asp-route-id="@i.Id"
                                    class="btn btn-success">Sửa</a>
+
+                                <a asp-area=""
+                                   asp-controller="NhanChung"
+                                   asp-action="Index"
+                                   asp-route-id="@i.Id"
+                                   class="btn btn-info">Nhân Chứng</a>
 
                                 <!-- Button trigger modal -->
                                 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#CheckXoaBaiViet_@i.Id">
@@ -436,5 +446,98 @@
                 }
             });
         }
+    </script>
+
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function()
+        {
+                    // Hiển thị thông báo từ TempData
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <text>
+                                        showNotification('success', '@Html.Raw(TempData["SuccessMessage"])');
+                    </text>
+                }
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <text>
+                                        showNotification('error', '@Html.Raw(TempData["ErrorMessage"])');
+                    </text>
+                }
+                @if (TempData["WarningMessage"] != null)
+                {
+                    <text>
+                                        showNotification('warning', '@Html.Raw(TempData["WarningMessage"])');
+                    </text>
+                }
+                @if (TempData["InfoMessage"] != null)
+                {
+                    <text>
+                                        showNotification('info', '@Html.Raw(TempData["InfoMessage"])');
+                    </text>
+                }
+
+        });
+
+
+        function showNotification(type, message)
+        {
+            // alert(message);
+
+            const notificationArea = document.getElementById('notification-area');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                                            <i class="fas ${getIconForType(type)} me-2"></i>
+                                            ${message}
+                                        `;
+
+
+            notificationArea.appendChild(notification);
+
+            // Tự động xóa sau 5 giây
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+
+            // Tự động xóa khi nhấn vào
+            notification.addEventListener('click', () => {
+                notification.remove();
+            });
+
+            // Thêm hiệu ứng hover
+            notification.addEventListener('mouseover', () => {
+                notification.style.transform = 'scale(1.05)';
+            });
+            notification.addEventListener('mouseout', () => {
+                notification.style.transform = 'scale(1)';
+            });
+
+            // Thêm hiệu ứng slide-in
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 10);
+
+
+
+        }
+
+
+        // Chọn biểu tượng dựa trên loại thông báo
+        function getIconForType(type) {
+            switch(type) {
+                case 'success': return 'fa-check-circle';
+                case 'error': return 'fa-times-circle';
+                case 'warning': return 'fa-exclamation-triangle';
+                case 'info': return 'fa-info-circle';
+                default: return 'fa-info-circle';
+            }
+        }
+
+
+
     </script>
 }   

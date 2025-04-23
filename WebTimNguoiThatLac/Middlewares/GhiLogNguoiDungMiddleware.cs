@@ -54,46 +54,39 @@ namespace WebTimNguoiThatLac.Middlewares
                 logInfo.Timestamp, logInfo.UserId, logInfo.UserName, logInfo.SessionId,
                 logInfo.IpAddress, logInfo.RequestMethod, logInfo.RequestPath);
 
-            // Ghi log database trong scope riêng (bất đồng bộ)
-            _ = Task.Run(async () =>
+            var queryStringValue = context.Request.QueryString.Value;
+            var headersDict = context.Request.Headers
+                .Where(h => !h.Key.Equals("Authorization", StringComparison.OrdinalIgnoreCase))
+                .ToDictionary(h => h.Key, h => h.Value.ToString());
+
+            try
             {
-                try
+                var dbContext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
+                var logEntry = new UserActivityLog
                 {
-                    using (var scope = context.RequestServices.CreateScope())
-                    {
-                        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
-                        var logEntry = new UserActivityLog
-                        {
-                            UserId = logInfo.UserId,
-                            UserName = logInfo.UserName,
-                            SessionId = logInfo.SessionId,
-                            AnonymousId = logInfo.AnonymousId,
-                            Action = logInfo.RequestMethod,
-                            Controller = logInfo.ControllerName,
-                            ActionMethod = logInfo.ActionName,
-                            IpAddress = logInfo.IpAddress,
-                            UserAgent = logInfo.UserAgent,
-                            Url = $"{logInfo.RequestMethod} {logInfo.RequestPath}",
-                            AdditionalData = JsonSerializer.Serialize(new
-                            {
-                                QueryString = context.Request.QueryString.Value,
-                                Headers = context.Request.Headers
-                                    .Where(h => !h.Key.Equals("Authorization", StringComparison.OrdinalIgnoreCase))
-                                    .ToDictionary(h => h.Key, h => h.Value.ToString())
-                            }),
-                            Timestamp = logInfo.Timestamp
-                        };
-
-                        await dbContext.UserActivityLogs.AddAsync(logEntry);
-                        await dbContext.SaveChangesAsync();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Lỗi khi ghi log vào database");
-                }
-            });
+                    UserId = logInfo.UserId,
+                    UserName = logInfo.UserName,
+                    SessionId = logInfo.SessionId,
+                    AnonymousId = logInfo.AnonymousId,
+                    Action = logInfo.RequestMethod,
+                    Controller = logInfo.ControllerName,
+                    ActionName = logInfo.ActionName,
+                    IpAddress = logInfo.IpAddress,
+                    UserAgent = logInfo.UserAgent,
+                    Url = context.Request.Path,
+                    RequestPath = context.Request.Path,
+                    QueryString = queryStringValue,
+                    AdditionalData = JsonSerializer.Serialize(new { QueryString = queryStringValue, Headers = headersDict }),
+                    Headers = JsonSerializer.Serialize(headersDict),
+                    Timestamp = logInfo.Timestamp
+                };
+                dbContext.UserActivityLogs.Add(logEntry);
+                await dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi ghi log vào database");
+            }
 
             await _next(context);
         }

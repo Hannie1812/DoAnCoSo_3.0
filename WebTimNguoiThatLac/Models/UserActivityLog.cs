@@ -36,6 +36,9 @@ namespace WebTimNguoiThatLac.Models
         public string? ActionMethod { get; set; } // Tên action (nếu có)
 
         [MaxLength(50)]
+        public string? ActionName { get; set; } // Tên action (bổ sung cho middleware)
+
+        [MaxLength(500)]
         public string? IpAddress { get; set; } // Địa chỉ IP người dùng
 
         [MaxLength(500)]
@@ -44,7 +47,16 @@ namespace WebTimNguoiThatLac.Models
         [MaxLength(500)]
         public string? Url { get; set; } // Đường dẫn truy cập
 
+        [MaxLength(500)]
+        public string? RequestPath { get; set; } // Đường dẫn request (bổ sung cho middleware)
+
+        [MaxLength(2000)]
+        public string? QueryString { get; set; } // Query string (bổ sung cho middleware)
+
         public string? AdditionalData { get; set; } // JSON chứa QueryString, Headers
+
+        [MaxLength(4000)]
+        public string? Headers { get; set; } // Headers (bổ sung cho middleware)
 
         [Required]
         public DateTime Timestamp { get; set; } = DateTime.UtcNow; // Thời gian ghi log

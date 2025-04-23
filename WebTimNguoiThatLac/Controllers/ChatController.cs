@@ -68,8 +68,8 @@ namespace WebTimNguoiThatLac.Controllers
                 foreach (TinNhan i in unreadMessages)
                 {
                     i.IsRead = true;
-                    _context.SaveChangesAsync();
                 }
+                await _context.SaveChangesAsync();
             }
             
 

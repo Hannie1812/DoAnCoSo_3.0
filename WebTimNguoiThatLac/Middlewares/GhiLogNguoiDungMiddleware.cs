@@ -54,12 +54,19 @@ namespace WebTimNguoiThatLac.Middlewares
                 logInfo.Timestamp, logInfo.UserId, logInfo.UserName, logInfo.SessionId,
                 logInfo.IpAddress, logInfo.RequestMethod, logInfo.RequestPath);
 
+            // Lưu lại thông tin cần thiết trước khi vào Task.Run để tránh truy cập context đã dispose
+            var queryStringValue = context.Request.QueryString.Value;
+            var headersDict = context.Request.Headers
+                .Where(h => !h.Key.Equals("Authorization", StringComparison.OrdinalIgnoreCase))
+                .ToDictionary(h => h.Key, h => h.Value.ToString());
+            var serviceProvider = context.RequestServices;
+
             // Ghi log database trong scope riêng (bất đồng bộ)
             _ = Task.Run(async () =>
             {
                 try
                 {
-                    using (var scope = context.RequestServices.CreateScope())
+                    using (var scope = serviceProvider.CreateScope())
                     {
                         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
@@ -77,10 +84,8 @@ namespace WebTimNguoiThatLac.Middlewares
                             Url = $"{logInfo.RequestMethod} {logInfo.RequestPath}",
                             AdditionalData = JsonSerializer.Serialize(new
                             {
-                                QueryString = context.Request.QueryString.Value,
-                                Headers = context.Request.Headers
-                                    .Where(h => !h.Key.Equals("Authorization", StringComparison.OrdinalIgnoreCase))
-                                    .ToDictionary(h => h.Key, h => h.Value.ToString())
+                                QueryString = queryStringValue,
+                                Headers = headersDict
                             }),
                             Timestamp = logInfo.Timestamp
                         };

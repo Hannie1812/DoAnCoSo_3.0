@@ -597,6 +597,42 @@
                         </div>
                     </div>
                 }
+                @if (dsBinhLuan.Any())
+                {
+
+                    int slanh = dsBinhLuan.Count(z=>z.HinhAnh != null);
+                    if(slanh > 0)
+                    {
+                        <div class="gallery-container">
+                            <div class="gallery-header">
+                                <h6 class="mb-0 fw-bold">
+                                    <i class="fas fa-images me-2 text-primary"></i>Hình ảnh mới nhất
+                                </h6>
+
+                                <small class="text-muted">@slanh ảnh</small>
+                            </div>
+
+                            <div class="gallery-scroll">
+                                @foreach (WebTimNguoiThatLac.Models.BinhLuan img in dsBinhLuan)
+                                {
+                                    if (img.HinhAnh != null)
+                                    {
+                                        <div class="gallery-item">
+                                            <div class="position-relative">
+                                                <img src="@img.HinhAnh"
+                                                     class="gallery-thumbnail"
+                                                     onclick="changeMainImage('@img.HinhAnh')"
+                                                     alt="Ảnh liên quan"
+                                                     loading="lazy">
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    }
+                    
+                }
             </div>
 
             <!-- Info Column -->

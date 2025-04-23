@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WebTimNguoiThatLac")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d151e18ae08c47287e5cbf542b2cedb63e92eacb")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0d236f4e5c8d0ed799e966fa15097f872eb93ca0")]
 [assembly: System.Reflection.AssemblyProductAttribute("WebTimNguoiThatLac")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WebTimNguoiThatLac")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

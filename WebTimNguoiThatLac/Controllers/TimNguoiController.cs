@@ -318,12 +318,17 @@ namespace WebTimNguoiThatLac.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 var nguoiDung = await _userManager.GetUserAsync(User);
-                if (nguoiDung == null || nguoiDung.Active == false)
+                if (nguoiDung == null )
                 {
                     // Ghi log
                     _logger.LogWarning($"Tài khoản {nguoiDung.Email} đã bị vô hiệu hóa do vi phạm quy định.");
                     TempData["WarningMessage"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
                     return Redirect("/Identity/Account/Login");
+                }
+                if(nguoiDung.Active==false)
+                {
+                    TempData["WarningMessage"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
+                    return RedirectToAction("Index", "LoiViPham", new { area = "" });
                 }
             }
             else
@@ -342,12 +347,17 @@ namespace WebTimNguoiThatLac.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 var nguoiDung = await _userManager.GetUserAsync(User);
-                if (nguoiDung == null || nguoiDung.Active == false)
+                if (nguoiDung == null)
+                {
+                    // Ghi log
+                    _logger.LogWarning($"Tài khoản {nguoiDung.Email} đã bị vô hiệu hóa do vi phạm quy định.");
+                    TempData["WarningMessage"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
+                    return Redirect("/Identity/Account/Login");
+                }
+                if (nguoiDung.Active == false)
                 {
                     TempData["WarningMessage"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
-                    //return Redirect("/Identity/Account/Login");
                     return RedirectToAction("Index", "LoiViPham", new { area = "" });
-
                 }
             }
             if (ModelState.IsValid)
@@ -385,10 +395,10 @@ namespace WebTimNguoiThatLac.Controllers
                     db.AnhTimNguois.Add(x);
                     await db.SaveChangesAsync();
                 }
-                TempData["WarningMessage"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
+                //TempData["WarningMessage"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
 
-                //return Redirect("/Identity/Account/Manage/Index");
-                return RedirectToAction("Index", "LoiViPham", new { area = "" });
+                return Redirect("/Identity/Account/Manage/Index");
+                //return RedirectToAction("Index", "LoiViPham", new { area = "" });
 
             }
 

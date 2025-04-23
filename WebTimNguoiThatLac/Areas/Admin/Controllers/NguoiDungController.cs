@@ -277,6 +277,8 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                                                         .Include(u => u.AnhTimNguois)
                                                         .Where(i => i.IdNguoiDung == id)
                                                         .ToListAsync();
+
+
                 foreach (TimNguoi i in ds)
                 {
                     // Xóa ảnh tìm người

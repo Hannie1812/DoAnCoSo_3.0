@@ -100,46 +100,46 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    <script>
-        $(document).ready(function() {
-            // Cập nhật số lượng thông báo
-            function updateNotificationCount() {
-                $.get('@Url.Action("DemBinhLuanChuaDoc", "TimNguoi")', function(data) {
-                    $('#notificationBadge').text(data.count);
-                    if (data.count > 0) {
-                        $('#notificationBadge').removeClass('d-none');
-                    } else {
-                        $('#notificationBadge').addClass('d-none');
-                    }
-                });
-            }
+    @* <script> *@
+    @*     $(document).ready(function() { *@
+    @*         // Cập nhật số lượng thông báo *@
+    @*         function updateNotificationCount() { *@
+    @*             $.get('@Url.Action("DemBinhLuanChuaDoc", "TimNguoi")', function(data) { *@
+    @*                 $('#notificationBadge').text(data.count); *@
+    @*                 if (data.count > 0) { *@
+    @*                     $('#notificationBadge').removeClass('d-none'); *@
+    @*                 } else { *@
+    @*                     $('#notificationBadge').addClass('d-none'); *@
+    @*                 } *@
+    @*             }); *@
+    @*         } *@
 
-            // Tải lại danh sách thông báo
-            function loadNotifications() {
-                $('#notificationContainer').load('@Url.Action("LayBinhLuanChuaDoc", "TimNguoi")');
-            }
+    @*         // Tải lại danh sách thông báo *@
+    @*         function loadNotifications() { *@
+    @*             $('#notificationContainer').load('@Url.Action("LayBinhLuanChuaDoc", "TimNguoi")'); *@
+    @*         } *@
 
-            // Cập nhật khi dropdown được mở
-            $('#notificationDropdown').on('click', function() {
-                loadNotifications();
-            });
+    @*         // Cập nhật khi dropdown được mở *@
+    @*         $('#notificationDropdown').on('click', function() { *@
+    @*             loadNotifications(); *@
+    @*         }); *@
 
-            // Đánh dấu đã đọc khi click vào thông báo
-            $(document).on('click', '.notification-item', function(e) {
-                e.preventDefault();
-                var commentId = $(this).data('comment-id');
-                var url = $(this).attr('href');
+    @*         // Đánh dấu đã đọc khi click vào thông báo *@
+    @*         $(document).on('click', '.notification-item', function(e) { *@
+    @*             e.preventDefault(); *@
+    @*             var commentId = $(this).data('comment-id'); *@
+    @*             var url = $(this).attr('href'); *@
 
-                $.post('@Url.Action("DanhDauDaDoc", "TimNguoi")', { id: commentId }, function() {
-                    window.location.href = url;
-                });
-            });
+    @*             $.post('@Url.Action("DanhDauDaDoc", "TimNguoi")', { id: commentId }, function() { *@
+    @*                 window.location.href = url; *@
+    @*             }); *@
+    @*         }); *@
 
-            // Kiểm tra thông báo mới mỗi 30 giây
-            updateNotificationCount();
-            setInterval(updateNotificationCount, 30000);
-        });
-    </script>
+    @*         // Kiểm tra thông báo mới mỗi 30 giây *@
+    @*         updateNotificationCount(); *@
+    @*         setInterval(updateNotificationCount, 30000); *@
+    @*     }); *@
+    @* </script> *@
     
 
     @await RenderSectionAsync("Scripts", required: false)

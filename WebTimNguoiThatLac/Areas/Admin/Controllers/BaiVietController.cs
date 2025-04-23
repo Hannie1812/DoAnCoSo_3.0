@@ -14,6 +14,7 @@ using WebTimNguoiThatLac.Services;
 using X.PagedList.Extensions;
 using Microsoft.Build.Framework;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
+using DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace WebTimNguoiThatLac.Areas.Admin.Controllers
 {
@@ -106,7 +107,8 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         public async Task<IActionResult> Index(string TimKiem = "", int Page = 1)
         {
             IEnumerable<TimNguoi> ds = await db.TimNguois
-                                                            .Include(u => u.ApplicationUser)                                            
+                                                            .Include(u => u.ApplicationUser)  
+                                                            .OrderByDescending(m => m.NgayDang)
                                                             .ToListAsync();
             ViewBag.TimKiem = TimKiem;
             int sodongtren1trang = 5;
@@ -286,70 +288,115 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
 
             IEnumerable<string> DanhSachTinhThanh = TinhThanhIEnumerable;
             ViewBag.DanhSachTinhThanh = DanhSachTinhThanh;
+            ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == id).ToList();
 
             return View(x);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update(TimNguoi t, List<IFormFile>? DSHinhAnhCapNhat)
+        public async Task<IActionResult> Update(TimNguoi x, List<IFormFile>? DSHinhAnhCapNhat)
         {
-            if (ModelState.IsValid)
+            try
             {
-                TimNguoi x = await db.TimNguois.FirstOrDefaultAsync(i => i.Id == t.Id);
-                if (x == null)
+                if (ModelState.IsValid)
                 {
+                    TimNguoi y = await db.TimNguois.FirstOrDefaultAsync(i => i.Id == x.Id);
+                    if (y == null)
+                    {
+                        TempData["ErrorMessage"] = " Lỗi Khi Thay Đổi";
+                        return RedirectToAction("Index");
+                    }
+
+                    // Luôn thiết lập ViewBag trước khi trả về View
+                    ViewBag.DanhSachTinhThanh = TinhThanhIEnumerable;
+                    ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == x.Id).ToList();
+
+                    if (!ModelState.IsValid)
+                    {
+                        ViewData["ErrorMessage"] = " Lỗi Khi Thay Đổi";
+                        return View(x);
+                    }
+
+                    // Cập nhật thông tin cơ bản (luôn thực hiện dù có ảnh hay không)
+                    y.MoTa = x.MoTa;
+                    y.TieuDe = x.TieuDe;
+                    y.DaciemNhanDang = x.DaciemNhanDang;
+                    y.GioiTinh = x.GioiTinh;
+                    y.TrangThai = x.TrangThai;
+                    y.KhuVuc = x.KhuVuc;
+                    y.NgaySinh = x.NgaySinh;
+                    y.NgayMatTich = x.NgayMatTich;
+                    y.HoTen = x.HoTen;
+                    y.MoiQuanHe = x.MoiQuanHe;
+
+                    await db.SaveChangesAsync();
+
+                    // Chỉ xử lý ảnh nếu có ảnh mới được chọn
+                    if (DSHinhAnhCapNhat != null && DSHinhAnhCapNhat.Count > 0)
+                    {
+                        using (var transaction = db.Database.BeginTransaction())
+                        {
+                            try
+                            {
+                                var dsHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == x.Id).ToList();
+
+                                if (dsHinhAnh != null && dsHinhAnh.Count > 0)
+                                {
+                                    foreach (var i in dsHinhAnh)
+                                    {
+                                        DeleteImage(i.HinhAnh, "AnhNguoiCanTim");
+                                        db.AnhTimNguois.Remove(i);
+                                    }
+                                    await db.SaveChangesAsync();
+                                }
+
+                                int d = 0;
+                                foreach (IFormFile i in DSHinhAnhCapNhat)
+                                {
+                                    var z = new AnhTimNguoi();
+
+                                    z.IdNguoiCanTim = y.Id;
+                                    z.TrangThai = (d == 0) ? 1 : 0;
+                                    z.HinhAnh = await SaveImage(i, "AnhNguoiCanTim");
+
+                                    db.AnhTimNguois.Add(z);
+                                    await db.SaveChangesAsync();
+                                    d++;
+                                }
+
+                                await db.SaveChangesAsync();
+                                await transaction.CommitAsync(); // QUAN TRỌNG: Phải commit transaction
+
+
+                            }
+                            catch
+                            {
+                                transaction.Rollback();
+                                ModelState.AddModelError("", "Có lỗi xảy ra khi cập nhật hình ảnh");
+                                ViewData["ErrorMessage"] = " Lỗi Khi Thay Đổi";
+                                return View(x);
+                            }
+                        }
+                    }
+
+                    // Lưu các thay đổi khác (luôn thực hiện)
+                    await db.SaveChangesAsync();
+                    TempData["SuccessMessage"] = " Lưu Thay Đỗi Bài Viết Tành Công";
                     return RedirectToAction("Index");
                 }
 
 
-                x.HoTen = t.HoTen;
-                x.TieuDe = t.TieuDe;
-                x.MoTa = t.MoTa;
-                x.DaciemNhanDang = t.DaciemNhanDang;
-                x.GioiTinh = t.GioiTinh;
-                x.TrangThai = t.TrangThai;
-                x.KhuVuc = t.KhuVuc;
-                x.active = t.active;
-
-                await db.SaveChangesAsync();
-
-                if(DSHinhAnhCapNhat != null)
-                {
-                    List<AnhTimNguoi> dsha = await db.AnhTimNguois
-                                            .Where(i => i.IdNguoiCanTim == t.Id)
-                                            .ToListAsync();
-                    foreach(AnhTimNguoi i in dsha)
-                    {
-                        db.AnhTimNguois.Remove(i);
-                        DeleteImage(i.HinhAnh, "AnhNguoiCanTim");
-                    }
-                    int d = 0;
-                    foreach(IFormFile i in DSHinhAnhCapNhat)
-                    {
-                        AnhTimNguoi a = new AnhTimNguoi();
-                        a.HinhAnh = await SaveImage(i, "AnhNguoiCanTim");
-                        if(d==0)
-                        {
-                            a.TrangThai = 1;
-                        }
-                        else
-                        {
-                            a.TrangThai = 0;
-                        }
-                        a.IdNguoiCanTim = x.Id;
-                        await db.SaveChangesAsync();
-                    }
-                }
-
-
-                return RedirectToAction("Index");
+                IEnumerable<string> DanhSachTinhThanh = TinhThanhIEnumerable;
+                ViewBag.DanhSachTinhThanh = DanhSachTinhThanh;
+                ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == x.Id).ToList();
+                ViewData["ErrorMessage"] = " Nhập Đầy Đủ Thông Tin";
+                return View(x);
             }
-
-
-            IEnumerable<string> DanhSachTinhThanh = TinhThanhIEnumerable;
-            ViewBag.DanhSachTinhThanh = DanhSachTinhThanh;
-
-            return View(t);
+            catch(Exception ex)
+            {
+                return View(x);
+            }
+           
 
         }
 
@@ -378,75 +425,74 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                ApplicationUser y = await db.Users.FirstOrDefaultAsync(i => i.Id == id);
-                if (y == null)
-                {
-                    return Json(new { success = false, message = "Ko Có Id Cần Xóa" });
-                }
+                TimNguoi tn = db.TimNguois
+                    .Include(u => u.ApplicationUser)
+                    .Include(u => u.BaoCaoBaiViets)
+                    .Include(u => u.AnhTimNguois)
+                    .Include(u => u.NhanChungs)
+                    .Include(u => u.BinhLuans)
+                        .ThenInclude(v => v.ApplicationUser)
+                        .ThenInclude(v => v.BaoCaoBinhLuans)
+                    .Include(u=>u.BaoCaoBaiViets)
+                        .ThenInclude(v => v.ApplicationUser)
+                    .FirstOrDefault(i => i.Id == id);
 
 
-                List<TimNguoi> ds = await db.TimNguois
-                                                        .Include(u => u.ApplicationUser)
-                                                        .Include(u => u.AnhTimNguois)
-                                                        .Where(i => i.IdNguoiDung == id)
-                                                        .ToListAsync();
-                foreach (TimNguoi i in ds)
+                // bình luận
+                List<BinhLuan> dsBinhLuan = db.BinhLuans
+                    .Include(u => u.BaoCaoBinhLuans)
+                    .Where(i => i.IdBaiViet == tn.Id).ToList();
+                // xóa các báo cáo bình luận trong dsBinhLuan
+                foreach(BinhLuan i in dsBinhLuan)
                 {
-                    // Xóa ảnh tìm người
-                    List<AnhTimNguoi> dsHA = await db.AnhTimNguois.Where(m => m.IdNguoiCanTim == i.Id).ToListAsync();
-                    foreach (AnhTimNguoi j in dsHA)
+                    List<BaoCaoBinhLuan> bc = db.BaoCaoBinhLuans.Where(m => m.MaBinhLuan == i.Id).ToList();
+                    if(bc.Count() > 0)
                     {
-                        DeleteImage(j.HinhAnh, "AnhNguoiCanTim");
-                        db.AnhTimNguois.Remove(j);
-                        //await db.SaveChangesAsync();
+                        db.BaoCaoBinhLuans.RemoveRange(bc);
                     }
-
-                    // Xóa Bình luôanj trong bài viết
-                    List<BinhLuan> dsBL = await db.BinhLuans.Where(m => m.IdBaiViet == i.Id).ToListAsync();
-                    foreach (BinhLuan z in dsBL)
-                    {
-                        if (z.HinhAnh != null)
-                        {
-                            DeleteImage(z.HinhAnh, "BinhLuan");
-                        }
-                        db.BinhLuans.Remove(z);
-                        //await db.SaveChangesAsync();
-                    }
-
-                    db.TimNguois.Remove(i);
-                    //await db.SaveChangesAsync();
                 }
 
-                // Xóa toàm bộ bình luận người dùng
-                List<BinhLuan> BLUS = await db.BinhLuans
-                                                     .Include(u => u.ApplicationUser)
-                                                     .Where(i => i.UserId == y.Id)
-                                                     .ToListAsync();
+                db.BinhLuans.RemoveRange(dsBinhLuan);
 
-                foreach (BinhLuan j in BLUS)
+                // tìm thấy thất lạc
+                List<TimThayNguoiThatLac> dsThayThayLac = db.TimThayNguoiThatLacs
+                    .Include(u => u.ApplicationUser)
+                    .Where(i => i.TimNguoiId == tn.Id).ToList();
+
+                if(dsThayThayLac.Count() > 0)
                 {
-                    if (j.HinhAnh != null)
-                    {
-                        DeleteImage(j.HinhAnh, "BinhLuan");
-                    }
-                    db.BinhLuans.Remove(j);
+                    db.TimThayNguoiThatLacs.RemoveRange(dsThayThayLac);
                 }
 
+                // ảnh tìm người
+                List<AnhTimNguoi> dsAnhTimNguoi = db.AnhTimNguois
+                   .Where(i => i.IdNguoiCanTim == tn.Id).ToList();
+
+               foreach(AnhTimNguoi i in dsAnhTimNguoi)
+               {
+                    DeleteImage(i.HinhAnh, "AnhNguoiCanTim");
+                    db.AnhTimNguois.Remove(i);
+               }
 
 
-                var usrole = await userManager.GetRolesAsync(y);
+                // báo cáo bài viết
 
-                if (usrole != null)
+                List<BaoCaoBaiViet> dsBaoCaoBaiViet = db.BaoCaoBaiViets
+                    .Include(u => u.ApplicationUser)
+                    .Where(i => i.MaBaiViet == tn.Id).ToList();
+
+
+                foreach(BaoCaoBaiViet i in dsBaoCaoBaiViet)
                 {
-                    await userManager.RemoveFromRolesAsync(y, usrole);
+                    DeleteImage(i.HinhAnh, "AnhMinhTrungBaoCaoBaiViet");
+                    db.BaoCaoBaiViets.Remove(i);
                 }
 
-                db.Users.Remove(y);
-
+                db.TimNguois.Remove(tn);
 
                 await db.SaveChangesAsync();
 

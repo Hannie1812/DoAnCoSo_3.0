@@ -61,27 +61,30 @@ namespace WebTimNguoiThatLac.Middlewares
 
             try
             {
-                var dbContext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
-                var logEntry = new UserActivityLog
+                using (var scope = context.RequestServices.CreateScope())
                 {
-                    UserId = logInfo.UserId,
-                    UserName = logInfo.UserName,
-                    SessionId = logInfo.SessionId,
-                    AnonymousId = logInfo.AnonymousId,
-                    Action = logInfo.RequestMethod,
-                    Controller = logInfo.ControllerName,
-                    ActionName = logInfo.ActionName,
-                    IpAddress = logInfo.IpAddress,
-                    UserAgent = logInfo.UserAgent,
-                    Url = context.Request.Path,
-                    RequestPath = context.Request.Path,
-                    QueryString = queryStringValue,
-                    AdditionalData = JsonSerializer.Serialize(new { QueryString = queryStringValue, Headers = headersDict }),
-                    Headers = JsonSerializer.Serialize(headersDict),
-                    Timestamp = logInfo.Timestamp
-                };
-                dbContext.UserActivityLogs.Add(logEntry);
-                await dbContext.SaveChangesAsync();
+                    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    var logEntry = new UserActivityLog
+                    {
+                        UserId = logInfo.UserId,
+                        UserName = logInfo.UserName,
+                        SessionId = logInfo.SessionId,
+                        AnonymousId = logInfo.AnonymousId,
+                        Action = logInfo.RequestMethod,
+                        Controller = logInfo.ControllerName,
+                        ActionName = logInfo.ActionName,
+                        IpAddress = logInfo.IpAddress,
+                        UserAgent = logInfo.UserAgent,
+                        Url = context.Request.Path,
+                        RequestPath = context.Request.Path,
+                        QueryString = queryStringValue,
+                        AdditionalData = JsonSerializer.Serialize(new { QueryString = queryStringValue, Headers = headersDict }),
+                        Headers = JsonSerializer.Serialize(headersDict),
+                        Timestamp = logInfo.Timestamp
+                    };
+                    dbContext.UserActivityLogs.Add(logEntry);
+                    await dbContext.SaveChangesAsync();
+                }
             }
             catch (Exception ex)
             {

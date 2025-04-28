@@ -61,7 +61,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 .ToPagedList(page, PageSize);
 
             // Kiểm tra và xử lý bài viết có nhiều báo cáo
-            await ProcessReportedPosts();
+            //await ProcessReportedPosts();
 
             ViewBag.TiemKiem = TiemKiem;
             ViewBag.Status = status;

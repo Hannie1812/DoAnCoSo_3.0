@@ -57,7 +57,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 .OrderByDescending(b => b.NgayBaoCao)
                 .ToPagedList(page, PageSize);
 
-            await ProcessReportedComments();
+            //await ProcessReportedComments();
 
             ViewBag.TiemKiem = TiemKiem;
             ViewBag.Status = status;

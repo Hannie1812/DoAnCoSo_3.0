@@ -28,6 +28,7 @@ namespace WebTimNguoiThatLac.Controllers
         private readonly EmailService _emailService;
         private readonly OtpService _otpService;
         private readonly ILogger<TimNguoiController> _logger;
+        private const int ReportThreshold = 3;// vi pham
 
         private static readonly IEnumerable<string> TinhThanhIEnumerable = new List<string>
     {
@@ -512,6 +513,12 @@ namespace WebTimNguoiThatLac.Controllers
                 ViewBag.DSHinhAnh = await db.AnhTimNguois
                                                         .Where(i => i.IdNguoiCanTim == y.Id)
                                                         .ToListAsync();
+
+                if(y.active == false)
+                {
+                    TempData["ErrorMessage"] = "Bài Viết Đã Bị Khóa, Nếu Có Thắc Mắc Xin Liên Hệ Với Admin";
+                    return RedirectToAction("Index");
+                }
                 List<BinhLuan> DSBinhLuan = db.BinhLuans
                                                         .Include(u => u.ApplicationUser)
                                                         .Where(i => i.IdBaiViet ==  id && i.Active == true && i.NguoiDangBaiXoa==false)
@@ -589,7 +596,7 @@ namespace WebTimNguoiThatLac.Controllers
                     TempData["SuccessMessage"] = "Thêm Bình luận Thành Công";
                     return RedirectToAction("ChiTietBaiTimNguoi", new { id = IdBaiViet });
                 }
-                TempData["Warning"] = "Có lỗi xảy ra khi thêm bình luận. Vui lòng thử lại.";
+                TempData["WarningMessage"] = "Có lỗi xảy ra khi thêm bình luận. Vui lòng thử lại.";
                 return RedirectToAction("ChiTietBaiTimNguoi", new { id = IdBaiViet }); // Quay lại trang chi tiết
 
                
@@ -606,7 +613,7 @@ namespace WebTimNguoiThatLac.Controllers
                 var nguoiDung = await _userManager.GetUserAsync(User);
                 if (nguoiDung == null || nguoiDung.Active == false)
                 {
-                    TempData["Warning"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
+                    TempData["WarningMessage"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
                     return Redirect("/Identity/Account/Login");
                 }
                 TimNguoi x = db.TimNguois
@@ -821,6 +828,8 @@ namespace WebTimNguoiThatLac.Controllers
                     $"Bình luận #{MaBinhLuan} trong bài viết '{binhLuan.TimNguoi.HoTen}' đã được báo cáo bởi {currentUser.Email}.\nLý do: {LyDo}"
                 );
 
+                await ProcessReportedComments(); // xử lý tự động báo cáo bình luận
+
                 return Json(new { success = true, message = "Báo cáo của bạn đã được gửi thành công" });
             }
             catch (Exception ex)
@@ -887,6 +896,8 @@ namespace WebTimNguoiThatLac.Controllers
                     $"Bài viết #{x.MaBaiViet} '{baiViet.HoTen}' đã được báo cáo bởi {currentUser.Email}.\nLý do: {x.LyDo}\nChi tiết: {x.ChiTiet}"
                 );
 
+                await ProcessReportedPosts();
+
                 return Json(new { success = true, message = "Báo cáo của bạn đã được gửi thành công" });
             }
             catch (Exception ex)
@@ -896,7 +907,163 @@ namespace WebTimNguoiThatLac.Controllers
             }
         }
 
+        private async Task ProcessReportedComments() // Xử lý bình luận bị báo cáo
+        {
+            var problematicComments = await db.BaoCaoBinhLuans
+                .Where(b => !b.check)
+                .GroupBy(b => b.MaBinhLuan)
+                .Where(g => g.Count() >= ReportThreshold)
+                .Select(g => new {
+                    CommentId = g.Key,
+                    ReportCount = g.Count()
+                })
+                .ToListAsync();
 
+            foreach (var item in problematicComments)
+            {
+                var comment = await db.BinhLuans
+                    .Include(c => c.ApplicationUser)
+                    .Include(c => c.TimNguoi)
+                    .FirstOrDefaultAsync(c => c.Id == item.CommentId);
+
+                if (comment != null)
+                {
+                    comment.Active = false;
+                    db.Update(comment);
+
+                    var relatedReports = await db.BaoCaoBinhLuans
+                        .Where(b => b.MaBinhLuan == item.CommentId)
+                        .ToListAsync();
+
+                    foreach (var report in relatedReports)
+                    {
+                        report.check = true;
+                        db.Update(report);
+                    }
+
+                    if (comment.ApplicationUser != null)
+                    {
+                        await _emailService.SendEmailAsync(
+                            comment.ApplicationUser.Email,
+                            "Bình luận của bạn đã bị ẩn tự động",
+                            $"Bình luận của bạn trong bài viết \"{comment.TimNguoi?.TieuDe}\" " +
+                            $"đã bị ẩn tự động do nhận được {item.ReportCount} báo cáo vi phạm."
+                        );
+
+                        ApplicationUser applicationUser = await db.Users
+                            .FirstOrDefaultAsync(u => u.Id == comment.ApplicationUser.Id);
+                        if (applicationUser != null)
+                        {
+                            applicationUser.SoLanViPham += 1;
+                            await db.SaveChangesAsync();
+
+
+
+                            HanhViDangNgo hanhVi = new HanhViDangNgo
+                            {
+                                NguoiDungId = applicationUser.Id,
+                                HanhDong = "Bình luận bị báo cáo nhiều lần",
+                                ThoiGian = DateTime.Now,
+                                IdLoiViPham = comment.Id,
+                                LoaiViPham = "Bình Luận",
+
+                            };
+                            db.HanhViDangNgos.Add(hanhVi);
+                            await db.SaveChangesAsync();
+
+                            if (applicationUser.SoLanViPham >= 3)
+                            {
+                                applicationUser.Active = false;
+
+                                await db.SaveChangesAsync();
+
+                                await _emailService.SendEmailAsync(
+                                    applicationUser.Email,
+                                    "Tài khoản của bạn đã bị khóa",
+                                    "Tài khoản của bạn đã bị khóa do vi phạm quy định nhiều lần. " +
+                                    "Vui lòng liên hệ với quản trị viên để biết thêm chi tiết."
+                                );
+
+                            }
+
+                            await db.SaveChangesAsync();
+
+                        }
+                    }
+                }
+            }
+            await db.SaveChangesAsync();
+        }
+
+
+
+        private async Task ProcessReportedPosts() // Xử Lý tự động báo cáo bài viết
+        {
+            // Lấy danh sách bài viết có số báo cáo >= ngưỡng
+            var problematicPosts = await db.BaoCaoBaiViets
+                .Where(b => !b.check)
+                .GroupBy(b => b.TimNguoi.Id)
+                .Where(g => g.Count() >= ReportThreshold)
+                .Select(g => g.Key)
+                .ToListAsync();
+
+            // Vô hiệu hóa các bài viết này
+            foreach (var postId in problematicPosts)
+            {
+                var post = await db.TimNguois.Include(z => z.ApplicationUser).FirstOrDefaultAsync(i => i.Id == postId);
+                if (post != null && post.active)
+                {
+                    post.active = false;
+                    db.Update(post);
+
+                    // Gửi email thông báo cho người dùng
+                    var user = await db.Users.FirstOrDefaultAsync(m => m.Id == post.ApplicationUser.Id);
+                    if (user != null)
+                    {
+                        await _emailService.SendEmailAsync(
+                            user.Email,
+                            $"Bài Viết {post.HoTen} đã bị ẩn",
+                            $"Bài viết của bạn đã bị ẩn do có nhiều báo cáo. Vui lòng kiểm tra lại nội dung bài viết của bạn."
+                        );
+
+
+                        // Gửi thông báo cho người dùng
+                        user.SoLanViPham += 1;
+                        if (user.SoLanViPham >= 3)
+                        {
+                            user.Active = false;
+
+                            await _emailService.SendEmailAsync(
+                                user.Email,
+                                "Tài Khoản Bị Khóa",
+                                "Tài khoản của bạn đã bị khóa do vi phạm nhiều lần. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết."
+                            );
+
+                            HanhViDangNgo hanhVi = new HanhViDangNgo
+                            {
+                                NguoiDungId = user.Id,
+                                HanhDong = $"bài viết {post.TieuDe} bị báo cáo nhiều lần",
+                                ThoiGian = DateTime.Now,
+                                IdLoiViPham = post.Id,
+                                LoaiViPham = "Bài Viết",
+
+                            };
+
+
+                            db.HanhViDangNgos.Add(hanhVi);
+                            await db.SaveChangesAsync();
+                        }
+                    }
+
+
+                    // Cập nhật số lần vi phạm
+
+                    await db.SaveChangesAsync();
+                }
+            }
+
+            await db.SaveChangesAsync();
+        }
         public async Task<IActionResult> XacNhanTimThay(int id)
         {
             if (User.Identity.IsAuthenticated)

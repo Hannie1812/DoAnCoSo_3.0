@@ -129,6 +129,12 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                         {
                             applicationUser.SoLanViPham = 0;
                         }
+
+                        if(applicationUser.SoLanViPham <5)
+                        {
+                            applicationUser.Active = true;
+                        }
+                        _context.SaveChanges();
                     }
 
                     if(hanhVi.LoaiViPham == "Bình Luận" && hanhVi.IdLoiViPham >0)

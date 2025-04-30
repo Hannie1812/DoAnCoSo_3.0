@@ -198,10 +198,31 @@ namespace WebTimNguoiThatLac.Controllers
             }
 
             // Áp dụng bộ lọc khu vực
-            if (!string.IsNullOrEmpty(khuVuc))
+            /*if (!string.IsNullOrEmpty(khuVuc))
             {
                 query = query.Where(x => x.KhuVuc.Contains(khuVuc));
                 d ++;
+            }*/
+            // Áp dụng bộ lọc Tỉnh Thành
+            if (!string.IsNullOrEmpty(khuVuc))
+            {
+                int idTinhThanh;
+                if (int.TryParse(khuVuc, out idTinhThanh))
+                {
+                    query = query.Where(x => x.IdTinhThanh == idTinhThanh);
+                    d++;
+                }
+            }
+
+            // Áp dụng bộ lọc Quận Huyện
+            if (!string.IsNullOrEmpty(dacDiem))
+            {
+                int idQuanHuyen;
+                if (int.TryParse(dacDiem, out idQuanHuyen))
+                {
+                    query = query.Where(x => x.IdQuanHuyen == idQuanHuyen);
+                    d++;
+                }
             }
 
             // Áp dụng bộ lọc đặc điểm nhận dạng

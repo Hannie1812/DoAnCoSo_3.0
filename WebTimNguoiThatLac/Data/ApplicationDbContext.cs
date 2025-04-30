@@ -27,6 +27,8 @@ namespace WebTimNguoiThatLac.Data
 
         // ghi log  -> thêm bảng ghi log
         public DbSet<UserActivityLog> UserActivityLogs { get; set; }
-       
+
+        public DbSet<TinhThanh> TinhThanhs { get; set; }
+        public DbSet<QuanHuyen> QuanHuyens { get; set; }
     }
 }

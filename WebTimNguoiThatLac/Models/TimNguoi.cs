@@ -27,6 +27,11 @@ namespace WebTimNguoiThatLac.Models
         public bool active { get; set; } = false;
         public string? TrangThai { get; set; } = "Đang Tìm Kiếm";
         public string? KhuVuc { get; set; }
+        public int? IdQuanHuyen { get; set; }
+
+        [ForeignKey("IdQuanHuyen")]
+        public QuanHuyen? QuanHuyen { get; set; }
+
         public DateTime NgayDang { get; set; } = DateTime.Now;
         public string? MoiQuanHe { get; set; } // Mối quan hệ với người mất tích
         public DateTime? NgayMatTich { get; set; }  // Ngày mất tích

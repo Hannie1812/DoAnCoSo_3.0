@@ -412,9 +412,12 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 {
                     return Json(new { success = false, message = "Ko Có Id Cần chỉnh sửa" });
                 }
-
+                if(y.active == false)
+                {
+                    y.NguoiDangBaiXoa = false;
+                }
                 y.active = !y.active;
-
+                
                 await db.SaveChangesAsync();
                 return Json(new { success = true, message = "Thành Công" });
             }

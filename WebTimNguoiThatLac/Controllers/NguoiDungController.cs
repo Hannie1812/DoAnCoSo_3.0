@@ -77,7 +77,7 @@ namespace WebTimNguoiThatLac.Controllers
             {
                 var baiViet = await db.TimNguois
                     .Include(t => t.AnhTimNguois)
-                    .Where(t => t.IdNguoiDung == user.Id)
+                    .Where(t => t.IdNguoiDung == user.Id && t.NguoiDangBaiXoa == false)
                     .OrderByDescending(t => t.NgayDang)
                     .ToListAsync();
                 return View(baiViet);

@@ -620,10 +620,10 @@
                                         <div class="gallery-item">
                                             <div class="position-relative">
                                                 <img src="@img.HinhAnh"
-                                                     class="gallery-thumbnail"
-                                                     onclick="changeMainImage('@img.HinhAnh')"
-                                                     alt="Ảnh liên quan"
-                                                     loading="lazy">
+                                                class="gallery-thumbnail"
+                                                onclick="changeMainImage('@img.HinhAnh')"
+                                                alt="Ảnh liên quan"
+                                                loading="lazy">
                                             </div>
                                         </div>
                                     }
@@ -631,7 +631,7 @@
                             </div>
                         </div>
                     }
-                    
+
                 }
             </div>
 
@@ -739,37 +739,41 @@
                         </div>
                         @if (Model.TrangThai == "Đã Tìm Thấy")
                         {
-							List<TimThayNguoiThatLac> dsTimThay = db
+                            List<TimThayNguoiThatLac> dsTimThay = db
                                     .TimThayNguoiThatLacs
                                     .Where(m => m.TimNguoiId == Model.Id)
                                     .OrderByDescending(z => z.Id)
                                     .ToList();
-							if (dsTimThay.Count == 0)
-							{
-								 var timThay = dsTimThay.FirstOrDefault();
-                                <div class="info-item">
-                                    <div class="info-icon">
-                                        <i class="fas fa-calendar-day"></i>
+                            if (dsTimThay!= null)
+                            {
+                                if (dsTimThay.Count != 0)
+                                {
+                                    var timThay = dsTimThay.FirstOrDefault();
+                                    <div class="info-item">
+                                        <div class="info-icon">
+                                            <i class="fas fa-calendar-day"></i>
+                                        </div>
+                                        <div class="info-content">
+                                            <div class="info-label">Ngày tìm thấy</div>
+                                            <div class="info-value">@timThay.NgayTimThay?.ToString("dd/MM/yyyy")</div>
+                                            <small class="text-muted">
+                                                @if (@timThay.NgayTimThay == null)
+                                                {
+                                                    <span class="text-danger">Chưa xác định</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="">
+                                                        @(Math.Abs((DateTime.Now - @timThay.NgayTimThay.Value).TotalDays).ToString("0")) ngày trước
+                                                    </span>
+                                                }
+                                            </small>
+                                        </div>
                                     </div>
-                                    <div class="info-content">
-                                        <div class="info-label">Ngày tìm thấy</div>
-                                        <div class="info-value">@timThay.NgayTimThay?.ToString("dd/MM/yyyy")</div>
-                                        <small class="text-muted">
-                                            @if (@timThay.NgayTimThay == null)
-                                            {
-                                                <span class="text-danger">Chưa xác định</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="">
-                                                    @(Math.Abs((DateTime.Now - @timThay.NgayTimThay.Value).TotalDays).ToString("0")) ngày trước
-                                                </span>
-                                            }
-                                        </small>
-                                    </div>
-                                </div>
 
-							}
+                                }
+                            }
+                            
                         }
 
                     </div>
@@ -783,12 +787,16 @@
                             </a>
 
                             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmFoundModal">
-                                <i class="fas fa-check-circle"></i> Xác nhận đã thấy
+                                <i class="fas fa-check-circle"></i> Xác nhận thấy
                             </button>
 
                             <a asp-action="Index" asp-controller="NhanChung" asp-route-id="@Model.Id" class="btn btn-info">
                                 <i class="fas fa-user-friends"></i> Nhân chứng
                             </a>
+
+                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#removePostModal">
+                                <i class="fas fa-trash"></i> Xóa Bài
+                            </button>
                         }
 
                         @if (!isAuthor && user != null)
@@ -900,14 +908,6 @@
                                 <div class="me-3">
                                     <div class="comment-avatar bg-primary text-white d-flex align-items-center justify-content-center rounded-circle"
                                          style="width: 48px; height: 48px; font-size: 1.2rem;">
-                                        @* @if (!string.IsNullOrEmpty(binhLuan.ApplicationUser?.FullName)) *@
-                                        @* { *@
-                                        @*     @binhLuan.ApplicationUser.FullName[0] *@
-                                        @* } *@
-                                        @* else *@
-                                        @* { *@
-                                        @*     <i class="fas fa-user"></i> *@
-                                        @* } *@
                                         @if (!string.IsNullOrEmpty(binhLuan.ApplicationUser?.HinhAnh))
                                         {
                                             <img src="@binhLuan.ApplicationUser?.HinhAnh" alt="Ảnh đại diện"
@@ -1102,6 +1102,40 @@
                 <button type="button" id="submitReportPost" class="btn btn-danger">
                     <span class="submit-text">
                         <i class="fas fa-paper-plane me-1"></i> Gửi báo cáo
+                    </span>
+                    <span class="loading-spinner spinner-border spinner-border-sm d-none"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Remove Post Modal -->
+<div class="modal fade report-modal" id="removePostModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2 text-danger"></i>Thông báo Xóa Bài
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="removePostContent">
+                    <input type="hidden" id="removePostId" value="@Model?.Id" />
+                    <div class="mb-3">
+                        <p class="form-label">Bạn có chắc muốn xóa bài viết tìm <strong>@Model.HoTen</strong> này không?</p>
+                        <p class="form-label">Ngày đăng @Model.NgayDang.ToString("dd/MM/yyyy")</p>
+                        <p class="form-label">Trạng thái @Model.TrangThai</p>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" id="submitRemovePost" class="btn btn-danger">
+                    <span class="submit-text">
+                        <i class="fas fa-trash me-1"></i> Xóa Bài Viết
                     </span>
                     <span class="loading-spinner spinner-border spinner-border-sm d-none"></span>
                 </button>
@@ -1341,7 +1375,10 @@
             // Setup report buttons
             document.getElementById('submitReportPost')?.addEventListener('click', submitPostReport);
             document.getElementById('submitReportComment')?.addEventListener('click', submitCommentReport);
+            document.getElementById('submitRemovePost')?.addEventListener('click', submitPostRemove);
 
+
+            
             document.querySelectorAll('.report-comment-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     document.getElementById('reportCommentId').value = this.getAttribute('data-comment-id');
@@ -1452,6 +1489,59 @@
                 },
                 error: function(xhr, status, error) {
                     let errorMsg = 'Có lỗi xảy ra khi gửi báo cáo';
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        errorMsg = response.message || errorMsg;
+                    } catch (e) {
+                        errorMsg = xhr.responseText || errorMsg;
+                    }
+                    showNotification('error', errorMsg);
+                },
+                complete: function() {
+                    submitText.classList.remove('d-none');
+                    spinner.classList.add('d-none');
+                    submitBtn.disabled = false;
+                }
+            });
+        }
+
+         function submitPostRemove() {
+            const submitBtn = document.getElementById('submitRemovePost');
+            const submitText = submitBtn.querySelector('.submit-text');
+            const spinner = submitBtn.querySelector('.loading-spinner');
+
+            submitText.classList.add('d-none');
+            spinner.classList.remove('d-none');
+            submitBtn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('id', document.getElementById('reportPostId').value);
+
+
+            // Sử dụng AJAX thay vì Fetch API
+            $.ajax({
+                url: '/TimNguoi/NguoiDungXoaBai',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(data) {
+                     if (data.success) {
+                        showNotification('success', data.message || 'Bài Viết Đã Được Xóa');
+                        $('#submitRemovePost').modal('hide');
+                         setTimeout(() => {
+                                window.location.href = '/NguoiDung/BaiVietCuaToi';
+                            }, 2000);
+                        
+                    } else {
+                        showNotification('error', data.message || 'Có lỗi xảy ra khi gửi Xóa Bài Viết');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    let errorMsg = 'Có lỗi xảy ra khi xóa bài viết';
                     try {
                         const response = JSON.parse(xhr.responseText);
                         errorMsg = response.message || errorMsg;

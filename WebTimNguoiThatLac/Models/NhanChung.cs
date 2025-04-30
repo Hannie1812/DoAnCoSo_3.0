@@ -25,5 +25,9 @@ namespace WebTimNguoiThatLac.Models
         [ForeignKey("TimNguoiId")]
         public TimNguoi? TimNguoi { get; set; } // Thông tin người mất tích liên quan
         public DateTime NgayBaoTin { get; set; } = DateTime.Now;
+
+        // so sách cơ sở dữ liệu
+        public string? NguoiDungChon  { get; set; }
+        public int PhanTramDanhGia { get; set; } = 0;
     }
 }

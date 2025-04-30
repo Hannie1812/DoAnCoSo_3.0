@@ -16,6 +16,9 @@ using WebTimNguoiThatLac.Models;
 using WebTimNguoiThatLac.Services;
 using X.PagedList.Extensions;
 using WebTimNguoiThatLac.ViewModels;
+using WebTimNguoiThatLac.Areas.Admin.Models;
+using X.PagedList;
+using System.Threading.Tasks;
 
 namespace WebTimNguoiThatLac.Controllers
 {
@@ -182,6 +185,139 @@ namespace WebTimNguoiThatLac.Controllers
 
 
 
+        //public async Task<IActionResult> Index(string ten, string khuVuc, string dacDiem, int page = 1)
+        //{
+        //    int pageSize = 6; // Số bài viết mỗi trang
+
+        //    var query = db.TimNguois
+        //        .Include(u => u.ApplicationUser)
+        //        .Include(u => u.AnhTimNguois)
+        //        .Where(i => i.active == true);
+
+        //    int d = 0;
+        //    // Áp dụng bộ lọc tên
+        //    if (!string.IsNullOrEmpty(ten))
+        //    {
+        //        query = query.Where(x => x.HoTen.Contains(ten) || x.TieuDe.Contains(ten));
+        //        d++;
+        //    }
+
+        //    // Áp dụng bộ lọc khu vực
+        //    if (!string.IsNullOrEmpty(khuVuc))
+        //    {
+        //        query = query.Where(x => x.KhuVuc.Contains(khuVuc));
+        //        d ++;
+        //    }
+
+        //    // Áp dụng bộ lọc đặc điểm nhận dạng
+        //    if (!string.IsNullOrEmpty(dacDiem))
+        //    {
+        //        query = query.Where(x => x.DaciemNhanDang.Contains(dacDiem));
+        //        d++;
+        //    }
+
+        //    if(d>0)
+        //    {
+        //        // Lưu lịch sử tìm kiếm
+        //        string nguoiDungId = null;
+
+        //        var diaChiIP = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+        //        if(User.Identity.IsAuthenticated)
+        //        {
+        //            var nguoiDung = await _userManager.GetUserAsync(User);
+        //            nguoiDungId = nguoiDung.Id;
+
+        //            if(nguoiDung.Active == false)
+        //            {
+
+        //                // Ghi log
+        //                _logger.LogWarning($"Tài khoản {nguoiDung.Email} đã bị vô hiệu hóa do vi phạm quy định.");
+        //                TempData["Warning"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
+        //                return Redirect("/Identity/Account/Login");
+        //            }
+
+        //            // Ghi lịch sử tìm kiếm
+        //            LichSuTimKiem lichSu = new LichSuTimKiem
+        //            {
+        //                IdNguoiDung = nguoiDungId,
+        //                TuKhoa = ten + khuVuc + dacDiem,
+        //                ThoiGianTimKiem = DateTime.UtcNow,
+        //                DiaChiIP = diaChiIP
+        //            };
+        //            db.LichSuTimKiems.Add(lichSu);
+        //            await db.SaveChangesAsync();
+
+        //            // Kiểm tra hành vi đáng ngờ
+        //            var soLanTimTrong1Phut = db.LichSuTimKiems
+        //                .Where(x => x.IdNguoiDung == nguoiDungId && x.ThoiGianTimKiem > DateTime.UtcNow.AddMinutes(-1))
+        //                .Count();
+
+        //            if (soLanTimTrong1Phut > 10)
+        //            {
+        //                var hanhVi = new HanhViDangNgo
+        //                {
+        //                    NguoiDungId = nguoiDungId,
+        //                    HanhDong = "Tìm kiếm quá nhiều",
+        //                    ThoiGian = DateTime.UtcNow,
+        //                    ChiTiet = $"Đã tìm kiếm {soLanTimTrong1Phut} lần trong vòng 1 phút, Nghi ngờ bạn đang có ý định xâm hại hệ thống"
+        //                };
+        //                db.HanhViDangNgos.Add(hanhVi);
+        //                await db.SaveChangesAsync();
+
+        //                // 👉 Tăng số lần vi phạm của người dùng
+        //                ApplicationUser nguoiDungViPham = await db.Users.FirstOrDefaultAsync(u => u.Id == nguoiDungId);
+        //                if (nguoiDungViPham != null)
+        //                {
+        //                    nguoiDungViPham.SoLanViPham++;
+        //                    await db.SaveChangesAsync();
+
+        //                    if (nguoiDungViPham.SoLanViPham >= 5)
+        //                    {
+        //                        nguoiDungViPham.Active = false;
+        //                        await db.SaveChangesAsync();
+
+        //                        // 👉 Gửi email thông báo
+        //                        await _emailService.SendEmailAsync(nguoiDungViPham.Email, "Tài khoản của bạn đã bị vô hiệu hóa", "Tài khoản của bạn đã bị vô hiệu hóa do vi phạm quy định của hệ thống. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.");
+
+        //                        // 👉 Ghi log
+        //                        _logger.LogWarning($"Tài khoản {nguoiDungViPham.Email} đã bị vô hiệu hóa do vi phạm quy định.");
+
+
+        //                        //return Redirect("/Identity/Account/Login");
+        //                        TempData["WarningMessage"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
+        //                        return RedirectToAction("Index", "LoiViPham", new { area = "" });
+
+        //                    }
+        //                    else
+        //                    {
+        //                        ViewData["Warning"] = "Bạn đang bị nghi ngờ phá hoại hệ thống. Cần Đăng Nhập Lại";
+        //                    }
+
+        //                }
+        //                // 👉 đăng nhập lại
+        //                //return Redirect("/Identity/Account/Login");
+
+
+        //            }
+        //        }
+
+        //    }
+
+        //    // Lưu các giá trị filter vào ViewBag
+        //    ViewBag.TenFilter = ten;
+        //    ViewBag.KhuVucFilter = khuVuc;
+        //    ViewBag.DacDiemFilter = dacDiem;
+        //    ViewBag.TinhThanhList = new SelectList(TinhThanhIEnumerable);
+
+        //    // Sắp xếp và phân trang
+        //    var pagedList = query.OrderByDescending(x => x.Id)
+        //                        .ToPagedList(page, pageSize);
+
+        //    return View(pagedList);
+        //}
+
+
         public async Task<IActionResult> Index(string ten, string khuVuc, string dacDiem, int page = 1)
         {
             int pageSize = 6; // Số bài viết mỗi trang
@@ -203,30 +339,39 @@ namespace WebTimNguoiThatLac.Controllers
             if (!string.IsNullOrEmpty(khuVuc))
             {
                 query = query.Where(x => x.KhuVuc.Contains(khuVuc));
-                d ++;
-            }
-
-            // Áp dụng bộ lọc đặc điểm nhận dạng
-            if (!string.IsNullOrEmpty(dacDiem))
-            {
-                query = query.Where(x => x.DaciemNhanDang.Contains(dacDiem));
                 d++;
             }
 
-            if(d>0)
+            // Áp dụng bộ lọc đặc điểm nhận dạng (nâng cấp)
+            if (!string.IsNullOrEmpty(dacDiem))
             {
+                // Tách các đặc điểm bằng dấu phẩy và loại bỏ khoảng trắng thừa
+                var dacDiemList = dacDiem.Split(new[] { ',', ';', ':', '-' }, StringSplitOptions.RemoveEmptyEntries)
+                                      .Select(x => x.Trim())
+                                      .Where(x => !string.IsNullOrWhiteSpace(x))
+                                      .ToList();
 
+                if (dacDiemList.Any())
+                {
+                    // Tìm kiếm theo OR - bài viết chứa bất kỳ đặc điểm nào trong danh sách
+                    query = query.Where(x => dacDiemList.Any(d => x.DaciemNhanDang.Contains(d)));
+                    d++;
+                }
+            }
+
+            if (d > 0)
+            {
                 // Lưu lịch sử tìm kiếm
                 string nguoiDungId = null;
 
                 var diaChiIP = HttpContext.Connection.RemoteIpAddress?.ToString();
 
-                if(User.Identity.IsAuthenticated)
+                if (User.Identity.IsAuthenticated)
                 {
                     var nguoiDung = await _userManager.GetUserAsync(User);
                     nguoiDungId = nguoiDung.Id;
 
-                    if(nguoiDung.Active == false)
+                    if (nguoiDung.Active == false)
                     {
 
                         // Ghi log
@@ -291,15 +436,14 @@ namespace WebTimNguoiThatLac.Controllers
                             {
                                 ViewData["Warning"] = "Bạn đang bị nghi ngờ phá hoại hệ thống. Cần Đăng Nhập Lại";
                             }
-                           
+
                         }
                         // 👉 đăng nhập lại
                         //return Redirect("/Identity/Account/Login");
 
-                        
+
                     }
                 }
-
             }
 
             // Lưu các giá trị filter vào ViewBag
@@ -614,14 +758,18 @@ namespace WebTimNguoiThatLac.Controllers
                 if (nguoiDung == null || nguoiDung.Active == false)
                 {
                     TempData["WarningMessage"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
-                    return Redirect("/Identity/Account/Login");
+                    return Redirect("/Identity/Account/login");
                 }
                 TimNguoi x = db.TimNguois
                                     .Include(u => u.ApplicationUser)
                                     .Include(u => u.AnhTimNguois)
                                     .Include(u => u.BinhLuans)
                                     .FirstOrDefault(i => i.Id ==  id);
-                if(x.IdNguoiDung == userid)
+                var roles = await _userManager.GetRolesAsync(nguoiDung);
+
+                bool check = (roles.Contains(SD.Role_Admin) || roles.Contains(SD.Role_Moderator));
+
+                if (x.IdNguoiDung == userid || check == true)
                 {
                     ViewBag.DanhSachTinhThanh = TinhThanhIEnumerable;
                     ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == id).ToList();
@@ -629,7 +777,8 @@ namespace WebTimNguoiThatLac.Controllers
                 }
                 else
                 {
-                    return RedirectToAction("Login", "Account");
+                    TempData["WarningMessage"] = "Cần phải đăng nhập đúng tài khoản để chỉnh sửa";
+                    return Redirect("/Identity/Account/login");
                 }
             }
             ViewBag.DanhSachTinhThanh = TinhThanhIEnumerable;
@@ -643,7 +792,8 @@ namespace WebTimNguoiThatLac.Controllers
         {
             if (!User.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Login", "Account");
+                TempData["WarningMessage"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
+                return Redirect("/Identity/Account/login");
             }
             var nguoiDung = await _userManager.GetUserAsync(User);
             var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -653,9 +803,14 @@ namespace WebTimNguoiThatLac.Controllers
                                 .Include(u => u.BinhLuans)
                                 .FirstOrDefault(i => i.Id == x.Id);
 
-            if (y == null || y.IdNguoiDung != userid || nguoiDung.Active == false)
+            var roles = await _userManager.GetRolesAsync(nguoiDung);
+
+            bool check = (roles.Contains(SD.Role_Admin) || roles.Contains(SD.Role_Moderator));
+
+            if (y == null || (y.IdNguoiDung != userid && check == false) || nguoiDung.Active == false )
             {
-                return RedirectToAction("Login", "Account");
+                TempData["WarningMessage"] = "Cần phải đăng nhập đúng tài khoản để chỉnh sửa";
+                return Redirect("/Identity/Account/login");
             }
 
             // Luôn thiết lập ViewBag trước khi trả về View
@@ -1074,7 +1229,12 @@ namespace WebTimNguoiThatLac.Controllers
                                     .Include(u => u.AnhTimNguois)
                                     .Include(u => u.BinhLuans)
                                     .FirstOrDefault(i => i.Id == id);
-                if (x.IdNguoiDung == userid)
+
+                var nguoiDung = await _userManager.GetUserAsync(User);
+                var roles = await _userManager.GetRolesAsync(nguoiDung);
+
+                bool check = (roles.Contains(SD.Role_Admin) || roles.Contains(SD.Role_Moderator));
+                if (x.IdNguoiDung == userid || check == true)
                 {
                     ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == id).ToList();
                     ViewBag.TimNguoi = x;
@@ -1082,13 +1242,13 @@ namespace WebTimNguoiThatLac.Controllers
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = "Bạn cần đăng nhập để thực hiện chức năng này.";
-                    return RedirectToAction("Login", "Account");
+                    TempData["WarningMessage"] = "Bạn cần đăng nhập để thực hiện chức năng này.";
+                    return Redirect("/Identity/Account/Login");
                 }
             }
 
-            TempData["ErrorMessage"] = "Bạn cần đăng nhập để thực hiện chức năng này.";
-            return RedirectToAction("Login", "Account");
+            TempData["WarningMessage"] = "Bạn cần đăng nhập để thực hiện chức năng này.";
+            return Redirect("/Identity/Account/Login");
         }
 
         [HttpPost]
@@ -1246,6 +1406,176 @@ namespace WebTimNguoiThatLac.Controllers
             {
 
                 return Json(new { success = false, message = "Đã xảy ra lỗi khi xóa bình luận" });
+            }
+        }
+
+
+        public async Task<IActionResult> TimKiemNangCao(List<string> dacDiemDaChon) // Tìm kiếm nhân cao
+        {
+            var viewModel = new TimKiemNangCaoViewModel();
+
+            // Loại bỏ các đặc điểm trùng lặp và rỗng
+            dacDiemDaChon = dacDiemDaChon?
+                .Where(d => !string.IsNullOrWhiteSpace(d))
+                .Distinct()
+                .ToList() ?? new List<string>();
+
+            // Lấy tất cả bài đăng kèm hình ảnh
+            var allPosts = await db.TimNguois
+                .Include(t => t.AnhTimNguois)
+                .Where(t => t.active)
+                .ToListAsync();
+
+            // Xử lý đặc điểm nhận dạng
+            var allDacDiem = new List<string>();
+            var dacDiemRelations = new Dictionary<string, HashSet<string>>();
+
+            foreach (var post in allPosts)
+            {
+                if (!string.IsNullOrEmpty(post.DaciemNhanDang))
+                {
+                    var dacDiems = post.DaciemNhanDang.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                        .Select(d => d.Trim())
+                        .Distinct()
+                        .ToList();
+
+                    allDacDiem.AddRange(dacDiems);
+
+                    // Xây dựng mối quan hệ giữa các đặc điểm
+                    foreach (var dacDiem in dacDiems)
+                    {
+                        if (!dacDiemRelations.ContainsKey(dacDiem))
+                        {
+                            dacDiemRelations[dacDiem] = new HashSet<string>();
+                        }
+
+                        foreach (var relatedDacDiem in dacDiems.Where(d => d != dacDiem))
+                        {
+                            dacDiemRelations[dacDiem].Add(relatedDacDiem);
+                        }
+                    }
+                }
+            }
+
+            // Nhóm và đếm số lần xuất hiện của mỗi đặc điểm
+            var groupedDacDiem = allDacDiem
+                .GroupBy(d => d)
+                .Select(g => new DacDiemNhanDangGroup
+                {
+                    DacDiem = g.Key,
+                    SoLuong = g.Count(),
+                    DaChon = dacDiemDaChon.Contains(g.Key)
+                })
+                .OrderByDescending(g => g.SoLuong)
+                .ToList();
+
+            // Thêm các đặc điểm liên quan
+            foreach (var item in groupedDacDiem)
+            {
+                if (dacDiemRelations.TryGetValue(item.DacDiem, out var related))
+                {
+                    item.DacDiemLienQuan = groupedDacDiem
+                        .Where(g => related.Contains(g.DacDiem))
+                        .OrderByDescending(g => g.SoLuong)
+                        .ToList();
+                }
+            }
+
+            // Lọc kết quả tìm kiếm
+            if (dacDiemDaChon.Any())
+            {
+                var filteredPosts = allPosts
+                    .Where(p => !string.IsNullOrEmpty(p.DaciemNhanDang))
+                    .Select(p => new
+                    {
+                        Post = p,
+                        DacDiems = p.DaciemNhanDang.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                            .Select(d => d.Trim())
+                            .Distinct()
+                            .ToList(),
+                        MatchCount = p.DaciemNhanDang.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                            .Select(d => d.Trim())
+                            .Count(d => dacDiemDaChon.Contains(d))
+                    })
+                    .Where(x => x.MatchCount > 0)
+                    .OrderByDescending(x => x.MatchCount)
+                    .ToList();
+
+                // Tính % khớp và tạo kết quả
+                viewModel.KetQuaTimKiem = filteredPosts.Select(x => new KetQuaTimKiemItem
+                {
+                    BaiDang = x.Post,
+                    PhanTramKhop = Math.Round((double)x.MatchCount / dacDiemDaChon.Count * 100, 1),
+                    AnhDaiDien = x.Post.AnhTimNguois.Take(1).ToList() // Lấy 1 ảnh đại diện
+                })
+                    .ToList();
+
+                // Lọc các đặc điểm có thể chọn (chỉ hiển thị các đặc điểm liên quan)
+                var relatedDacDiem = filteredPosts
+                    .SelectMany(x => x.DacDiems)
+                    .Distinct()
+                    .Where(d => !dacDiemDaChon.Contains(d))
+                    .ToList();
+
+                groupedDacDiem = groupedDacDiem
+                    .Where(g => dacDiemDaChon.Contains(g.DacDiem) || relatedDacDiem.Contains(g.DacDiem))
+                    .ToList();
+            }
+            else
+            {
+                // Nếu không có đặc điểm nào được chọn, hiển thị tất cả bài đăng
+                viewModel.KetQuaTimKiem = allPosts.Select(p => new KetQuaTimKiemItem
+                {
+                    BaiDang = p,
+                    PhanTramKhop = 0,
+                    AnhDaiDien = p.AnhTimNguois.Take(1).ToList()
+                })
+                    .OrderByDescending(x => x.BaiDang.NgayDang)
+                    .ToList();
+            }
+
+            viewModel.DacDiemDaChon = dacDiemDaChon;
+            viewModel.DacDiemCoTheChon = groupedDacDiem;
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> NguoiDungXoaBai(int id)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+
+                return Json(new { success = false, message = "Vui lòng đăng nhập để thực hiện xóa bài viết" });
+            }
+
+            try
+            {
+                var currentUser = await _userManager.GetUserAsync(User);
+                var baiViet = await db.TimNguois.FirstOrDefaultAsync(i => i.Id == id);
+
+                if (currentUser == null || currentUser.Active == false)
+                {
+                    return Json(new { success = false, message = "Tài khoản không hợp lệ" });
+                }
+
+                if (baiViet == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy bài viết" });
+                }
+
+                baiViet.NguoiDangBaiXoa = true;
+                baiViet.active = false;
+
+                await db.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Đã Xóa Bài Viết Tìm "+ baiViet.TieuDe + " Thành Công";
+                return Json(new { success = true, message = "Đã Xóa Bài Viết Tìm " + baiViet.TieuDe + " Thành Công"});
+            }
+            catch (Exception ex)
+            {
+
+                return Json(new { success = false, message = "Đã xảy ra lỗi khi xóa bài viết" });
             }
         }
     }

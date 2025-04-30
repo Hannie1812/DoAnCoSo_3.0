@@ -173,7 +173,7 @@
                                     <span class="input-group-text bg-white border-end-0">
                                         <i class="fas fa-map-marker-alt text-primary"></i>
                                     </span>
-                                    <select id="TinhThanh" name="tinhThanh" class="form-select border-start-0 ps-0"
+                                    <select id="TinhThanh" name="tinhThanhId" class="form-select border-start-0 ps-0"
                                             onchange="loadQuanHuyen(this.value)">
                                         <option value="">Tất cả tỉnh</option>
                                         @{
@@ -196,7 +196,7 @@
                                     <span class="input-group-text bg-white border-end-0">
                                         <i class="fas fa-map-pin text-primary"></i>
                                     </span>
-                                    <select id="QuanHuyen" name="quanHuyen" class="form-select border-start-0 ps-0">
+                                    <select id="QuanHuyen" name="quanHuyenId" class="form-select border-start-0 ps-0">
                                         <option value="">Tất cả quận</option>
                                     </select>
                                 </div>
@@ -266,9 +266,26 @@
             }
             else
             {
-                <div class="col-12 text-center py-5">
+                // <div class="col-12 text-center py-5">
+                //     <div class="alert alert-info">
+                //         <i class="fa fa-info-circle"></i> Không tìm thấy kết quả phù hợp
+                //     </div>
+                // </div>
+
+                <div class="col-12">
                     <div class="alert alert-info">
-                        <i class="fa fa-info-circle"></i> Không tìm thấy kết quả phù hợp
+                        <i class="fas fa-info-circle me-2"></i>
+                        @if (!string.IsNullOrEmpty(ViewBag.TenFilter) ||
+                       ViewBag.SelectedTinhThanh != null ||
+                       ViewBag.SelectedQuanHuyen != null ||
+                       !string.IsNullOrEmpty(ViewBag.DacDiemFilter))
+                        {
+                            <text>Không tìm thấy kết quả phù hợp với tiêu chí tìm kiếm.</text>
+                        }
+                        else
+                        {
+                            <text>Hiện chưa có bài đăng nào.</text>
+                        }
                     </div>
                 </div>
             }
@@ -281,14 +298,16 @@
                     {
                         page,
                         ten = ViewBag.TenFilter,
-                        khuVuc = ViewBag.KhuVucFilter,
+                        tinhThanhId = ViewBag.SelectedTinhThanh,
+                        quanHuyenId = ViewBag.SelectedQuanHuyen,
                         dacDiem = ViewBag.DacDiemFilter
                     }), new PagedListRenderOptions
-               {
-                   LiElementClasses = new[] { "page-item" },
-                   PageClasses = new[] { "page-link" },
-                   UlElementClasses = new[] { "pagination", "justify-content-center" }
-               })
+           {
+               LiElementClasses = new[] { "page-item" },
+               PageClasses = new[] { "page-link" },
+               UlElementClasses = new[] { "pagination", "justify-content-center" }
+           })
+
             </div>
         </div>
     </div>
@@ -327,6 +346,24 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <script>
+               function loadQuanHuyen(tinhThanhId) {
+            const quanHuyenDropdown = document.getElementById("QuanHuyen");
+            quanHuyenDropdown.innerHTML = '<option value="">-- Chọn Quận Huyện --</option>';
+
+            if (!tinhThanhId) return;
+
+            fetch(`/TimNguoi/GetQuanHuyenByTinhThanh?tinhThanhId=${tinhThanhId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(huyen => {
+                        const option = document.createElement("option");
+                        option.value = huyen.id;
+                        option.textContent = huyen.tenQuanHuyen;
+                        quanHuyenDropdown.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Error loading districts:", error));
+        }
         // Hiển thị thông báo từ TempData
         document.addEventListener('DOMContentLoaded', function() {
             @if (ViewData["Warning"] != null)

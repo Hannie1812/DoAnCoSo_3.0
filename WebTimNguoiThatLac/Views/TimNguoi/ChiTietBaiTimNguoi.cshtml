@@ -659,7 +659,7 @@
                             </div>
                         </div>
 
-                        <div class="info-item">
+                        @* <div class="info-item">
                             <div class="info-icon">
                                 <i class="fas fa-map-marker-alt"></i>
                             </div>
@@ -667,7 +667,28 @@
                                 <div class="info-label">Khu vực</div>
                                 <div class="info-value">@Model.KhuVuc</div>
                             </div>
+                        </div> *@
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Địa chỉ</div>
+                                <div class="info-value">
+                                    @if (!string.IsNullOrEmpty(ViewBag.TinhThanh) || !string.IsNullOrEmpty(ViewBag.QuanHuyen) || !string.IsNullOrEmpty(Model.KhuVuc))
+                                    {
+                                        <span>
+                                            @ViewBag.KhuVuc, @ViewBag.QuanHuyen, @ViewBag.TinhThanh
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Chưa xác định</span>
+                                    }
+                                </div>
+                            </div>
                         </div>
+
 
                         <div class="info-item">
                             <div class="info-icon">

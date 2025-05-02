@@ -173,17 +173,13 @@
                                     <span class="input-group-text bg-white border-end-0">
                                         <i class="fas fa-map-marker-alt text-primary"></i>
                                     </span>
-                                    <select id="TinhThanh" name="tinhThanhId" class="form-select border-start-0 ps-0"
-                                            onchange="loadQuanHuyen(this.value)">
+                                    <select id="TinhThanh" name="tinhThanhId" class="form-select border-start-0 ps-0" onchange="loadQuanHuyen(this.value)">
                                         <option value="">Tất cả tỉnh</option>
-                                        @{
-                                            var tinhThanhList = ViewBag.TinhThanhList as IEnumerable<TinhThanh> ?? Enumerable.Empty<TinhThanh>();
-                                            foreach (var tinh in tinhThanhList)
-                                            {
-                                                <option value="@tinh.Id" selected="@(tinh.Id.ToString() == ViewBag.SelectedTinhThanh?.ToString())">
-                                                    @tinh.TenTinhThanh
-                                                </option>
-                                            }
+                                        @foreach (var tinh in ViewBag.TinhThanhList as List<TinhThanh>)
+                                        {
+                                            <option value="@tinh.Id" selected="@(ViewBag.SelectedTinhThanh == tinh.Id ? "selected" : null)">
+                                                @tinh.TenTinhThanh
+                                            </option>
                                         }
                                     </select>
                                 </div>
@@ -198,9 +194,20 @@
                                     </span>
                                     <select id="QuanHuyen" name="quanHuyenId" class="form-select border-start-0 ps-0">
                                         <option value="">Tất cả quận</option>
+                                        @if (ViewBag.SelectedTinhThanh != null)
+                                        {
+                                            var quanHuyenList = ViewBag.QuanHuyenList as List<QuanHuyen>;
+                                            foreach (var huyen in quanHuyenList.Where(q => q.IdTinhThanh == ViewBag.SelectedTinhThanh))
+                                            {
+                                                <option value="@huyen.Id" selected="@(ViewBag.SelectedQuanHuyen == huyen.Id ? "selected" : null)">
+                                                    @huyen.TenQuanHuyen
+                                                </option>
+                                            }
+                                        }
                                     </select>
                                 </div>
                             </div>
+
 
                             <!-- Đặc điểm -->
                             <div class="col-lg-3 col-md-6">
@@ -346,9 +353,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <script>
-               function loadQuanHuyen(tinhThanhId) {
+                      function loadQuanHuyen(tinhThanhId) {
             const quanHuyenDropdown = document.getElementById("QuanHuyen");
-            quanHuyenDropdown.innerHTML = '<option value="">-- Chọn Quận Huyện --</option>';
+            quanHuyenDropdown.innerHTML = '<option value="">Tất cả quận</option>';
 
             if (!tinhThanhId) return;
 
@@ -364,6 +371,7 @@
                 })
                 .catch(error => console.error("Error loading districts:", error));
         }
+
         // Hiển thị thông báo từ TempData
         document.addEventListener('DOMContentLoaded', function() {
             @if (ViewData["Warning"] != null)

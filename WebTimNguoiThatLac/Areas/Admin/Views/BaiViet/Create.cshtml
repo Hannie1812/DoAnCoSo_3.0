@@ -1,6 +1,5 @@
 ﻿@model WebTimNguoiThatLac.Models.TimNguoi
 
-
 @{
     ViewData["Title"] = "Thêm Bài Viết";
 }
@@ -12,7 +11,7 @@
             <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="/Admin" class="nav-link ">Trang Chủ</a>
+            <a href="/Admin" class="nav-link">Trang Chủ</a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
             <a href="/Admin/BaiViet" class="nav-link active">Bài Viết</a>
@@ -20,123 +19,275 @@
     </ul>
 }
 
-<div class="card container-fluid ">
-    <div class="card-header d-flex ">
-        <h2 class="card-title">Chi Tiết @ViewData["Title"]</h2>
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-primary">@ViewData["Title"]</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/Admin">Trang Chủ</a></li>
+                    <li class="breadcrumb-item"><a href="/Admin/BaiViet">Bài Viết</a></li>
+                    <li class="breadcrumb-item active">Thêm Mới</li>
+                </ol>
+            </nav>
+        </div>
     </div>
-    <div class="card-body">
-        <form asp-controller="BaiViet" asp-action="Create" method="post" enctype="multipart/form-data">
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <div class="row">
-                <label asp-for="IdNguoiDung">Nhập Email Tài Khoản</label>
-                <input name="EmailNguoiDung" class="form-control" type="email" placeholder="Nhập Email Tài Khoản ......" />
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <label asp-for="HoTen">Tên Người Cần Tìm</label>
-                    <input asp-for="HoTen" class="form-control" type="text" placeholder="Nhập tên Người Cần Tìm ......" />
+
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">Thông tin người cần tìm</h5>
+        </div>
+        <div class="card-body">
+            <form asp-controller="BaiViet" asp-action="Create" method="post" enctype="multipart/form-data">
+                <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+                <!-- Account Information -->
+                <div class="form-group mb-4">
+                    <label asp-for="IdNguoiDung" class="font-weight-bold">Email tài khoản</label>
+                    <input name="EmailNguoiDung" class="form-control form-control-lg" type="email" placeholder="Nhập email tài khoản..." />
+                    <small class="form-text text-muted">Email của người đăng bài</small>
                 </div>
-                <div class="col-md-6">
-                    <label asp-for="KhuVuc">Khu Vực Lần Cuối Nhìn Thấy </label>
-                    <select asp-for="KhuVuc" class="form-control">
-                        <option value="" selected>-- Chọn Khu Vực --</option>
-                        @foreach (string i in ViewBag.DanhSachTinhThanh)
-                        {
-                            <option value="@i" >@i</option>
-                        }
-                    </select>
+
+                <!-- Basic Information -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="HoTen" class="font-weight-bold">Tên người cần tìm</label>
+                            <input asp-for="HoTen" class="form-control" type="text" placeholder="Nhập tên đầy đủ..." />
+                            <span asp-validation-for="HoTen" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="GioiTinh" class="font-weight-bold">Giới tính</label>
+                            <select asp-for="GioiTinh" class="form-control">
+                                <option value="1">Nam</option>
+                                <option value="2">Nữ</option>
+                                <option value="0">Khác</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="NgaySinh" class="font-weight-bold">Ngày sinh (nếu biết)</label>
+                            <input asp-for="NgaySinh" type="date" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="KhuVuc" class="font-weight-bold">Khu vực lần cuối nhìn thấy</label>
+                            <select asp-for="KhuVuc" class="form-control">
+                                <option value="" selected>-- Chọn khu vực --</option>
+                                @foreach (string i in ViewBag.DanhSachTinhThanh)
+                                {
+                                    <option value="@i">@i</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="NgayMatTich" class="font-weight-bold">Ngày mất tích</label>
+                            <input asp-for="NgayMatTich" type="date" class="form-control" />
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="MoiQuanHe" class="font-weight-bold">Mối quan hệ với người mất tích</label>
+                            <input asp-for="MoiQuanHe" class="form-control" placeholder="Ví dụ: Cha, Mẹ, Anh trai..." />
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <label asp-for="GioiTinh">Giới Tính</label>
-                    <select asp-for="GioiTinh" class="form-control">
-                        <option value="1">Nam</option>
-                        <option value="2">Nữ</option>
-                        <option value="0">Khác</option>
-                    </select>
-                    <span asp-validation-for="GioiTinh" class="text-danger"></span>
+
+                <!-- Post Details -->
+                <div class="form-group mb-4">
+                    <label asp-for="TieuDe" class="font-weight-bold">Tiêu đề bài viết</label>
+                    <input asp-for="TieuDe" type="text" class="form-control" placeholder="Viết tiêu đề ngắn gọn, rõ ràng..." />
+                    <small class="form-text text-muted">Tiêu đề sẽ giúp bài viết của bạn dễ được tìm thấy hơn</small>
                 </div>
-                <div class="col-md-6">
-                    <label asp-for="TrangThai" class="control-label"><strong>Trạng Thái:</strong></label>
+
+                <div class="form-group mb-4">
+                    <label asp-for="TrangThai" class="font-weight-bold">Trạng thái</label>
                     <select asp-for="TrangThai" class="form-control">
-                        <option value="Đã Tìm Thấy">Đã Tìm Thấy</option>
                         <option value="Đang Tìm Kiếm">Đang Tìm Kiếm</option>
                         <option value="Cần hỗ trợ từ cộng đồng">Cần hỗ trợ từ cộng đồng</option>
+                        <option value="Đã Tìm Thấy">Đã Tìm Thấy</option>
                     </select>
-                    <span asp-validation-for="TrangThai" class="text-danger"></span>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <label asp-for="TieuDe">Tiêu Đề</label>
-                    <input asp-for="TieuDe" type="text" class="form-control" placeholder="NhậpTiêu Đề Người Cần Tìm ......" />
-                    <span asp-validation-for="TieuDe" class="text-danger"></span>
+
+                <!-- Images -->
+                <div class="form-group mb-4">
+                    <label class="font-weight-bold">Hình ảnh</label>
+                    <div class="custom-file">
+                        <input name="DanhSachHinhAnh" id="AnhVuaTai" multiple type="file" class="custom-file-input" />
+                        <label class="custom-file-label" for="AnhVuaTai">Chọn hình ảnh...</label>
+                    </div>
+                    <small class="form-text text-muted">Tải lên hình ảnh rõ mặt để dễ nhận dạng (tối đa 5 ảnh)</small>
+                    <div class="ChuaAnh mt-3 d-flex flex-wrap"></div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <label >Danh Sách Hình Ảnh</label>
-                    <input name="DanhSachHinhAnh" id="AnhVuaTai" multiple type="file" class="form-control" placeholder="NhậpTiêu Đề Người Cần Tìm ......" />
-                    <div class="ChuaAnh"></div>
-                    <span asp-validation-for="TieuDe" class="text-danger"></span>
+
+                <!-- Identification -->
+                @* <div class="form-group mb-4"> *@
+                @*     <label asp-for="DaciemNhanDang" class="font-weight-bold">Đặc điểm nhận dạng</label> *@
+                @*     <textarea asp-for="DaciemNhanDang" class="form-control" rows="3" placeholder="Mô tả chi tiết đặc điểm nhận dạng như chiều cao, cân nặng, quần áo, đặc điểm riêng..."></textarea> *@
+                @* </div> *@
+                <div class="form-group mb-4">
+                    <label asp-for="DaciemNhanDang" class="font-weight-bold">Đặc điểm nhận dạng</label>
+
+                    <!-- Phần nhập đặc điểm mới -->
+                    <div class="input-group mb-3">
+                        <input type="text" id="newFeatureInput" class="form-control" placeholder="Nhập đặc điểm (ví dụ: Xẹo má trái, sẹo môi...)">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-primary" type="button" id="addFeatureBtn">Thêm</button>
+                        </div>
+                    </div>
+
+                    <!-- Hiển thị các đặc điểm đã thêm -->
+                    <div id="featureTags" class="d-flex flex-wrap mb-3"></div>
+
+                    <!-- Textarea ẩn chứa dữ liệu cuối cùng -->
+                    <textarea asp-for="DaciemNhanDang" id="featuresData" class="form-control" rows="3" style="display:none;"></textarea>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <label asp-for="DaciemNhanDang">Đặc Điểm Nhận Dạng</label>
-                    <textarea asp-for="DaciemNhanDang"  class="form-control" placeholder="NhậpTiêu Đề Người Cần Tìm ......" >
-                    </textarea>
-                    <span asp-validation-for="TieuDe" class="text-danger"></span>
+
+
+                <!-- Full Description -->
+                <div class="form-group mb-4">
+                    <label asp-for="MoTa" class="font-weight-bold">Mô tả chi tiết</label>
+                    <textarea asp-for="MoTa" id="compose-textarea" class="form-control" rows="5" placeholder="Mô tả chi tiết hoàn cảnh mất tích, thông tin cuối cùng, địa điểm nghi ngờ..."></textarea>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <label asp-for="MoTa">Mô Tả</label>
-                    <textarea asp-for="MoTa" id="compose-textarea" class="form-control" placeholder="NhậpTiêu Đề Người Cần Tìm ......">
-                    </textarea>
-                    <span asp-validation-for="MoTa" class="text-danger"></span>
+
+                <!-- Buttons -->
+                <div class="form-group text-right mt-5">
+                    <button type="submit" class="btn btn-primary btn-lg px-4">
+                        <i class="fas fa-save mr-2"></i>Lưu bài viết
+                    </button>
+                    <a asp-action="Index" asp-controller="BaiViet" asp-area="Admin" class="btn btn-outline-secondary btn-lg px-4 ml-2">
+                        <i class="fas fa-times mr-2"></i>Hủy bỏ
+                    </a>
                 </div>
-            </div> 
-            <div class="form-group text-right">
-                <button class="btn btn-primary">Thêm</button>
-                <a asp-action="ThongTinCaNhan" asp-controller="NguoiDung" class="btn btn-secondary">Hủy</a>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-    <div class="card-footer"></div>
 </div>
-       
+
 @section Scripts {
     <script src="~/clients/plugins/summernote/summernote-bs4.min.js"></script>
     <script>
-        $(function () {
-          //Add text editor
-          $('#compose-textarea').summernote()
-        })
-    </script>
-    <script>
-        $("#AnhVuaTai").change(function (e) {
-            let files = e.target.files; // Lấy danh sách file
-            $(".ChuaAnh").empty(); // Xóa hình ảnh cũ
+        $(document).ready(function() {
+            // Thêm đặc điểm mới
+            $('#addFeatureBtn').click(function() {
+                addFeature();
+            });
 
-            if (files.length > 0) {
-                for (let i = 0; i < files.length; i++) {
-                    let file = files[i];
-
-                    // Kiểm tra định dạng file (chỉ cho phép hình ảnh)
-                    if (file.type.startsWith("image/")) {
-                        let path = URL.createObjectURL(file); // Tạo URL tạm thời
-                        let imgElement = `<img src="${path}" class="m-3" style="width:79px; height:auto;" alt="Hình ảnh ${i + 1}"/>`;
-                        $(".ChuaAnh").append(imgElement); // Thêm hình ảnh vào container
-                    } else {
-                        alert("Vui lòng chọn file hình ảnh (định dạng JPEG, PNG, v.v.).");
-                        return; // Dừng nếu có file không phải hình ảnh
-                    }
+            // Cho phép nhấn Enter để thêm
+            $('#newFeatureInput').keypress(function(e) {
+                if (e.which === 13) {
+                    addFeature();
+                    return false;
                 }
-            } else {
-                alert("Không có file nào được chọn.");
+            });
+
+            function addFeature() {
+                const featureText = $('#newFeatureInput').val().trim();
+                if (featureText) {
+                    // Tạo tag mới
+                    const tagId = 'feature_' + Date.now();
+                    const tagHtml = `
+                        <div class="feature-tag badge badge-pill badge-primary mr-2 mb-2" data-id="${tagId}">
+                            ${featureText}
+                            <button type="button" class="close ml-2" onclick="removeTag('${tagId}')">
+                                <span>&times;</span>
+                            </button>
+                        </div>`;
+
+                    $('#featureTags').append(tagHtml);
+                    $('#newFeatureInput').val('');
+
+                    // Cập nhật textarea ẩn
+                    updateFeaturesData();
+                }
+            }
+
+            window.removeTag = function(tagId) {
+                $(`.feature-tag[data-id="${tagId}"]`).remove();
+                updateFeaturesData();
+            };
+
+            function updateFeaturesData() {
+                const features = [];
+                $('.feature-tag').each(function() {
+                    features.push($(this).clone().children().remove().end().text().trim());
+                });
+                $('#featuresData').val(features.join(', '));
             }
         });
     </script>
-}   
+
+    <style>
+        .feature-tag {
+            font-size: 0.9rem;
+            padding: 0.5em 0.8em;
+            display: inline-flex;
+            align-items: center;
+        }
+
+            .feature-tag .close {
+                font-size: 1rem;
+                line-height: 1;
+            }
+
+        #newFeatureInput {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        #addFeatureBtn {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+    </style>
+    <script>
+        $(function () {
+            // Initialize summernote
+            $('#compose-textarea').summernote({
+               
+            });
+
+            // Update file input label
+            $('.custom-file-input').on('change', function() {
+                let fileName = $(this).val().split('\\').pop();
+                $(this).next('.custom-file-label').addClass("selected").html(fileName || 'Chọn hình ảnh...');
+            });
+
+            // Image preview
+            $("#AnhVuaTai").change(function (e) {
+                let files = e.target.files;
+                $(".ChuaAnh").empty();
+
+                if (files.length > 0) {
+                    for (let i = 0; i < files.length; i++) {
+                        let file = files[i];
+
+                        if (file.type.startsWith("image/")) {
+                            let path = URL.createObjectURL(file);
+                            let imgElement = `
+                                <div class="position-relative mr-2 mb-2">
+                                    <img src="${path}" class="img-thumbnail" style="width:120px; height:120px; object-fit:cover;" alt="Hình ảnh ${i + 1}"/>
+                                    <button type="button" class="btn btn-sm btn-danger position-absolute" style="top:5px; right:5px;" onclick="removeImage(this)">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>`;
+                            $(".ChuaAnh").append(imgElement);
+                        } else {
+                            alert("Vui lòng chọn file hình ảnh (JPEG, PNG, etc.).");
+                            return;
+                        }
+                    }
+                }
+            });
+
+            // Function to remove image preview
+            window.removeImage = function(button) {
+                $(button).parent().remove();
+                // You might also want to remove the file from the input here
+            };
+        });
+    </script>
+}

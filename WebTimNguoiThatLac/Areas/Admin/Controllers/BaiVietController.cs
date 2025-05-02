@@ -260,7 +260,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         {
             if (string.IsNullOrEmpty(ImageURL))
             {
-                throw new ArgumentException("Đường dẫn ảnh không hợp lệ!");
+                return; // Không làm gì nếu không có ảnh
             }
 
             // Lấy đường dẫn tuyệt đối của ảnh trong thư mục wwwroot/uploads/
@@ -412,9 +412,12 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 {
                     return Json(new { success = false, message = "Ko Có Id Cần chỉnh sửa" });
                 }
-
+                if(y.active == false)
+                {
+                    y.NguoiDangBaiXoa = false;
+                }
                 y.active = !y.active;
-
+                
                 await db.SaveChangesAsync();
                 return Json(new { success = true, message = "Thành Công" });
             }

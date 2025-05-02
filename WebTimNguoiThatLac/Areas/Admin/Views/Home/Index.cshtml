@@ -6,7 +6,6 @@
     var messageCount = ViewBag.DSTinNhanMoi?.Count ?? 0;
 }
 
-
 @section naviHeader {
     <!-- Left navbar links -->
     <ul class="navbar-nav">
@@ -43,7 +42,7 @@
                 </a>
                 <div class="dropdown-divider"></div>
                 <a href="/Admin/HanhViDangNgo" class="dropdown-item">
-					Hành Vi Đáng Ngờ
+                    Hành Vi Đáng Ngờ
                 </a>
             </div>
         </li>
@@ -151,7 +150,7 @@
                 <div class="dropdown-divider"></div>
                 <a asp-area="Admin" asp-action="Index" asp-controller="NguoiDungLienHe" 
                     class="dropdown-item">
-					<i class="fas fa-envelope mr-2"></i> @ViewBag.DemLienHeNguoiDung Người Dùng Liên Hệ
+                    <i class="fas fa-envelope mr-2"></i> @ViewBag.DemLienHeNguoiDung Người Dùng Liên Hệ
                     <span class="float-right text-muted text-sm">3 mins</span>
                 </a>
                 <div class="dropdown-divider"></div>
@@ -181,8 +180,6 @@
                 <i class="fas fa-th-large"></i>
             </a>
         </li>
-
-
     </ul>
 }
 @model IEnumerable<WebTimNguoiThatLac.Models.TimNguoi>
@@ -194,18 +191,26 @@
     var trangThais = ViewBag.TrangThaiStats as List<dynamic> ?? new List<dynamic>();
     var gioiTinhData = ViewBag.GioiTinhStats as dynamic;
 
-
-
     // Lấy dữ liệu từ ViewBag
     var ngayLabels = ViewBag.NgayLabels as List<string> ?? new List<string>();
     var baiVietTheoNgay = ViewBag.BaiVietTheoNgay as List<int> ?? new List<int>();
     var allKhuVuc = ViewBag.AllKhuVuc as List<string> ?? new List<string>();
     var allTrangThai = ViewBag.AllTrangThai as List<string> ?? new List<string>();
 
-    string label = ViewBag.Tuan != null ? $"{ViewBag.Tuan} tuần gần nhất" : "7 ngày gần nhất";
-    if (ViewBag.Year != null && ViewBag.Month != null && ViewBag.Day != null)
+    string label = "Tất cả";
+    if (ViewBag.Tuan != null)
     {
-        label = $"{ViewBag.Day:D2}/{ViewBag.Month:D2}/{ViewBag.Year}";
+        switch(ViewBag.Tuan)
+        {
+            case 1: label = "7 ngày trước"; break;
+            case 2: label = "14 ngày trước"; break;
+            case 3: label = "21 ngày trước"; break;
+            case 4: label = "28 ngày trước"; break;
+        }
+    }
+    else if (ViewBag.Year != null && ViewBag.Month != null && ViewBag.Day != null)
+    {
+        label = $"Ngày {ViewBag.Day:D2}/{ViewBag.Month:D2}/{ViewBag.Year}";
     }
     else if (ViewBag.Year != null && ViewBag.Month != null)
     {
@@ -218,8 +223,6 @@
 }
 
 <div class="container-fluid">
-
-
     <!-- Card lọc dữ liệu -->
     <div class="card card-primary card-outline">
         <div class="card-header">
@@ -261,6 +264,18 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
+                            <label><i class="fas fa-calendar-day"></i> Ngày</label>
+                            <select name="day" class="form-control select2">
+                                <option value="">Tất cả ngày</option>
+                                @for (int d = 1; d <= 31; d++)
+                                {
+                                    <option value="@d" selected="@(ViewBag.Day == d)">Ngày @d</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
                             <label><i class="fas fa-map-marker-alt"></i> Khu vực</label>
                             <select name="khuVuc" class="form-control select2">
                                 <option value="">Tất cả khu vực</option>
@@ -271,6 +286,8 @@
                             </select>
                         </div>
                     </div>
+                </div>
+                <div class="row">
                     <div class="col-md-3">
                         <div class="form-group">
                             <label><i class="fas fa-info-circle"></i> Trạng thái</label>
@@ -283,17 +300,15 @@
                             </select>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-3">
                         <div class="form-group">
                             <label><i class="fas fa-calendar-week"></i> Khoảng thời gian</label>
                             <select name="tuan" class="form-control select2">
                                 <option value="">-- Chọn --</option>
-                                <option value="1" selected="@(ViewBag.Tuan == 1)">1 tuần (7 ngày)</option>
-                                <option value="2" selected="@(ViewBag.Tuan == 2)">2 tuần (14 ngày)</option>
-                                <option value="3" selected="@(ViewBag.Tuan == 3)">3 tuần (21 ngày)</option>
-                                <option value="4" selected="@(ViewBag.Tuan == 4)">4 tuần (28 ngày)</option>
+                                <option value="1" selected="@(ViewBag.Tuan == 1)">7 ngày trước</option>
+                                <option value="2" selected="@(ViewBag.Tuan == 2)">14 ngày trước</option>
+                                <option value="3" selected="@(ViewBag.Tuan == 3)">21 ngày trước</option>
+                                <option value="4" selected="@(ViewBag.Tuan == 4)">28 ngày trước</option>
                             </select>
                         </div>
                     </div>
@@ -331,6 +346,9 @@
                 <div class="card-body">
                     <canvas id="khuVucChart" style="min-height: 250px; height: 250px; max-height: 500px;"></canvas>
                 </div>
+                <div class="card-footer">
+                    <p class="text-muted">Thống kê số lượng bài viết theo từng khu vực</p>
+                </div>
             </div>
         </div>
 
@@ -352,6 +370,9 @@
                 </div>
                 <div class="card-body">
                     <canvas id="trangThaiChart" style="min-height: 250px; height: 250px; max-height: 500px;"></canvas>
+                </div>
+                <div class="card-footer">
+                    <p class="text-muted">Phân bổ trạng thái của các bài viết</p>
                 </div>
             </div>
         </div>
@@ -377,6 +398,9 @@
                 <div class="card-body">
                     <canvas id="gioiTinhChart" style="min-height: 250px; height: 250px; max-height: 500px;"></canvas>
                 </div>
+                <div class="card-footer">
+                    <p class="text-muted">Tỷ lệ giới tính trong các bài viết</p>
+                </div>
             </div>
         </div>
 
@@ -398,6 +422,9 @@
                 </div>
                 <div class="card-body">
                     <canvas id="thoiGianChart" style="min-height: 250px; height: 250px; max-height: 500px;"></canvas>
+                </div>
+                <div class="card-footer">
+                    <p class="text-muted">Diễn biến số lượng bài viết theo thời gian</p>
                 </div>
             </div>
         </div>
@@ -433,54 +460,68 @@
 
             // Xử lý sự kiện lọc
             $('#applyFilter').click(loadDataWithFilter);
+            
+            // Xử lý thay đổi select năm, tháng, ngày
+            $('select[name="year"], select[name="month"], select[name="day"]').change(function() {
+                if ($(this).val()) {
+                    $('select[name="tuan"]').val('').trigger('change');
+                }
+            });
+            
+            // Xử lý thay đổi select tuần
+            $('select[name="tuan"]').change(function() {
+                if ($(this).val()) {
+                    $('select[name="year"], select[name="month"], select[name="day"]').val('').trigger('change');
+                }
+            });
         });
 
         function initCharts() {
-            // Biểu đồ khu vực
-            khuVucChart = new Chart($('#khuVucChart'), {
-                type: 'bar',
-                data: {
-                    labels: @Html.Raw(Json.Serialize(khuVucs.Select(x => x.KhuVuc))),
-                    datasets: [{
-                        label: 'Số bài viết',
-                        data: @Html.Raw(Json.Serialize(khuVucs.Select(x => x.Count))),
-                        backgroundColor: generateRandomColors(@khuVucs.Count, 0.7),
-                        borderColor: generateRandomColors(@khuVucs.Count, 1),
-                        borderWidth: 1,
-                        borderRadius: 5
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `${context.dataset.label}: ${context.raw}`;
-                                }
-                            }
+    // Biểu đồ khu vực
+    khuVucChart = new Chart($('#khuVucChart'), {
+        type: 'bar',
+        data: {
+            labels: @Html.Raw(Json.Serialize(khuVucs.Select(x => x.KhuVuc))) || [],
+            datasets: [{
+                label: 'Số bài viết',
+                data: @Html.Raw(Json.Serialize(khuVucs.Select(x => x.Count))) || [],
+                backgroundColor: generateRandomColors(@khuVucs.Count, 0.7),
+                borderColor: generateRandomColors(@khuVucs.Count, 1),
+                borderWidth: 1,
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ${context.raw}`;
                         }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { drawBorder: false },
-                            ticks: { precision: 0 }
-                        },
-                        x: { grid: { display: false } }
                     }
                 }
-            });
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { drawBorder: false },
+                    ticks: { precision: 0 }
+                },
+                x: { grid: { display: false } }
+            }
+        }
+    });
 
             // Biểu đồ trạng thái
             trangThaiChart = new Chart($('#trangThaiChart'), {
                 type: 'pie',
                 data: {
-                    labels: @Html.Raw(Json.Serialize(trangThais.Select(x => x.TrangThai))),
+                    labels: @Html.Raw(Json.Serialize(trangThais.Select(x => x.TrangThai))) || [],
                     datasets: [{
-                        data: @Html.Raw(Json.Serialize(trangThais.Select(x => x.Count))),
+                        data: @Html.Raw(Json.Serialize(trangThais.Select(x => x.Count))) || [],
                         backgroundColor: generateRandomColors(@trangThais.Count, 0.8),
                         borderWidth: 1,
                         hoverOffset: 20
@@ -515,9 +556,9 @@
             gioiTinhChart = new Chart($('#gioiTinhChart'), {
                 type: 'doughnut',
                 data: {
-                    labels: @Html.Raw(Json.Serialize(gioiTinhData.Labels)),
+                    labels: @Html.Raw(Json.Serialize(gioiTinhData?.Labels)) || ['Nam', 'Nữ', 'Khác'],
                     datasets: [{
-                        data: @Html.Raw(Json.Serialize(gioiTinhData.Counts)),
+                        data: @Html.Raw(Json.Serialize(gioiTinhData?.Counts)) || [0, 0, 0],
                         backgroundColor: [
                             'rgba(54, 162, 235, 0.7)',
                             'rgba(255, 99, 132, 0.7)',
@@ -558,10 +599,10 @@
             thoiGianChart = new Chart($('#thoiGianChart'), {
                 type: 'line',
                 data: {
-                    labels: @Html.Raw(Json.Serialize(ngayLabels)),
+                    labels: @Html.Raw(Json.Serialize(ngayLabels)) || [],
                     datasets: [{
                         label: 'Số bài viết',
-                        data: @Html.Raw(Json.Serialize(baiVietTheoNgay)),
+                        data: @Html.Raw(Json.Serialize(baiVietTheoNgay)) || [],
                         borderColor: 'rgba(75, 192, 192, 1)',
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
                         borderWidth: 3,
@@ -614,37 +655,46 @@
                 url: '@Url.Action("Index")',
                 type: 'GET',
                 data: formData,
+                beforeSend: function() {
+                    // Hiển thị loading nếu cần
+                    $('.card-body').append('<div class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>');
+                },
                 success: function(data) {
                     updateCharts(data);
                     updateChartTitles(data.label);
                 },
                 error: function(xhr) {
                     console.error('Lỗi khi tải dữ liệu:', xhr.responseText);
+                    alert('Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại!');
+                },
+                complete: function() {
+                    // Ẩn loading
+                    $('.overlay').remove();
                 }
             });
         }
 
         function updateCharts(data) {
             // Cập nhật biểu đồ khu vực
-            khuVucChart.data.labels = data.khuVucs;
-            khuVucChart.data.datasets[0].data = data.soLuongsKhuVuc;
-            khuVucChart.data.datasets[0].backgroundColor = generateRandomColors(data.khuVucs.length, 0.7);
-            khuVucChart.data.datasets[0].borderColor = generateRandomColors(data.khuVucs.length, 1);
+            khuVucChart.data.labels = data.khuVucs || [];
+            khuVucChart.data.datasets[0].data = data.soLuongsKhuVuc || [];
+            khuVucChart.data.datasets[0].backgroundColor = generateRandomColors(data.khuVucs?.length || 1, 0.7);
+            khuVucChart.data.datasets[0].borderColor = generateRandomColors(data.khuVucs?.length || 1, 1);
             khuVucChart.update();
 
             // Cập nhật biểu đồ trạng thái
-            trangThaiChart.data.labels = data.trangThais;
-            trangThaiChart.data.datasets[0].data = data.soLuongsTrangThai;
-            trangThaiChart.data.datasets[0].backgroundColor = generateRandomColors(data.trangThais.length, 0.8);
+            trangThaiChart.data.labels = data.trangThais || [];
+            trangThaiChart.data.datasets[0].data = data.soLuongsTrangThai || [];
+            trangThaiChart.data.datasets[0].backgroundColor = generateRandomColors(data.trangThais?.length || 1, 0.8);
             trangThaiChart.update();
 
             // Cập nhật biểu đồ giới tính
-            gioiTinhChart.data.datasets[0].data = data.soLuongsGioiTinh;
+            gioiTinhChart.data.datasets[0].data = data.soLuongsGioiTinh || [0, 0, 0];
             gioiTinhChart.update();
 
             // Cập nhật biểu đồ thời gian
-            thoiGianChart.data.labels = data.ngayLabels;
-            thoiGianChart.data.datasets[0].data = data.baiVietTheoNgay;
+            thoiGianChart.data.labels = data.ngayLabels || [];
+            thoiGianChart.data.datasets[0].data = data.baiVietTheoNgay || [];
             thoiGianChart.update();
         }
 

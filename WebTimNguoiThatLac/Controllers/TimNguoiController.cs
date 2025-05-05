@@ -639,6 +639,7 @@ namespace WebTimNguoiThatLac.Controllers
             return RedirectToAction("ChiTietBaiTimNguoi", new { id = IdBaiViet }); // Quay lại trang chi tiết
         }
 
+        [HttpGet]
         public async Task<IActionResult> CapNhatBaiViet(int id)
         {
             if(User.Identity.IsAuthenticated)
@@ -666,7 +667,9 @@ namespace WebTimNguoiThatLac.Controllers
                     return RedirectToAction("Login", "Account");
                 }
             }
+
             ViewBag.DanhSachTinhThanh = await db.TinhThanhs.ToListAsync();
+            ViewBag.DanhSachQuanHuyen = await db.QuanHuyens.ToListAsync();
             ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == id).ToList();
             return View();
         }
@@ -685,6 +688,7 @@ namespace WebTimNguoiThatLac.Controllers
                                 .Include(u => u.ApplicationUser)
                                 .Include(u => u.AnhTimNguois)
                                 .Include(u => u.BinhLuans)
+                                .Include(u => u.QuanHuyen.TinhThanh)
                                 .FirstOrDefault(i => i.Id == x.Id);
 
             if (y == null || y.IdNguoiDung != userid || nguoiDung.Active == false)
@@ -694,6 +698,7 @@ namespace WebTimNguoiThatLac.Controllers
 
             // Luôn thiết lập ViewBag trước khi trả về View
             ViewBag.DanhSachTinhThanh = await db.TinhThanhs.ToListAsync();
+            ViewBag.DanhSachQuanHuyen = await db.QuanHuyens.ToListAsync();
             ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == x.Id).ToList();
 
             if (!ModelState.IsValid)
@@ -708,6 +713,8 @@ namespace WebTimNguoiThatLac.Controllers
             y.GioiTinh = x.GioiTinh;
             y.TrangThai = x.TrangThai;
             y.KhuVuc = x.KhuVuc;
+            y.IdTinhThanh = x.IdTinhThanh;
+            y.IdQuanHuyen = x.IdQuanHuyen;
             y.NgaySinh = x.NgaySinh;
             y.NgayMatTich = x.NgayMatTich;
             y.HoTen = x.HoTen;

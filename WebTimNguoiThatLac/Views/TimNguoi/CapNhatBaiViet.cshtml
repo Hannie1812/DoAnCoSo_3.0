@@ -194,9 +194,10 @@
                             </button>
 
                             <!-- Nút Hủy bỏ -->
-                            <a asp-action="Index" asp-controller="TimNguoi" class="btn btn-outline-secondary px-4">
+                            <a asp-action="Index" asp-controller="TimNguoi" class="btn btn-outline-secondary px-4" onclick="return confirm('Bạn có chắc chắn muốn hủy bỏ các thay đổi?');">
                                 <i class="fas fa-times mr-2"></i>Hủy bỏ
                             </a>
+
                         </div>
 
                     </form>
@@ -205,6 +206,10 @@
         </div>
     </div>
 </div>
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
 
 @section Styles {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />

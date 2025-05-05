@@ -259,7 +259,9 @@
                                 <h3><a asp-controller="TimNguoi" asp-action="ChiTietBaiTimNguoi" asp-route-id="@i.Id">@i.TieuDe</a></h3>
                                 <p>@i.HoTen</p>
                                 <p>@i.DaciemNhanDang</p>
-                                <span class="donation-time mb-3 d-block">@i.KhuVuc</span>
+                                <span class="donation-time mb-2 d-block">
+                                    @i.KhuVuc, @i.QuanHuyen?.TenQuanHuyen, @i.TinhThanh?.TenTinhThanh
+                                </span>
                                 <span class="donation-time mb-3 d-block">@i.NgayDang.ToString()</span>
                                 <div class="progress custom-progress-success">
                                     <div class="progress-bar bg-primary" role="progressbar" style="width: 28%" aria-valuenow="28" aria-valuemin="0" aria-valuemax="100"></div>

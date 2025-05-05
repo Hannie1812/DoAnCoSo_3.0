@@ -189,55 +189,44 @@ namespace WebTimNguoiThatLac.Controllers
                 .Include(u => u.AnhTimNguois)
                 .Where(i => i.active == true);
 
-            int d = 0;
+            bool coBoLoc = false;
 
-            // Áp dụng bộ lọc
             if (!string.IsNullOrEmpty(ten))
             {
                 query = query.Where(x => x.HoTen.Contains(ten) || x.TieuDe.Contains(ten));
-                d++;
-            }    
+                coBoLoc = true;
+            }
 
             if (tinhThanhId.HasValue)
             {
                 query = query.Where(x => x.IdTinhThanh == tinhThanhId.Value);
-                d++;
+                coBoLoc = true;
             }
 
             if (quanHuyenId.HasValue)
             {
                 query = query.Where(x => x.IdQuanHuyen == quanHuyenId.Value);
-                d++;
-            }    
+                coBoLoc = true;
+            }
 
             if (!string.IsNullOrEmpty(dacDiem))
             {
                 query = query.Where(x => x.DaciemNhanDang.Contains(dacDiem));
-                d++;
+                coBoLoc = true;
             }
 
-            if (d > 0)
+            if (coBoLoc && User.Identity.IsAuthenticated)
             {
-
-                // Lưu lịch sử tìm kiếm
-                string nguoiDungId = null;
-
-                var diaChiIP = HttpContext.Connection.RemoteIpAddress?.ToString();
-
-                if (User.Identity.IsAuthenticated)
+                var nguoiDung = await _userManager.GetUserAsync(User);
+                if (nguoiDung != null)
                 {
-                    var nguoiDung = await _userManager.GetUserAsync(User);
-                    nguoiDungId = nguoiDung.Id;
-
-                    if (nguoiDung.Active == false)
+                    if (!nguoiDung.Active)
                     {
-
-                        // Ghi log
-                        _logger.LogWarning($"Tài khoản {nguoiDung.Email} đã bị vô hiệu hóa do vi phạm quy định.");
-                        TempData["Warning"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
+                        _logger.LogWarning($"Tài khoản {nguoiDung.Email} đã bị vô hiệu hóa do vi phạm.");
+                        TempData["Warning"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.";
                         return Redirect("/Identity/Account/Login");
                     }
-                    // Trước khi tạo lịch sử tìm kiếm
+
                     string tenTinhThanh = "";
                     string tenQuanHuyen = "";
 
@@ -257,76 +246,48 @@ namespace WebTimNguoiThatLac.Controllers
 
                     string khuVuc = $"{tenQuanHuyen} {tenTinhThanh}".Trim();
 
-                    // Ghi lịch sử tìm kiếm
-                    LichSuTimKiem lichSu = new LichSuTimKiem
+                    db.LichSuTimKiems.Add(new LichSuTimKiem
                     {
-                        IdNguoiDung = nguoiDungId,
+                        IdNguoiDung = nguoiDung.Id,
                         TuKhoa = $"{ten} {khuVuc} {dacDiem}".Trim(),
                         ThoiGianTimKiem = DateTime.UtcNow,
-                        DiaChiIP = diaChiIP
-                    };
+                        DiaChiIP = HttpContext.Connection.RemoteIpAddress?.ToString()
+                    });
 
-                    db.LichSuTimKiems.Add(lichSu);
                     await db.SaveChangesAsync();
 
-                    // Kiểm tra hành vi đáng ngờ
-                    var soLanTimTrong1Phut = db.LichSuTimKiems
-                        .Where(x => x.IdNguoiDung == nguoiDungId && x.ThoiGianTimKiem > DateTime.UtcNow.AddMinutes(-1))
-                        .Count();
+                    int soLanTim = await db.LichSuTimKiems
+                        .CountAsync(x => x.IdNguoiDung == nguoiDung.Id && x.ThoiGianTimKiem > DateTime.UtcNow.AddMinutes(-1));
 
-                    if (soLanTimTrong1Phut > 10)
+                    if (soLanTim > 10)
                     {
-                        var hanhVi = new HanhViDangNgo
+                        db.HanhViDangNgos.Add(new HanhViDangNgo
                         {
-                            NguoiDungId = nguoiDungId,
+                            NguoiDungId = nguoiDung.Id,
                             HanhDong = "Tìm kiếm quá nhiều",
                             ThoiGian = DateTime.UtcNow,
-                            ChiTiet = $"Đã tìm kiếm {soLanTimTrong1Phut} lần trong vòng 1 phút, Nghi ngờ bạn đang có ý định xâm hại hệ thống"
-                        };
-                        db.HanhViDangNgos.Add(hanhVi);
-                        await db.SaveChangesAsync();
+                            ChiTiet = $"Đã tìm kiếm {soLanTim} lần trong 1 phút, nghi ngờ phá hoại hệ thống"
+                        });
 
-                        // 👉 Tăng số lần vi phạm của người dùng
-                        ApplicationUser nguoiDungViPham = await db.Users.FirstOrDefaultAsync(u => u.Id == nguoiDungId);
-                        if (nguoiDungViPham != null)
+                        nguoiDung.SoLanViPham++;
+
+                        if (nguoiDung.SoLanViPham >= 5)
                         {
-                            nguoiDungViPham.SoLanViPham++;
+                            nguoiDung.Active = false;
+                            await _emailService.SendEmailAsync(nguoiDung.Email, "Tài khoản bị vô hiệu hóa", "Bạn đã vi phạm quy định. Vui lòng liên hệ quản trị viên.");
+                            _logger.LogWarning($"Tài khoản {nguoiDung.Email} đã bị vô hiệu hóa.");
+                            TempData["WarningMessage"] = "Tài khoản của bạn đã bị vô hiệu hóa.";
                             await db.SaveChangesAsync();
-
-                            if (nguoiDungViPham.SoLanViPham >= 5)
-                            {
-                                nguoiDungViPham.Active = false;
-                                await db.SaveChangesAsync();
-
-                                // 👉 Gửi email thông báo
-                                await _emailService.SendEmailAsync(nguoiDungViPham.Email, "Tài khoản của bạn đã bị vô hiệu hóa", "Tài khoản của bạn đã bị vô hiệu hóa do vi phạm quy định của hệ thống. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.");
-
-                                // 👉 Ghi log
-                                _logger.LogWarning($"Tài khoản {nguoiDungViPham.Email} đã bị vô hiệu hóa do vi phạm quy định.");
-
-
-                                //return Redirect("/Identity/Account/Login");
-                                TempData["WarningMessage"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
-                                return RedirectToAction("Index", "LoiViPham", new { area = "" });
-
-                            }
-                            else
-                            {
-                                ViewData["Warning"] = "Bạn đang bị nghi ngờ phá hoại hệ thống. Cần Đăng Nhập Lại";
-                            }
-
+                            return RedirectToAction("Index", "LoiViPham");
                         }
-                        // 👉 đăng nhập lại
-                        //return Redirect("/Identity/Account/Login");
 
-
+                        await db.SaveChangesAsync();
+                        ViewData["Warning"] = "Bạn đang bị nghi ngờ phá hoại hệ thống. Vui lòng đăng nhập lại.";
                     }
                 }
-
             }
 
-
-            // Fetch data for dropdowns
+            // Danh sách dropdown
             ViewBag.TinhThanhList = await db.TinhThanhs.ToListAsync();
             ViewBag.QuanHuyenList = await db.QuanHuyens.ToListAsync();
 
@@ -335,11 +296,10 @@ namespace WebTimNguoiThatLac.Controllers
             ViewBag.TenFilter = ten;
             ViewBag.DacDiemFilter = dacDiem;
 
-            // Sử dụng ToPagedList thay vì ToPagedListAsync
-            var pagedList = query.OrderByDescending(x => x.Id)
-                                .ToPagedList(page, pageSize);
+            var pagedList = query.OrderByDescending(x => x.Id).ToPagedList(page, pageSize);
             return View(pagedList);
         }
+
         public async Task<IActionResult> ThemNguoiCanTim()
         {
             // Kiểm tra xem email đã được xác thực chưa
@@ -551,6 +511,7 @@ namespace WebTimNguoiThatLac.Controllers
                 }
 
                 // Pass TinhThanh, QuanHuyen to the view
+                ViewBag.Khuvuc = y.KhuVuc;
                 ViewBag.TinhThanh = y.QuanHuyen?.TinhThanh?.TenTinhThanh;
                 ViewBag.QuanHuyen = y.QuanHuyen?.TenQuanHuyen;
                 List<BinhLuan> DSBinhLuan = db.BinhLuans
@@ -655,6 +616,8 @@ namespace WebTimNguoiThatLac.Controllers
                                     .Include(u => u.ApplicationUser)
                                     .Include(u => u.AnhTimNguois)
                                     .Include(u => u.BinhLuans)
+                                    .Include(u => u.QuanHuyen)
+                                    .ThenInclude(q => q.TinhThanh)
                                     .FirstOrDefault(i => i.Id ==  id);
                 if(x.IdNguoiDung == userid)
                 {
@@ -667,10 +630,10 @@ namespace WebTimNguoiThatLac.Controllers
                     return RedirectToAction("Login", "Account");
                 }
             }
-
             ViewBag.DanhSachTinhThanh = await db.TinhThanhs.ToListAsync();
             ViewBag.DanhSachQuanHuyen = await db.QuanHuyens.ToListAsync();
             ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == id).ToList();
+
             return View();
         }
 
@@ -688,7 +651,8 @@ namespace WebTimNguoiThatLac.Controllers
                                 .Include(u => u.ApplicationUser)
                                 .Include(u => u.AnhTimNguois)
                                 .Include(u => u.BinhLuans)
-                                .Include(u => u.QuanHuyen.TinhThanh)
+                                .Include(u => u.QuanHuyen)
+                                .ThenInclude(q => q.TinhThanh)
                                 .FirstOrDefault(i => i.Id == x.Id);
 
             if (y == null || y.IdNguoiDung != userid || nguoiDung.Active == false)
@@ -771,7 +735,7 @@ namespace WebTimNguoiThatLac.Controllers
 
             // Lưu các thay đổi khác (luôn thực hiện)
             await db.SaveChangesAsync();
-
+            TempData["SuccessMessage"] = "Cập nhật bài viết thành công!";
             return RedirectToAction("ChiTietBaiTimNguoi", new { id = x.Id });
         }
 

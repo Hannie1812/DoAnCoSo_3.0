@@ -839,10 +839,9 @@
         <!-- Identification Section -->
         <div class="description-section mt-4">
             <h5 class="section-title">
-                <div class="info-icon me-3">
-                    <i class="fas fa-id-card"></i>
-                </div> Đặc Điểm Nhận Dạng
+                <i class="fas fa-id-card me-2"></i> Đặc Điểm Nhận Dạng
             </h5>
+
             <div class="info-item">
                 <div class="info-content">
                     <div class="description-container">
@@ -854,15 +853,16 @@
 
         <!-- Detailed Description -->
         <div class="description-section">
-            <h5 class="section-title">
-                <div class="info-icon me-3">
-                    <i class="fas fa-info-circle text-primary"></i>
-                </div> Thông Tin Chi Tiết
-            </h5>
-            <div class="info-content">
-                <div class="description-container">
-                    <div class="info-value">
-                        @Html.Raw(Model.MoTa)
+            <h5 class="section-title text-primary">
+    <i class="fas fa-info-circle me-2"></i> Thông Tin Chi Tiết
+</h5>
+
+            <div class="info-item">
+                <div class="info-content">
+                    <div class="description-container">
+                        <div class="info-value">
+                            @Html.Raw(Model.MoTa)
+                        </div>
                     </div>
                 </div>
             </div>

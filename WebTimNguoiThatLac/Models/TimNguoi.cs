@@ -38,7 +38,9 @@ namespace WebTimNguoiThatLac.Models
 
         public DateTime NgayDang { get; set; } = DateTime.Now;
         public string? MoiQuanHe { get; set; } // Mối quan hệ với người mất tích
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime? NgayMatTich { get; set; }  // Ngày mất tích
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime? NgaySinh { get; set; }  // Ngày sinh
         public  ICollection<AnhTimNguoi>? AnhTimNguois { get; set; }
 

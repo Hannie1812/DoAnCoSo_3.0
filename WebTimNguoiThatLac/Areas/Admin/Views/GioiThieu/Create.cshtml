@@ -2,8 +2,9 @@
 @using Microsoft.AspNetCore.Mvc.Rendering
 @{
     ViewData["Title"] = "Thêm Giới Thiệu";
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 }
+
 @section naviHeader {
     <!-- Left navbar links -->
     <ul class="navbar-nav">
@@ -11,77 +12,233 @@
             <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="/Admin" class="nav-link ">Trang Chủ</a>
+            <a href="/Admin" class="nav-link">Trang Chủ</a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="/Admin/GioiThieu" class="nav-link "> Giới Thiệu</a>
+            <a href="/Admin/GioiThieu" class="nav-link">Giới Thiệu</a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="/Admin/GioiThieu/Create" class="nav-link active"> Thêm Giới Thiệu</a>
+            <a href="/Admin/GioiThieu/Create" class="nav-link active">Thêm Giới Thiệu</a>
         </li>
     </ul>
 }
 
+<!-- Notification Area -->
+<div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
 
+<style>
+    /* Consistent styling with the management page */
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        border: none;
+        overflow: hidden;
+    }
 
-<form asp-area="Admin" asp-controller="GioiThieu" asp-action="Create" method="post" enctype="multipart/form-data">
-    <div class="card container-fluid ">
-        <div class="card-header d-flex ">
-            <h2 class="card-title">Chi Tiết @ViewData["Title"]</h2>
-        </div>
-        <div class="card-body">
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <div class=" mb-3">
-                <label asp-for="TieuDe">Tiêu Đề Giới Thiệu</label>
-                <input asp-for="TieuDe" type="text" class="form-control" placeholder="Nhập Tiêu Đề Giới Thiệu">
-                <span asp-validation-for="TieuDe"></span>
-            </div>
-            <div class=" mb-3">
-                <label asp-for="NoiDung">Nội Dung</label>
-                <textarea asp-for="NoiDung" id="compose-textarea" class="form-control"></textarea>                
-                <span asp-validation-for="NoiDung"></span>
-            </div>
-            <div class=" mb-3">
-                <label>Chọn Hình Ảnh </label>
-                <input name="HinhAnhCapNhat" id="AnhVuaTai" type="file" placeholder="Nhập Hình Ảnh" class="form-control" />
-                <div class="HienThiAnhGTMoi"></div>
-            </div>
-            <div class=" mb-3">
-                <input asp-for="Active" type="checkbox">
-                <span>Hoạt động</span>
+    .card-header {
+        background: rgb(0, 123, 255);
+        color: white;
+        padding: 1.5rem;
+    }
 
+    .card-title {
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .img-preview {
+        max-width: 200px;
+        max-height: 200px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 5px;
+        margin-top: 10px;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 10px 15px;
+    }
+
+    .btn-action {
+        padding: 0.5rem 1.25rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+
+    /* Notification styles matching the management page */
+    .notification {
+        padding: 15px 20px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        color: white;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+        .notification i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .notification.success {
+            background-color: #28a745;
+        }
+
+        .notification.error {
+            background-color: #dc3545;
+        }
+
+        .notification.warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .notification.info {
+            background-color: #17a2b8;
+        }
+</style>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex  align-items-center">
+                    <div>
+                        <h3 class="card-title"><i class="fas fa-plus-circle me-2"></i>@ViewData["Title"]</h3>
+                    </div>
+                    <div class="ms-auto">
+                        <a href="/Admin/GioiThieu" class="btn btn-light">
+                            <i class="fas fa-arrow-left me-2"></i>Quay lại
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <form asp-area="Admin" asp-controller="GioiThieu" asp-action="Create" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+                        <div class="form-group row mb-4">
+                            <label asp-for="TieuDe" class="col-sm-2 col-form-label">Tiêu Đề</label>
+                            <div class="col-sm-10">
+                                <input asp-for="TieuDe" type="text" class="form-control" placeholder="Nhập tiêu đề giới thiệu">
+                                <span asp-validation-for="TieuDe" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group row mb-4">
+                            <label asp-for="NoiDung" class="col-sm-2 col-form-label">Nội Dung</label>
+                            <div class="col-sm-10">
+                                <textarea asp-for="NoiDung" id="compose-textarea" class="form-control"></textarea>
+                                <span asp-validation-for="NoiDung" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group row mb-4">
+                            <label class="col-sm-2 col-form-label">Hình Ảnh</label>
+                            <div class="col-sm-10">
+                                <input name="HinhAnhCapNhat" id="AnhVuaTai" type="file" class="form-control">
+                                <div class="HienThiAnhGTMoi mt-2"></div>
+                                <small class="text-muted">Chọn hình ảnh đại diện cho nội dung giới thiệu</small>
+                            </div>
+                        </div>
+
+                        <div class="form-group row mb-4">
+                            <div class="col-sm-2"></div>
+                            <div class="col-sm-10">
+                                <div class="form-check form-switch">
+                                    <input asp-for="Active" class="form-check-input" type="checkbox" checked>
+                                    <label class="form-check-label" asp-for="Active">Hoạt động</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row mb-4">
+                            <div class="col-sm-2"></div>
+                            <div class="col-sm-10">
+                                <button type="submit" class="btn btn-success btn-action me-2">
+                                    <i class="fas fa-save me-2"></i>Lưu lại
+                                </button>
+                                <a href="/Admin/GioiThieu" class="btn btn-secondary btn-action">
+                                    <i class="fas fa-times me-2"></i>Hủy bỏ
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class=" mb-3">
-                <a class="btn btn-primary" href="/Admin/GioiThieu">Thoát</a>
-                <button class="btn btn-success">Thêm</button>
-            </div>
-        </div>
-        <div class="card-footer">
         </div>
     </div>
-</form>
-
+</div>
 
 @section Scripts {
     <!-- Summernote -->
     <script src="~/clients/plugins/summernote/summernote-bs4.min.js"></script>
     <script>
         $(function () {
-          //Add text editor
-          $('#compose-textarea').summernote()
-        })
-    </script>
-    <script>
-        $("#AnhVuaTai").change(function(e){//input #AnhVuaTai
-            let a = e.target.files[0]; // lấy thằng file đầu tiên
-            if(a != null)
-            {
+            // Initialize Summernote editor with same settings as management page
+            $('#compose-textarea').summernote({
+               
+            });
 
-                let path = URL.createObjectURL(a) // lấy ra địa chỉ
-                let s = `<img src="${path}" style="width:199px"/>`;
-                $(".HienThiAnhGTMoi").empty();
-                $(".HienThiAnhGTMoi").append(s);
-            }
+            // Image preview functionality
+            $("#AnhVuaTai").change(function(e) {
+                const file = e.target.files[0];
+                if(file != null) {
+                    const path = URL.createObjectURL(file);
+                    const preview = `<img src="${path}" class="img-preview"/>`;
+                    $(".HienThiAnhGTMoi").empty().append(preview);
+                }
+            });
+
+            // Show notifications from TempData
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>showNotification('success', '@Html.Raw(TempData["SuccessMessage"])');</text>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>showNotification('error', '@Html.Raw(TempData["ErrorMessage"])');</text>
+        }
+        @if (TempData["WarningMessage"] != null)
+        {
+            <text>showNotification('warning', '@Html.Raw(TempData["WarningMessage"])');</text>
+        }
+        @if (TempData["InfoMessage"] != null)
+        {
+            <text>showNotification('info', '@Html.Raw(TempData["InfoMessage"])');</text>
+        }
         });
+
+        // Notification functions matching the management page
+        function showNotification(type, message) {
+            const notificationArea = document.getElementById('notification-area');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas ${getIconForType(type)} me-2"></i>
+                ${message}
+            `;
+
+            notificationArea.appendChild(notification);
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        function getIconForType(type) {
+            switch(type) {
+                case 'success': return 'fa-check-circle';
+                case 'error': return 'fa-times-circle';
+                case 'warning': return 'fa-exclamation-triangle';
+                case 'info': return 'fa-info-circle';
+                default: return 'fa-info-circle';
+            }
+        }
     </script>
 }

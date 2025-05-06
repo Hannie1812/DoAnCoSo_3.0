@@ -176,7 +176,7 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
                 user.FullName = Input.FullName;
                 user.CCCD = Input.CCCD;
                 user.Address = Input.Address;
-                user.HinhAnh = "/uploads/avatars/default-avatar.svg";
+                user.HinhAnh = "/uploads/avatars/default-avatar.png";
 
                 if (!String.IsNullOrEmpty(Input.Role) && Input.Role == SD.Role_Admin )
                 {

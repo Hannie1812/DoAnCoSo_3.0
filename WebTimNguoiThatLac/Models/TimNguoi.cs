@@ -25,7 +25,7 @@ namespace WebTimNguoiThatLac.Models
         public string DaciemNhanDang { get; set; } 
         public int? GioiTinh { get; set; }
         public bool active { get; set; } = false;
-        public string? TrangThai { get; set; } = "Đang Tìm Kiếm";
+        public string? TrangThai { get; set; } = "Đang Tìm Kiếm";// Cần hỗ trợ từ cộng đồng , Đã tìm thấy
         public string? KhuVuc { get; set; }
 
         public int? IdTinhThanh { get; set; }
@@ -42,6 +42,7 @@ namespace WebTimNguoiThatLac.Models
         public DateTime? NgayMatTich { get; set; }  // Ngày mất tích
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime? NgaySinh { get; set; }  // Ngày sinh
+        public bool NguoiDangBaiXoa { get; set; } = false; // Người đăng bài Đã Xóa bài viết
         public  ICollection<AnhTimNguoi>? AnhTimNguois { get; set; }
 
         public string? IdNguoiDung { get; set; }

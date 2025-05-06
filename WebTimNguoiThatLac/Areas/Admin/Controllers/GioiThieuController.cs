@@ -97,7 +97,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         {
             if (string.IsNullOrEmpty(ImageURL))
             {
-                throw new ArgumentException("Đường dẫn ảnh không hợp lệ!");
+                return;
             }
 
             // Lấy đường dẫn tuyệt đối của ảnh trong thư mục wwwroot/uploads/
@@ -130,8 +130,11 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 db.GioiThieus.Add(t);
 
                 await db.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Thêm thành công Giới Thiệu!";
                 return RedirectToAction("Index");
             }
+            TempData["ErrorMessage"] = "Vui lòng nhập đủ thông tin!";
             return View(t);
         }
 
@@ -157,8 +160,11 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 }
                 db.GioiThieus.Update(t);
                 await db.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Cập Nhật thành công Giới Thiệu!";
                 return RedirectToAction("Index");
             }
+            TempData["ErrorMessage"] = "Vui lòng nhập đủ thông tin!";
             return View(t);
         }
 

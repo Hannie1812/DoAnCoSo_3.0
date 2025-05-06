@@ -73,17 +73,54 @@
                             <div class="col-md-6">
                                 <h4 class="mb-3 text-primary"><i class="fas fa-info-circle mr-2"></i>Thông tin bổ sung</h4>
 
+                                @* <div class="form-group"> *@
+                                @*     <label asp-for="DaciemNhanDang" class="font-weight-bold">Đặc điểm nhận dạng</label> *@
+                                @*     <textarea asp-for="DaciemNhanDang" class="form-control" rows="3" placeholder="Mô tả đặc điểm nhận dạng" required></textarea> *@
+                                @*     <span asp-validation-for="DaciemNhanDang" class="text-danger small"></span> *@
+                                @* </div> *@
+
+                                @* dặc đeir nhận dạng *@
                                 <div class="form-group">
                                     <label asp-for="DaciemNhanDang" class="font-weight-bold">Đặc điểm nhận dạng</label>
-                                    <textarea asp-for="DaciemNhanDang" class="form-control" rows="3" placeholder="Mô tả đặc điểm nhận dạng" required></textarea>
-                                    <span asp-validation-for="DaciemNhanDang" class="text-danger small"></span>
-                                </div>
 
+                                    <!-- Phần nhập đặc điểm mới -->
+                                    <div class="input-group mb-3">
+                                        <input type="text" id="newFeatureInput" class="form-control" placeholder="Nhập đặc điểm (ví dụ: Xẹo má trái, sẹo môi...)">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-primary" type="button" id="addFeatureBtn">Thêm</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Hiển thị các đặc điểm đã thêm -->
+                                    <div id="featureTags" class="d-flex flex-wrap mb-3">
+                                        @if (!string.IsNullOrEmpty(Model.DaciemNhanDang))
+                                        {
+                                            var features = Model.DaciemNhanDang.Split(',');
+                                            foreach (var feature in features)
+                                            {
+                                                var trimmedFeature = feature.Trim();
+                                                if (!string.IsNullOrEmpty(trimmedFeature))
+                                                {
+                                                    <div class="feature-tag badge badge-pill badge-primary mr-2 mb-2" data-id="feature_@Guid.NewGuid()">
+                                                        @trimmedFeature
+                                                        <button type="button" class="close ml-2" onclick="removeTag(this)">
+                                                            <span>&times;</span>
+                                                        </button>
+                                                    </div>
+                                                }
+                                            }
+                                        }
+                                    </div>
+
+                                    <!-- Textarea ẩn chứa dữ liệu cuối cùng -->
+                                    <textarea asp-for="DaciemNhanDang" id="featuresData" class="form-control" style="display:none;"></textarea>
+                                </div>
+                                @* end dặc đeir nhận dạng *@
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
                                         <label asp-for="TrangThai" class="font-weight-bold">Trạng thái</label>
                                         <select asp-for="TrangThai" class="form-control" required>
-                                            <option value="Đã Tìm Thấy">Đã Tìm Thấy</option>
+                                            @* <option value="Đã Tìm Thấy">Đã Tìm Thấy</option> *@
                                             <option value="Đang Tìm Kiếm">Đang Tìm Kiếm</option>
                                             <option value="Cần hỗ trợ từ cộng đồng">Cần hỗ trợ từ cộng đồng</option>
                                         </select>
@@ -192,9 +229,7 @@
                             <button type="submit" class="btn btn-primary px-4">
                                 <i class="fas fa-save mr-2"></i>Cập nhật
                             </button>
-
-                            <!-- Nút Hủy bỏ -->
-                            <a asp-action="Index" asp-controller="TimNguoi" class="btn btn-outline-secondary px-4" onclick="return confirm('Bạn có chắc chắn muốn hủy bỏ các thay đổi?');">
+                            <a asp-action="BaiVietCuaToi" asp-controller="NguoiDung" class="btn btn-outline-secondary px-4">
                                 <i class="fas fa-times mr-2"></i>Hủy bỏ
                             </a>
 
@@ -244,6 +279,31 @@
             content: "Duyệt";
         }
     </style>
+
+    @* so sánh với dữ liệu  *@
+    <style>
+        .feature-tag {
+            font-size: 0.9rem;
+            padding: 0.5em 0.8em;
+            display: inline-flex;
+            align-items: center;
+        }
+
+            .feature-tag .close {
+                font-size: 1rem;
+                line-height: 1;
+            }
+
+        #newFeatureInput {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        #addFeatureBtn {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+    </style>
 }
 
 @section Scripts {
@@ -257,6 +317,61 @@
     <!-- Bootstrap File Input -->
     <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js"></script>
 
+    @* so sánh với cơ sửo dl *@
+    <script>
+        $(document).ready(function() {
+            // Khởi tạo các đặc điểm từ model nếu có
+            updateFeaturesData();
+
+            // Thêm đặc điểm mới
+            $('#addFeatureBtn').click(function() {
+                addFeature();
+            });
+
+            // Cho phép nhấn Enter để thêm
+            $('#newFeatureInput').keypress(function(e) {
+                if (e.which === 13) {
+                    addFeature();
+                    return false;
+                }
+            });
+
+            function addFeature() {
+                const featureText = $('#newFeatureInput').val().trim();
+                if (featureText) {
+                    // Tạo tag mới
+                    const tagId = 'feature_' + Date.now();
+                    const tagHtml = `
+                        <div class="feature-tag badge badge-pill badge-primary mr-2 mb-2" data-id="${tagId}">
+                            ${featureText}
+                            <button type="button" class="close ml-2" onclick="removeTag(this)">
+                                <span>&times;</span>
+                            </button>
+                        </div>`;
+
+                    $('#featureTags').append(tagHtml);
+                    $('#newFeatureInput').val('');
+
+                    // Cập nhật textarea ẩn
+                    updateFeaturesData();
+                }
+            }
+
+            window.removeTag = function(button) {
+                $(button).parent().remove();
+                updateFeaturesData();
+            };
+
+            function updateFeaturesData() {
+                const features = [];
+                $('.feature-tag').each(function() {
+                    features.push($(this).clone().children().remove().end().text().trim());
+                });
+                $('#featuresData').val(features.join(', '));
+            }
+        });
+    </script>
+    @* end so sánh với cơ sửo dl *@
     <script>
         window.loadQuanHuyen = function(tinhThanhId) {
             const quanHuyenSelect = document.getElementById('QuanHuyen');

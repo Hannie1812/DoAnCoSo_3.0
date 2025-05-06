@@ -142,7 +142,8 @@ namespace WebTimNguoiThatLac.Controllers
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = "Vui lòng nhập đầy đủ thông tin.";
+                    ModelState.AddModelError("", "Hãy Nhập Đủ Thông Tin");
+                    TempData["ErrorMessage"] = "Vui Lòng Nhập Đủ Thông Tin";
                 }
             }
             catch (Exception ex)

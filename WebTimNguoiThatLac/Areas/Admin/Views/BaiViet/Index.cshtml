@@ -814,7 +814,9 @@
                                             </td>
                                             <td data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id" style="cursor: pointer;">
                                                 <div class="fw-bold">@i.HoTen</div>
-                                                <small class="text-muted">@i.KhuVuc</small>
+                                                <small class="text-muted">
+                                                    @i.KhuVuc, @i.QuanHuyen?.TenQuanHuyen, @i.TinhThanh?.TenTinhThanh
+                                                </small>
                                             </td>
                                             <td data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id" style="cursor: pointer;">
                                                 <div class="text-truncate" style="max-width: 200px;">@i.TieuDe</div>

@@ -359,11 +359,11 @@
                 {
                     if(rs.success){
                         $("#Dong_ID_"+id).remove();
-                         showNotification('success', '@Html.Raw(TempData["SuccessMessage"])');
+                         showNotification('success', 'Xóa Thành Công Tin Tức');
                     }
                     else
                     {
-                         showNotification('error', '@Html.Raw(TempData["ErrorMessage"])');
+                         showNotification('error', rs.message);
                     }
                 },
                 error : () =>

@@ -1,103 +1,254 @@
 ﻿@model WebTimNguoiThatLac.Models.TinTuc
 @using Microsoft.AspNetCore.Mvc.Rendering
 @{
-    ViewData["Title"] = "Thêm Tin Tức";
-
+    ViewData["Title"] = "Cập Nhật Tin Tức";
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 }
+
 @section naviHeader {
-        <!-- Left navbar links -->
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-            </li>
-            <li class="nav-item d-none d-sm-inline-block">
-                <a href="/Admin" class="nav-link ">Trang Chủ</a>
-            </li>
-            <li class="nav-item d-none d-sm-inline-block">
-                <a href="/Admin/GioiThieu" class="nav-link "> Tin Tức</a>
-            </li>
-            <li class="nav-item d-none d-sm-inline-block">
-                <a href="/Admin/GioiThieu/Create" class="nav-link active"> Thêm Tin Tức</a>
-            </li>
-        </ul>
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin" class="nav-link">Trang Chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin/TinTuc" class="nav-link">Tin Tức</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/Admin/TinTuc/Update" class="nav-link active">Cập Nhật Tin Tức</a>
+        </li>
+    </ul>
 }
 
+<!-- Notification Area -->
+<div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
 
+<style>
+    .notification {
+        padding: 15px 20px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        color: white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        animation: slideIn 0.3s, fadeOut 0.5s 4.5s;
+        transition: all 0.3s;
+    }
 
-<form asp-area="Admin" asp-controller="TinTuc" asp-action="Update" method="post" enctype="multipart/form-data">
-    <input type="hidden" asp-for="Id" />
-    <div class="card container-fluid ">
-        <div class="card-header d-flex ">
-            <h2 class="card-title">Chi Tiết @ViewData["Title"]</h2>
+        .notification.success {
+            background-color: #28a745;
+        }
+
+        .notification.error {
+            background-color: #dc3545;
+        }
+
+        .notification.warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .notification.info {
+            background-color: #17a2b8;
+        }
+
+    @@keyframes slideIn {
+        from {
+            transform: translateX(100%);
+        }
+
+        to {
+            transform: translateX(0);
+        }
+    }
+
+    @@keyframes fadeOut {
+        from {
+            opacity: 1;
+        }
+
+        to {
+            opacity: 0;
+        }
+    }
+
+    .img-preview {
+        max-width: 200px;
+        max-height: 200px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 5px;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="card-title">@ViewData["Title"]</h3>
+                </div>
+                <div class="col-md-6 text-right">
+                    <a class="btn btn-light" href="/Admin/TinTuc">
+                        <i class="fas fa-arrow-left"></i> Quay lại
+                    </a>
+                </div>
+            </div>
         </div>
         <div class="card-body">
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <div class=" mb-3">
-                <label asp-for="TieuDe">Tiêu Đề Tin Tức</label>
-                <input asp-for="TieuDe" type="text" class="form-control" placeholder="Nhập Tiêu Đề Tin Tức">
-                <span asp-validation-for="TieuDe"></span>
-            </div>
-            <div class=" mb-3">
-                <label asp-for="TacGia">Tác Giả</label>
-                <input asp-for="TacGia" type="text" class="form-control" placeholder="Nhập Tên Tác Giả">
-                <span asp-validation-for="TacGia"></span>
-            </div>
-            <div class=" mb-3">
-                <label asp-for="MoTaNgan">Mô Tả Ngắn</label>
-                <textarea asp-for="MoTaNgan" class="form-control"></textarea>
-                <span asp-validation-for="MoTaNgan"></span>
-            </div>
-            <div class=" mb-3">
-                <label asp-for="NoiDung">Nội Dung</label>
-                <textarea asp-for="NoiDung" id="compose-textarea" class="form-control"></textarea>
-                <span asp-validation-for="NoiDung"></span>
-            </div>
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label>Hình Ảnh Hiện Tại</label>
-                    <input asp-for="HinhAnh" class="form-control" readonly />
-                    <img src="@Model.HinhAnh" style="width:199px" />
-                </div>
-                <div class="col-md-6">
-                    <label>Chọn Hình Ảnh </label>
-                    <input name="HinhAnhCapNhat" id="AnhVuaTai" type="file" placeholder="Nhập Hình Ảnh" class="form-control" />
-                    <div class="HienThiAnhGTMoi"></div>
-                </div>
-            </div>
-            <div class=" mb-3">
-                <input asp-for="Active" type="checkbox">
-                <span>Hoạt động</span>
+            <form asp-area="Admin" asp-controller="TinTuc" asp-action="Update" method="post" enctype="multipart/form-data">
+                <input type="hidden" asp-for="Id" />
+                <div asp-validation-summary="All" class="text-danger"></div>
 
-            </div>
-            <div class=" mb-3">
-                <a class="btn btn-primary" href="/Admin/TinTuc">Thoát</a>
-                <button class="btn btn-success">Thêm</button>
-            </div>
-        </div>
-        <div class="card-footer">
+                <div class="form-group row mb-3">
+                    <label asp-for="TieuDe" class="col-sm-2 col-form-label">Tiêu Đề Tin Tức</label>
+                    <div class="col-sm-10">
+                        <input asp-for="TieuDe" type="text" class="form-control" placeholder="Nhập Tiêu Đề Tin Tức">
+                        <span asp-validation-for="TieuDe" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group row mb-3">
+                    <label asp-for="TacGia" class="col-sm-2 col-form-label">Tác Giả</label>
+                    <div class="col-sm-10">
+                        <input asp-for="TacGia" type="text" class="form-control" placeholder="Nhập Tên Tác Giả">
+                        <span asp-validation-for="TacGia" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group row mb-3">
+                    <label asp-for="MoTaNgan" class="col-sm-2 col-form-label">Mô Tả Ngắn</label>
+                    <div class="col-sm-10">
+                        <textarea asp-for="MoTaNgan" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="MoTaNgan" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group row mb-3">
+                    <label asp-for="NoiDung" class="col-sm-2 col-form-label">Nội Dung</label>
+                    <div class="col-sm-10">
+                        <textarea asp-for="NoiDung" id="compose-textarea" class="form-control"></textarea>
+                        <span asp-validation-for="NoiDung" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group row mb-3">
+                    <label class="col-sm-2 col-form-label">Hình Ảnh</label>
+                    <div class="col-sm-10">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Hình Ảnh Hiện Tại</label>
+                                <input asp-for="HinhAnh" class="form-control mb-2" readonly />
+                                <img src="@Model.HinhAnh" class="img-preview" />
+                            </div>
+                            <div class="col-md-6">
+                                <label>Cập Nhật Hình Ảnh Mới</label>
+                                <input name="HinhAnhCapNhat" id="AnhVuaTai" type="file" class="form-control mb-2" />
+                                <div class="HienThiAnhGTMoi"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row mb-3">
+                    <div class="col-sm-2"></div>
+                    <div class="col-sm-10">
+                        <div class="form-check">
+                            <input asp-for="Active" class="form-check-input" type="checkbox">
+                            <label class="form-check-label" asp-for="Active">Hoạt động</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row mb-3">
+                    <div class="col-sm-2"></div>
+                    <div class="col-sm-10">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Cập Nhật
+                        </button>
+                        <a href="/Admin/TinTuc" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Hủy
+                        </a>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
-</form>
-
+</div>
 
 @section Scripts {
     <!-- Summernote -->
     <script src="~/clients/plugins/summernote/summernote-bs4.min.js"></script>
     <script>
         $(function () {
-          //Add text editor
-          $('#compose-textarea').summernote()
-        })
-    </script>
-    <script>
-        $("#AnhVuaTai").change(function(e){//input #AnhVuaTai
-            let a = e.target.files[0]; // lấy thằng file đầu tiên
-            if(a != null)
-            {
-                let path = URL.createObjectURL(a) // lấy ra địa chỉ
-                let s = `<img src="${path}" style="width:199px"/>`;
-                $(".HienThiAnhGTMoi").empty();
-                $(".HienThiAnhGTMoi").append(s);
+            // Initialize Summernote editor
+            $('#compose-textarea').summernote({
+               
+            });
+
+            // Display notifications from TempData
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>
+                        showNotification('success', '@Html.Raw(TempData["SuccessMessage"])');
+            </text>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>
+                        showNotification('error', '@Html.Raw(TempData["ErrorMessage"])');
+            </text>
+        }
+        @if (TempData["WarningMessage"] != null)
+        {
+            <text>
+                        showNotification('warning', '@Html.Raw(TempData["WarningMessage"])');
+            </text>
+        }
+        @if (TempData["InfoMessage"] != null)
+        {
+            <text>
+                        showNotification('info', '@Html.Raw(TempData["InfoMessage"])');
+            </text>
+        }
+        });
+
+        function showNotification(type, message) {
+            const notificationArea = document.getElementById('notification-area');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas ${getIconForType(type)} me-2"></i>
+                ${message}
+            `;
+
+            notificationArea.appendChild(notification);
+
+            // Remove after 5 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        function getIconForType(type) {
+            switch(type) {
+                case 'success': return 'fa-check-circle';
+                case 'error': return 'fa-times-circle';
+                case 'warning': return 'fa-exclamation-triangle';
+                case 'info': return 'fa-info-circle';
+                default: return 'fa-info-circle';
+            }
+        }
+
+        // Image preview for new image upload
+        $("#AnhVuaTai").change(function(e){
+            const file = e.target.files[0];
+            if(file != null) {
+                const path = URL.createObjectURL(file);
+                const preview = `<img src="${path}" class="img-preview mt-2"/>`;
+                $(".HienThiAnhGTMoi").empty().append(preview);
             }
         });
     </script>

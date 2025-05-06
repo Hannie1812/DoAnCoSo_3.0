@@ -247,7 +247,7 @@ public class NhanChungController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(NhanChung model, IFormFile file)
+    public async Task<IActionResult> Create(NhanChung model, IFormFile file, List<string>? MatchedFeatures)
     {
         var timNguoi = await _context.TimNguois
             .Include(t => t.ApplicationUser)
@@ -305,8 +305,32 @@ public class NhanChungController : Controller
             x.MoTaManhMoi = model.MoTaManhMoi;
             x.TimNguoiId = model.TimNguoiId;
             x.NgayBaoTin = DateTime.Now;
-            
-      
+
+            // so sánh cơ sở dữ liệu
+            // Xử lý đặc điểm được chọn
+            if (MatchedFeatures != null && MatchedFeatures.Any())
+            {
+                x.NguoiDungChon = string.Join(",", MatchedFeatures);
+
+                // Tính toán phần trăm đánh giá
+                if (timNguoi != null && !string.IsNullOrEmpty(timNguoi.DaciemNhanDang))
+                {
+                    var totalFeatures = timNguoi.DaciemNhanDang.Split(
+                        new[] { ',', ';', ':', '-' },
+                        StringSplitOptions.RemoveEmptyEntries)
+                        .Select(f => f.Trim())
+                        .Where(f => !string.IsNullOrEmpty(f))
+                        .Distinct()
+                        .Count();
+
+                    if (totalFeatures > 0)
+                    {
+                        x.PhanTramDanhGia = (int)Math.Round(
+                            (MatchedFeatures.Count / (double)totalFeatures) * 100);
+                    }
+                }
+            }
+
 
             // Lưu file
             x.FileDinhKem = await SaveImage(file, "AnhNhanChung");

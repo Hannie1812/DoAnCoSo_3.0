@@ -741,7 +741,7 @@
                     <div>
                         <h3 class="card-title"><i class="fas fa-search-location me-2"></i>@ViewData["Title"]</h3>
                     </div>
-                    <div>
+                    <div class="ms-auto">
                         <a href="/Admin/BaiViet/Create" class="btn btn-light">
                             <i class="fas fa-plus me-2"></i>Thêm Bài Viết
                         </a>
@@ -814,9 +814,7 @@
                                             </td>
                                             <td data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id" style="cursor: pointer;">
                                                 <div class="fw-bold">@i.HoTen</div>
-                                                <small class="text-muted">
-                                                    @i.KhuVuc, @i.QuanHuyen?.TenQuanHuyen, @i.TinhThanh?.TenTinhThanh
-                                                </small>
+                                                <small class="text-muted">@i.KhuVuc</small>
                                             </td>
                                             <td data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id" style="cursor: pointer;">
                                                 <div class="text-truncate" style="max-width: 200px;">@i.TieuDe</div>

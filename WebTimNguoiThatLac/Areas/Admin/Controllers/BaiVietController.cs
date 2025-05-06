@@ -166,7 +166,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 if(us == null)
                 {
                     ModelState.AddModelError("", "Lỗi email chưa đăng kí tài khoản ");
-                    return View();
+                    return View(x);
                 }
 
 
@@ -203,9 +203,10 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 }
 
                 await db.SaveChangesAsync();
-
+                ModelState.AddModelError("", "Vui Lòng Nhập Đủ Thông Tin ");
                 return RedirectToAction("Index");
             }
+
             return View();
         }
 
@@ -401,9 +402,12 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 {
                     return Json(new { success = false, message = "Ko Có Id Cần chỉnh sửa" });
                 }
-
+                if(y.active == false)
+                {
+                    y.NguoiDangBaiXoa = false;
+                }
                 y.active = !y.active;
-
+                
                 await db.SaveChangesAsync();
                 return Json(new { success = true, message = "Thành Công" });
             }

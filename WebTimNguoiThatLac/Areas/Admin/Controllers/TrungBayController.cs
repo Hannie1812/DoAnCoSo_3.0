@@ -105,7 +105,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         {
             if (string.IsNullOrEmpty(ImageURL))
             {
-                throw new ArgumentException("Đường dẫn ảnh không hợp lệ!");
+                return;
             }
 
             // Lấy đường dẫn tuyệt đối của ảnh trong thư mục wwwroot/uploads/
@@ -120,7 +120,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         }
         public async Task<IActionResult> Update(int id)
         {
-            TinTuc x = await db.TinTucs.FindAsync(id);
+            TrungBayHinhAnh x = await db.TrungBayHinhAnhs.FindAsync(id);
             if (x == null)
             {
                 return RedirectToAction("Index");
@@ -129,22 +129,23 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update(TrungBayHinhAnh t, IFormFile? HinhAnhFile)
+        public async Task<IActionResult> Update(TrungBayHinhAnh t, IFormFile? HinhAnhCapNhat)
         {
             if (ModelState.IsValid)
             {
                 TrungBayHinhAnh x = await db.TrungBayHinhAnhs.FindAsync(t.Id);
                 if (x == null)
                 {
+                    TempData["ErrorMessage"] = "Không có hình ảnh này!";
                     return RedirectToAction("Index");
                 }
 
-                if (HinhAnhFile != null)
+                if (HinhAnhCapNhat != null)
                 {
                    
                     DeleteImage(x.HinhAnh, "TrungBayHinhAnh");
 
-                    x.HinhAnh = await SaveImage(HinhAnhFile, "TrungBayHinhAnh");
+                    x.HinhAnh = await SaveImage(HinhAnhCapNhat, "TrungBayHinhAnh");
 
                     db.SaveChanges();
                     return RedirectToAction("Index");
@@ -153,9 +154,10 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 x.Active = t.Active;
 
                 db.SaveChanges();
+                TempData["SuccessMessage"] = "Cập nhật thành công thành công!";
                 return RedirectToAction("Index");
             }
-
+            TempData["ErrorMessage"] = "Vui lòng nhập đầy đủ thông tin!";
             return View(t);
 
         }
@@ -176,7 +178,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 y.Active = !y.Active;
 
                 db.SaveChanges();
-                return Json(new { success = true, message = "Thành Công" });
+                return Json(new { success = true, message = y.Active? "Hình Ảnh Trưng Bày Được Phép Hiển Thị" : "Hình Ảnh Trưng Bày Không Được Phép Hiển Thị" });
             }
             catch (Exception ex)
             {

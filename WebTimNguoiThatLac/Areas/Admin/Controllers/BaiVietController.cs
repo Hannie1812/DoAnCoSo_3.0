@@ -180,7 +180,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 if(us == null)
                 {
                     ModelState.AddModelError("", "Lỗi email chưa đăng kí tài khoản ");
-                    return View();
+                    return View(x);
                 }
 
 
@@ -217,9 +217,10 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 }
 
                 await db.SaveChangesAsync();
-
+                ModelState.AddModelError("", "Vui Lòng Nhập Đủ Thông Tin ");
                 return RedirectToAction("Index");
             }
+
             return View();
         }
 

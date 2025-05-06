@@ -512,7 +512,88 @@
     .report-modal select option:hover {
     background-color: #f8f9fa;
     }
+    /* Custom colors */
+    .btn-orange {
+        background-color: #FF4500;
+        color: white;
+        border: none;
+    }
 
+        .btn-orange:hover {
+            background-color: #e03d00;
+            color: white;
+        }
+
+    .btn-warning {
+        background-color: #ffc107;
+        color: #212529;
+        border: none;
+    }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+            color: #212529;
+        }
+
+    /* Modal enhancements */
+    .modal-content {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .modal-header {
+        border-bottom: none;
+        padding: 1.25rem 1.5rem;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .modal-footer {
+        padding: 1rem 1.5rem;
+        background-color: #f8f9fa;
+    }
+
+    /* Tooltip styles */
+    .tooltip-inner {
+        background-color: var(--primary-color);
+        border-radius: 6px;
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
+
+    .bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before,
+    .bs-tooltip-top .tooltip-arrow::before {
+        border-top-color: var(--primary-color);
+    }
+
+    /* Button hover effects */
+    .btn {
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+    /* Responsive adjustments for buttons */
+    @@media (max-width: 768px) {
+        .action-buttons
+
+    {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    }
 </style>
 
 
@@ -773,49 +854,110 @@
 
                                 }
                             }
-                            
+
                         }
 
                     </div>
 
                     <!-- Action Buttons -->
+                    @* <div class="action-buttons"> *@
+                    @*     @if (isAuthor || user.IsAdmin) *@
+                    @*     { *@
+                    @*         <a href="/TimNguoi/CapNhatBaiViet?id=@Model.Id" class="btn btn-primary"> *@
+                    @*             <i class="fas fa-edit"></i> Chỉnh sửa *@
+                    @*         </a> *@
+
+                    @*         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmFoundModal"> *@
+                    @*             <i class="fas fa-check-circle"></i> Xác nhận thấy *@
+                    @*         </button> *@
+
+                    @*         <a asp-action="Index" asp-controller="NhanChung" asp-route-id="@Model.Id" class="btn btn-info"> *@
+                    @*             <i class="fas fa-user-friends"></i> Nhân chứng *@
+                    @*         </a> *@
+
+                    @*         <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#removePostModal"> *@
+                    @*             <i class="fas fa-trash"></i> Xóa Bài *@
+                    @*         </button> *@
+                    @*         if(Model.active == true) *@
+                    @*         { *@
+                    @*             <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#XuatFileModal"> *@
+                    @*                 <i class="fas fa-trash"></i> Xuất File *@
+                    @*             </button> *@
+                    @*         } *@
+                    @*     } *@
+
+                    @*     @if (!isAuthor && user != null) *@
+                    @*     { *@
+                    @*         <button class="btn " style="background-color:#FF4500; color:white;" data-bs-toggle="modal" data-bs-target="#reportPostModal"> *@
+                    @*             <i class="fas fa-flag"></i> Báo cáo *@
+                    @*         </button> *@
+
+                    @*         <a href="@Url.Action("BatDauChat", "Chat", new { nguoiNhanId = Model.IdNguoiDung })" *@
+                    @*            class="btn " *@
+                    @*            style="background-color:#32CD32; color:white;"> *@
+                    @*             <i class="fas fa-comment"></i> Liên hệ *@
+                    @*         </a> *@
+                    @*     } *@
+
+                    @*     @if (idAdmin != null && user != null && user.IsAdmin == false) *@
+                    @*     { *@
+                    @*         <a href="@Url.Action("BatDauChat", "Chat", new { nguoiNhanId = idAdmin })" *@
+                    @*            class="btn btn-outline-primary"> *@
+                    @*             <i class="fas fa-headset"></i> Liên hệ Admin *@
+                    @*         </a> *@
+                    @*     } *@
+                    @* </div> *@
+                    <!-- Action Buttons -->
                     <div class="action-buttons">
                         @if (isAuthor || user.IsAdmin)
                         {
                             <a href="/TimNguoi/CapNhatBaiViet?id=@Model.Id" class="btn btn-primary">
-                                <i class="fas fa-edit"></i> Chỉnh sửa
+                                <i class="fas fa-edit me-1"></i> Chỉnh sửa
                             </a>
 
-                            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmFoundModal">
-                                <i class="fas fa-check-circle"></i> Xác nhận thấy
+                            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmFoundModal"
+                                    data-bs-toggle="tooltip" title="Xác nhận đã tìm thấy">
+                                <i class="fas fa-check-circle me-1"></i> Xác nhận
                             </button>
 
-                            <a asp-action="Index" asp-controller="NhanChung" asp-route-id="@Model.Id" class="btn btn-info">
-                                <i class="fas fa-user-friends"></i> Nhân chứng
-                            </a>
+                            <a asp-action="Index" asp-controller="NhanChung" asp-route-id="@Model.Id" class="btn btn-info"> 
+                                    <i class="fas fa-user-friends me-1"></i> Nhân chứng 
+                            </a> 
 
-                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#removePostModal">
-                                <i class="fas fa-trash"></i> Xóa Bài
+                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#removePostModal"
+                                    data-bs-toggle="tooltip" title="Xóa bài viết">
+                                <i class="fas fa-trash-alt me-1"></i> Xóa bài
                             </button>
+
+                            if (Model.active == true)
+                            {
+                                <button class="btn btn-warning text-white" data-bs-toggle="modal" data-bs-target="#XuatFileModal"
+                                        data-bs-toggle="tooltip" title="Xuất file đơn trình báo">
+                                    <i class="fas fa-file-word me-1"></i> Xuất file
+                                </button>
+                            }
                         }
 
                         @if (!isAuthor && user != null)
                         {
-                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#reportPostModal">
-                                <i class="fas fa-flag"></i> Báo cáo
+                            <button class="btn btn-orange" data-bs-toggle="modal" data-bs-target="#reportPostModal"
+                                    data-bs-toggle="tooltip" title="Báo cáo bài viết">
+                                <i class="fas fa-flag me-1"></i> Báo cáo
                             </button>
 
                             <a href="@Url.Action("BatDauChat", "Chat", new { nguoiNhanId = Model.IdNguoiDung })"
-                               class="btn btn-success">
-                                <i class="fas fa-comment"></i> Liên hệ
+                               class="btn btn-success"
+                               data-bs-toggle="tooltip" title="Liên hệ với người đăng">
+                                <i class="fas fa-comment-dots me-1"></i> Liên hệ
                             </a>
                         }
 
                         @if (idAdmin != null && user != null && user.IsAdmin == false)
                         {
                             <a href="@Url.Action("BatDauChat", "Chat", new { nguoiNhanId = idAdmin })"
-                               class="btn btn-outline-primary">
-                                <i class="fas fa-headset"></i> Liên hệ Admin
+                               class="btn btn-outline-primary"
+                               data-bs-toggle="tooltip" title="Liên hệ với quản trị viên">
+                                <i class="fas fa-headset me-1"></i> Hỗ trợ
                             </a>
                         }
                     </div>
@@ -1032,6 +1174,50 @@
         </div>
     }
 </div>
+
+
+<!-- Xuất Fie Modal -->
+<div class="modal fade" id="XuatFileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-file-export me-2"></i>Xuất file đơn trình báo
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="flex-shrink-0 text-primary">
+                        <i class="fas fa-info-circle fa-2x"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <p class="mb-0">Bạn đang thực hiện xuất file đơn trình báo mất tích dưới dạng tài liệu Word.</p>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    File sẽ bao gồm tất cả thông tin hiện có về trường hợp này.
+                </div>
+
+                <input type="hidden" id="XuatFileId" value="@Model?.Id" />
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Hủy bỏ
+                </button>
+                <button type="button" id="submitXuatFile" class="btn btn-primary">
+                    <span class="submit-text">
+                        <i class="fas fa-file-export me-1"></i> Xuất file
+                    </span>
+                    <span class="loading-spinner spinner-border spinner-border-sm d-none"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!-- Confirm Found Modal -->
 <div class="modal fade" id="confirmFoundModal" tabindex="-1" aria-hidden="true">
@@ -1376,8 +1562,9 @@
             document.getElementById('submitReportPost')?.addEventListener('click', submitPostReport);
             document.getElementById('submitReportComment')?.addEventListener('click', submitCommentReport);
             document.getElementById('submitRemovePost')?.addEventListener('click', submitPostRemove);
+            document.getElementById('submitXuatFile')?.addEventListener('click', submitXuatFileBaiViet);
 
-
+            
             
             document.querySelectorAll('.report-comment-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -1557,6 +1744,60 @@
                 }
             });
         }
+
+
+        function submitXuatFileBaiViet() {
+            const submitBtn = document.getElementById('submitXuatFile');
+            const submitText = submitBtn.querySelector('.submit-text');
+            const spinner = submitBtn.querySelector('.loading-spinner');
+
+            submitText.classList.add('d-none');
+            spinner.classList.remove('d-none');
+            submitBtn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('id', document.getElementById('XuatFileId').value);
+
+            // Using AJAX
+            $.ajax({
+                url: '/TimNguoi/XuatFileBaiViet',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function(data) {
+                    if (data.success) {
+                        showNotification('success', 'Xuất file thành công!');
+
+                        // Automatically trigger download
+                        if (data.downloadUrl) {
+                            window.location.href = data.downloadUrl;
+                        }
+                    } else {
+                        showNotification('error', data.message || 'Có lỗi xảy ra khi xuất file 123');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    let errorMsg = 'Có lỗi xảy ra khi xuất file 456';
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        errorMsg = response.message || errorMsg;
+                    } catch (e) {
+                        errorMsg = xhr.responseText || errorMsg;
+                    }
+                    showNotification('error', errorMsg);
+                },
+                complete: function() {
+                    submitText.classList.remove('d-none');
+                    spinner.classList.add('d-none');
+                    submitBtn.disabled = false;
+                }
+            });
+        }
+
     </script>
 
     

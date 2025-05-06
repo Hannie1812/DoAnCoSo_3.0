@@ -38,18 +38,18 @@
                 <input type="hidden" name="status" value="@status" />
             </form>
 
-            <div class="btn-group mt-2 mt-md-0">
+            <div class="btn-group mt-2 mt-md-0 ms-auto">
                 <a asp-action="Index" asp-route-status="all" asp-route-searchString="@ViewBag.SearchString"
                    class="btn btn-light @(status == "all" ? "active font-weight-bold" : "")">
                     Tất cả (@Model.TotalItemCount)
                 </a>
                 <a asp-action="Index" asp-route-status="KhangNghi" asp-route-searchString="@ViewBag.SearchString"
                    class="btn btn-light @(status == "KhangNghi" ? "active font-weight-bold" : "")">
-                    Kháng nghị
+                    Kháng nghị (@Model.TotalItemCount)
                 </a>
                 <a asp-action="Index" asp-route-status="ChuaXuLy" asp-route-searchString="@ViewBag.SearchString"
                    class="btn btn-light @(status == "ChuaXuLy" ? "active font-weight-bold" : "")">
-                    Chưa xử lý
+                    Chưa xử lý (@Model.TotalItemCount)
                 </a>
             </div>
         </div>

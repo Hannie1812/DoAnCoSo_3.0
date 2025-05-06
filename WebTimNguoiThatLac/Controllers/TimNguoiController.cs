@@ -540,7 +540,7 @@ namespace WebTimNguoiThatLac.Controllers
                 db.Add(timNguoi);
                 await db.SaveChangesAsync();
                 int d = 0;
-                if(DSHinhAnhCapNhat.Count == 0)
+                if (DSHinhAnhCapNhat.Count == 0)
                 {
                     ModelState.AddModelError("Lỗi", "Chưa Có Hình Ảnh");
                     ViewBag.DanhSachTinhThanh = TinhThanhIEnumerable;
@@ -1366,6 +1366,82 @@ namespace WebTimNguoiThatLac.Controllers
                 fileName);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> XuatFileBaiViet(int id)
+        {
+            try
+            {
+                // Get the blog post
+                var baiViet = await db.TimNguois
+                    .Include(b => b.ApplicationUser)
+                    .FirstOrDefaultAsync(b => b.Id == id);
+          
+
+                if (baiViet == null)
+                    return Json(new { success = false, message = "Không tìm thấy bài viết" });
+
+
+                ApplicationUser nguoidung = db.Users.FirstOrDefault(i => i.Id == baiViet.IdNguoiDung);
+                if (nguoidung == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Không tìm thấy thông tin người dùng"
+                    });
+                }
+
+                // Create Word document
+                var wordService = new WordExportService();
+                byte[] fileContents = wordService.CreateOfficialReport(baiViet, nguoidung);
+
+                var fileName = $"DonTrinhBao_{baiViet.Id}_{DateTime.Now:yyyyMMddHHmmss}.docx";
+
+                // Save file permanently on server
+                var folderPath = Path.Combine("wwwroot", "DangKiTimKiem");
+                if (!Directory.Exists(folderPath))
+                    Directory.CreateDirectory(folderPath);
+
+                var filePath = Path.Combine(folderPath, fileName);
+                await System.IO.File.WriteAllBytesAsync(filePath, fileContents);
+
+                // Update file path in database if needed
+                baiViet.DonDangKiTrinhBao = Path.Combine("DangKiTimKiem", fileName);
+                await db.SaveChangesAsync();
+
+                return Json(new
+                {
+                    success = true,
+                    downloadUrl = Url.Action("DownloadBlogPost", new { id = baiViet.Id, fileName = fileName })
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi xuất file bài viết");
+                return Json(new
+                {
+                    success = false,
+                    message = "Có lỗi xảy ra khi xuất file",
+                    error = ex.Message
+                });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DownloadBlogPost(int id, string fileName)
+        {
+            var filePath = Path.Combine("wwwroot", "DangKiTimKiem", fileName);
+
+            if (!System.IO.File.Exists(filePath))
+                return NotFound();
+
+            var fileContents = await System.IO.File.ReadAllBytesAsync(filePath);
+
+            return File(fileContents,
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                fileName);
+        }
 
         [HttpPost]
         public async Task<IActionResult> XoaBinhLuan(int id)

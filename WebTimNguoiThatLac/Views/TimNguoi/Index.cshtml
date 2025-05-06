@@ -367,27 +367,18 @@
                         </div>
                     </div>
 
-                            <!-- Quận Huyện -->
-                            <div class="col-lg-2 col-md-6">
-                                <label class="form-label text-muted small mb-1">Quận/Huyện</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-white border-end-0">
-                                        <i class="fas fa-map-pin text-primary"></i>
-                                    </span>
-                                    <select id="QuanHuyen" name="quanHuyenId" class="form-select border-start-0 ps-0">
-                                        <option value="">Tất cả quận</option>
-                                        @if (ViewBag.SelectedTinhThanh != null)
-                                        {
-                                            var quanHuyenList = ViewBag.QuanHuyenList as List<QuanHuyen>;
-                                            foreach (var huyen in quanHuyenList.Where(q => q.IdTinhThanh == ViewBag.SelectedTinhThanh))
-                                            {
-                                                <option value="@huyen.Id" selected="@(ViewBag.SelectedQuanHuyen == huyen.Id ? "selected" : null)">
-                                                    @huyen.TenQuanHuyen
-                                                </option>
-                                            }
-                                        }
-                                    </select>
-                                </div>
+                    <!-- Đặc điểm nhận dạng -->
+                    <div class="col-md-5">
+                        <div class="form-floating">
+                            <input type="text" name="dacDiem" class="form-control"
+                                   id="dacDiem"
+                                   placeholder="Ví dụ: sẹo mắt trái, nốt ruồi má phải, áo đỏ"
+                                   value="@ViewBag.DacDiemFilter">
+                            <label for="dacDiem">
+                                <i class="fas fa-id-card me-2 text-muted"></i>Đặc điểm nhận dạng
+                            </label>
+                            <div class="form-text ps-4">
+                                <small><i class="fas fa-info-circle me-1 text-primary"></i>Nhập các đặc điểm cách nhau bằng dấu phẩy</small>
                             </div>
 
 
@@ -484,32 +475,6 @@
                             </a>
                         </div>
                     </div>
-                    
-                }
-            }
-            else
-            {
-                // <div class="col-12 text-center py-5">
-                //     <div class="alert alert-info">
-                //         <i class="fa fa-info-circle"></i> Không tìm thấy kết quả phù hợp
-                //     </div>
-                // </div>
-
-                <div class="col-12">
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        @if (!string.IsNullOrEmpty(ViewBag.TenFilter) ||
-                       ViewBag.SelectedTinhThanh != null ||
-                       ViewBag.SelectedQuanHuyen != null ||
-                       !string.IsNullOrEmpty(ViewBag.DacDiemFilter))
-                        {
-                            <text>Không tìm thấy kết quả phù hợp với tiêu chí tìm kiếm.</text>
-                        }
-                        else
-                        {
-                            <text>Hiện chưa có bài đăng nào.</text>
-                        }
-                    </div>
                 </div>
             }
         </div>
@@ -587,25 +552,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
 
     <script>
-                      function loadQuanHuyen(tinhThanhId) {
-            const quanHuyenDropdown = document.getElementById("QuanHuyen");
-            quanHuyenDropdown.innerHTML = '<option value="">Tất cả quận</option>';
-
-            if (!tinhThanhId) return;
-
-            fetch(`/TimNguoi/GetQuanHuyenByTinhThanh?tinhThanhId=${tinhThanhId}`)
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(huyen => {
-                        const option = document.createElement("option");
-                        option.value = huyen.id;
-                        option.textContent = huyen.tenQuanHuyen;
-                        quanHuyenDropdown.appendChild(option);
-                    });
-                })
-                .catch(error => console.error("Error loading districts:", error));
-        }
-
         // Hiển thị thông báo từ TempData
         $(document).ready(function() {
             // Khởi tạo tooltip

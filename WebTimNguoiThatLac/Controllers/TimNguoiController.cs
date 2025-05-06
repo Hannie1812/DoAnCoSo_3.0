@@ -328,12 +328,12 @@ namespace WebTimNguoiThatLac.Controllers
                 .Include(u => u.AnhTimNguois)
                 .Where(i => i.active == true);
 
-            bool coBoLoc = false;
+            int d = 0;
 
             if (!string.IsNullOrEmpty(ten))
             {
                 query = query.Where(x => x.HoTen.Contains(ten) || x.TieuDe.Contains(ten));
-                coBoLoc = true;
+                d++;
             }
 
             // //Áp dụng bộ lọc khu vực
@@ -414,8 +414,7 @@ namespace WebTimNguoiThatLac.Controllers
                         return Redirect("/Identity/Account/Login");
                     }
 
-                    string tenTinhThanh = "";
-                    string tenQuanHuyen = "";
+
 
                     if (tinhThanhId.HasValue)
                     {
@@ -431,7 +430,7 @@ namespace WebTimNguoiThatLac.Controllers
                             tenQuanHuyen = quan.TenQuanHuyen;
                     }
 
-                    string khuVuc = $"{tenQuanHuyen} {tenTinhThanh}".Trim();
+                     khuVuc = $"{tenQuanHuyen} {tenTinhThanh}".Trim();
 
                     db.LichSuTimKiems.Add(new LichSuTimKiem
                     {
@@ -453,9 +452,8 @@ namespace WebTimNguoiThatLac.Controllers
                             NguoiDungId = nguoiDung.Id,
                             HanhDong = "Tìm kiếm quá nhiều",
                             ThoiGian = DateTime.UtcNow,
-                            ChiTiet = $"Đã tìm kiếm {soLanTimTrong1Phut} lần trong vòng 1 phút, Nghi ngờ bạn đang có ý định xâm hại hệ thống"
-                        };
-                        db.HanhViDangNgos.Add(hanhVi);
+                            ChiTiet = $"Đã tìm kiếm {soLanTim} lần trong vòng 1 phút, Nghi ngờ bạn đang có ý định xâm hại hệ thống"
+                        });
                         await db.SaveChangesAsync();
 
                         // 👉 Tăng số lần vi phạm của người dùng
@@ -742,11 +740,6 @@ namespace WebTimNguoiThatLac.Controllers
                     TempData["ErrorMessage"] = "Bài Viết Đã Bị Khóa, Nếu Có Thắc Mắc Xin Liên Hệ Với Admin";
                     return RedirectToAction("Index");
                 }
-
-                // Pass TinhThanh, QuanHuyen to the view
-                ViewBag.Khuvuc = y.KhuVuc;
-                ViewBag.TinhThanh = y.QuanHuyen?.TinhThanh?.TenTinhThanh;
-                ViewBag.QuanHuyen = y.QuanHuyen?.TenQuanHuyen;
                 List<BinhLuan> DSBinhLuan = db.BinhLuans
                                                         .Include(u => u.ApplicationUser)
                                                         .Where(i => i.IdBaiViet ==  id && i.Active == true && i.NguoiDangBaiXoa==false)
@@ -1748,18 +1741,6 @@ namespace WebTimNguoiThatLac.Controllers
                 return Json(new { success = false, message = "Đã xảy ra lỗi khi xóa bài viết" });
             }
         }
-        [HttpGet]
-        public async Task<IActionResult> GetQuanHuyenByTinhThanh(int tinhThanhId)
-        {
-            var quanHuyens = await db.QuanHuyens
-                .Where(q => q.IdTinhThanh == tinhThanhId)
-                .Select(q => new { id = q.Id, tenQuanHuyen = q.TenQuanHuyen })
-                .ToListAsync();
-
-            return Json(quanHuyens);
-        }
-
-
     }
 
 }

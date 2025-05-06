@@ -19,7 +19,7 @@
 
                 <div class="card-body p-4">
                     <form asp-action="ThemNguoiCanTim" asp-controller="TimNguoi" enctype="multipart/form-data" method="post">
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        <div asp-validation-summary="All" class="alert alert-danger"></div>
                         <input type="hidden" asp-for="IdNguoiDung" value="@us.Id">
 
                         <!-- Personal Information Section -->
@@ -60,12 +60,28 @@
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label asp-for="DaciemNhanDang" class="font-weight-bold">Đặc Điểm Nhận Dạng</label>
-                                <input asp-for="DaciemNhanDang" class="form-control" placeholder="Ví dụ: Nốt ruồi ở cằm, sẹo trên trán..." />
-                                <span asp-validation-for="DaciemNhanDang" class="text-danger small"></span>
-                            </div>
+                            @* <div class="form-group"> *@
+                            @*     <label asp-for="DaciemNhanDang" class="font-weight-bold">Đặc Điểm Nhận Dạng</label> *@
+                            @*     <input asp-for="DaciemNhanDang" class="form-control" placeholder="Ví dụ: Nốt ruồi ở cằm, sẹo trên trán..." /> *@
+                            @*     <span asp-validation-for="DaciemNhanDang" class="text-danger small"></span> *@
+                            @* </div> *@
+                            <div class="form-group mb-4">
+                                <label asp-for="DaciemNhanDang" class="font-weight-bold">Đặc điểm nhận dạng</label>
 
+                                <!-- Phần nhập đặc điểm mới -->
+                                <div class="input-group mb-3">
+                                    <input type="text" id="newFeatureInput" class="form-control" placeholder="Nhập đặc điểm (ví dụ: Xẹo má trái, sẹo môi...)">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-primary" type="button" id="addFeatureBtn">Thêm</button>
+                                    </div>
+                                </div>
+
+                                <!-- Hiển thị các đặc điểm đã thêm -->
+                                <div id="featureTags" class="d-flex flex-wrap mb-3"></div>
+
+                                <!-- Textarea ẩn chứa dữ liệu cuối cùng -->
+                                <textarea asp-for="DaciemNhanDang" id="featuresData" class="form-control" rows="3" style="display:none;"></textarea>
+                            </div>
                             <div class="form-group">
                                 <label asp-for="MoiQuanHe" class="font-weight-bold">Mối Quan Hệ</label>
                                 <input asp-for="MoiQuanHe" class="form-control" placeholder="Mối quan hệ của bạn với người mất tích" />
@@ -91,42 +107,32 @@
                                           placeholder="Mô tả chi tiết về người mất tích, hoàn cảnh mất tích..."></textarea>
                                 <span asp-validation-for="MoTa" class="text-danger small"></span>
                             </div>
-
-                            @* <div class="form-group">
-                                <label asp-for="KhuVuc" class="font-weight-bold">Khu Vực Mất Tích</label>
-                                <select asp-for="KhuVuc" class="form-control">
-                                    <option value="">-- Chọn tỉnh/thành phố --</option>
-                                    @foreach (string i in ViewBag.DanhSachTinhThanh)
-                                    {
-                                        <option value="@i">@i</option>
-                                    }
-                                </select>
-                                <span asp-validation-for="KhuVuc" class="text-danger small"></span>
-                            </div> *@
+                            @* khu vực *@
                             <div class="form-group">
                                 <label class="font-weight-bold">Tỉnh Thành</label>
-                                <select id="TinhThanh" name="IdTinhThanh" class="form-control" onchange="loadQuanHuyen(this.value)">
+                                <select id="TinhThanh" asp-for="IdTinhThanh" asp-items="@ViewBag.DanhSachTinhThanh" class="form-control" onchange="loadQuanHuyen(this.value)">
                                     <option value="">-- Chọn tỉnh/thành phố --</option>
-                                    @foreach (var tinh in ViewBag.DanhSachTinhThanh as List<TinhThanh> ?? new List<TinhThanh>())
-                                    {
-                                        <option value="@tinh.Id">@tinh.TenTinhThanh</option>
-                                    }
+                                   
                                 </select>
                             </div>
 
                             <div class="form-group">
                                 <label class="font-weight-bold">Quận Huyện</label>
-                                <select id="QuanHuyen" name="IdQuanHuyen" class="form-control">
+                                <select id="QuanHuyen" asp-for="IdQuanHuyen" asp-items="@ViewBag.DanhSachQuanHuyen" class="form-control">
                                     <option value="">-- Chọn quận/huyện --</option>
                                 </select>
                             </div>
-
-                            <div class="form-group">
-                                <label asp-for="KhuVuc" class="font-weight-bold">Địa chỉ Cụ Thể</label>
-                                <input asp-for="KhuVuc" class="form-control" placeholder="Nhập địa chỉ cụ thể (nếu có)" />
-                                <span asp-validation-for="KhuVuc" class="text-danger small"></span>
-                            </div>
-
+                            @* <div class="form-group"> *@
+                            @*     <label asp-for="KhuVuc" class="font-weight-bold">Khu Vực Mất Tích</label> *@
+                            @*     <select asp-for="KhuVuc" class="form-control"> *@
+                            @*         <option value="">-- Chọn tỉnh/thành phố --</option> *@
+                            @*         @foreach (string i in ViewBag.DanhSachTinhThanh) *@
+                            @*         { *@
+                            @*             <option value="@i">@i</option> *@
+                            @*         } *@
+                            @*     </select> *@
+                            @*     <span asp-validation-for="KhuVuc" class="text-danger small"></span> *@
+                            @* </div> *@
                         </div>
 
                         <!-- Image Upload Section -->
@@ -209,6 +215,81 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        $(document).ready(function() {
+            // Thêm đặc điểm mới
+            $('#addFeatureBtn').click(function() {
+                addFeature();
+            });
+
+            // Cho phép nhấn Enter để thêm
+            $('#newFeatureInput').keypress(function(e) {
+                if (e.which === 13) {
+                    addFeature();
+                    return false;
+                }
+            });
+
+            function addFeature() {
+                const featureText = $('#newFeatureInput').val().trim();
+                if (featureText) {
+                    // Tạo tag mới
+                    const tagId = 'feature_' + Date.now();
+                    const tagHtml = `
+                        <div class="feature-tag badge badge-pill badge-primary mr-2 mb-2" data-id="${tagId}">
+                            ${featureText}
+                            <button type="button" class="close ml-2" onclick="removeTag('${tagId}')">
+                                <span>&times;</span>
+                            </button>
+                        </div>`;
+
+                    $('#featureTags').append(tagHtml);
+                    $('#newFeatureInput').val('');
+
+                    // Cập nhật textarea ẩn
+                    updateFeaturesData();
+                }
+            }
+
+            window.removeTag = function(tagId) {
+                $(`.feature-tag[data-id="${tagId}"]`).remove();
+                updateFeaturesData();
+            };
+
+            function updateFeaturesData() {
+                const features = [];
+                $('.feature-tag').each(function() {
+                    features.push($(this).clone().children().remove().end().text().trim());
+                });
+                $('#featuresData').val(features.join(', '));
+            }
+        });
+    </script>
+
+    <style>
+        .feature-tag {
+            font-size: 0.9rem;
+            padding: 0.5em 0.8em;
+            display: inline-flex;
+            align-items: center;
+        }
+
+            .feature-tag .close {
+                font-size: 1rem;
+                line-height: 1;
+            }
+
+        #newFeatureInput {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        #addFeatureBtn {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+    </style>
 
     <!-- Summernote -->
     <script src="~/clients/plugins/summernote/summernote-bs4.min.js"></script>

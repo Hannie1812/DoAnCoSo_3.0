@@ -1,0 +1,317 @@
+﻿
+@model WebTimNguoiThatLac.ViewModels.TimKiemNangCaoViewModel
+@{
+    ViewData["Title"] = "Tìm Kiếm Nâng Cao";
+}
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white py-3">
+            <h2 class="h4 mb-0 text-truncate"><i class="fas fa-search me-2"></i>Tìm kiếm nâng cao theo đặc điểm nhận dạng</h2>
+        </div>
+
+        <div class="card-body p-0">
+            <!-- Phần tìm kiếm -->
+            <div class="p-4 border-bottom">
+                <form asp-action="TimKiemNangCao" method="get" class="mb-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="card h-100">
+                                <div class="card-header bg-info text-white py-2">
+                                    <h5 class="mb-0">Đặc điểm đã chọn</h5>
+                                </div>
+                                <div class="card-body">
+                                    @if (Model.DacDiemDaChon.Any())
+                                    {
+                                        <div class="d-flex flex-wrap gap-2">
+                                            @foreach (var dacDiem in Model.DacDiemDaChon)
+                                            {
+                                                <div class="badge bg-primary p-2 d-flex align-items-center" style="max-width: 100%;">
+                                                    <input type="checkbox" name="dacDiemDaChon" value="@dacDiem" checked hidden />
+                                                    <!-- Trong phần đặc điểm đã chọn tooltip-->
+                                                    <span class="text-truncate" style="max-width: 150px;"
+                                                          data-bs-toggle="tooltip" data-bs-placement="top"
+                                                          title="@dacDiem">
+                                                        @dacDiem
+                                                    </span>
+                                                    <button type="button" class="btn-close btn-close-white ms-2"
+                                                            style="font-size: 0.7rem; flex-shrink: 0;"
+                                                            data-feature="@dacDiem"></button>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-muted mb-0">Chưa có đặc điểm nào được chọn</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-8">
+                            <div class="card h-100">
+                                <div class="card-header bg-info text-white py-2">
+                                    <h5 class="mb-0">Đặc điểm có thể chọn</h5>
+                                </div>
+                                <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                                    @foreach (var item in Model.DacDiemCoTheChon)
+                                    {
+                                        <div class="mb-2">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                       name="dacDiemDaChon" value="@item.DacDiem"
+                                                       id="dd_@item.DacDiem.GetHashCode()"
+                                                @(item.DaChon ? "checked" : "") />
+                                                <label class="form-check-label d-flex align-items-center" for="dd_@item.DacDiem.GetHashCode()">
+                                                    <!-- Trong phần đặc điểm có thể chọn tooltip -->
+                                                    <span class="text-truncate me-2" style="max-width: 200px;"
+                                                          data-bs-toggle="tooltip" data-bs-placement="top"
+                                                          title="@item.DacDiem">
+                                                        @item.DacDiem
+                                                    </span>
+                                                    <span class="badge bg-secondary ms-auto">@item.SoLuong</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fas fa-search me-2"></i>Tìm kiếm
+                        </button>
+                        <a asp-action="TimKiemNangCao" class="btn btn-outline-secondary px-4 ms-2">
+                            <i class="fas fa-redo me-2"></i>Đặt lại
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Kết quả tìm kiếm -->
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="h5 mb-0">
+                        Kết quả tìm kiếm: <span class="badge bg-success">@Model.KetQuaTimKiem.Count</span>
+                    </h3>
+
+                    @* <div class="dropdown"> *@
+                    @*     <!-- Nút sắp xếp tooltip --> *@
+                    @*     <button class="btn btn-sm btn-outline-primary dropdown-toggle" *@
+                    @*             type="button" id="sortDropdown" data-bs-toggle="dropdown" *@
+                    @*             data-bs-toggle="tooltip" data-bs-placement="left" *@
+                    @*             title="Sắp xếp kết quả theo tiêu chí"> *@
+                    @*         <i class="fas fa-sort me-1"></i>Sắp xếp *@
+                    @*     </button> *@
+                    @*     <ul class="dropdown-menu dropdown-menu-end"> *@
+                    @*         <li><a class="dropdown-item" href="?sort=relevance">Độ phù hợp ↓</a></li> *@
+                    @*         <li><a class="dropdown-item" href="?sort=newest">Mới nhất ↓</a></li> *@
+                    @*         <li><a class="dropdown-item" href="?sort=oldest">Cũ nhất ↑</a></li> *@
+                    @*     </ul> *@
+                    @* </div> *@
+                </div>
+
+                @if (Model.KetQuaTimKiem.Any())
+                {
+                    <div class="row g-3">
+                        @foreach (var item in Model.KetQuaTimKiem)
+                        {
+                            <div class="col-md-4">
+                                <div class="card h-100 shadow-sm">
+                                    <div class="position-relative">
+                                        @if (item.AnhDaiDien.Any())
+                                        {
+                                            <img src="@Url.Content(item.AnhDaiDien.First().HinhAnh)"
+                                                 class="card-img-top"
+                                                 style="height: 180px; object-fit: cover;"
+                                                 alt="@item.BaiDang.TieuDe">
+                                        }
+                                        else
+                                        {
+                                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                                                 style="height: 180px;">
+                                                <i class="fas fa-user-circle fa-4x text-secondary"></i>
+                                            </div>
+                                        }
+
+                                        @if (Model.DacDiemDaChon.Any())
+                                        {
+                                            <div class="position-absolute top-0 start-0 bg-success text-white px-2 py-1 rounded-end">
+                                                @item.PhanTramKhop% phù hợp
+                                            </div>
+                                        }
+                                    </div>
+
+                                    <div class="card-body">
+                                        <h5 class="card-title text-truncate" 
+                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="@item.BaiDang.TieuDe">
+                                            @item.BaiDang.TieuDe
+                                        </h5>
+
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-user text-muted me-2"></i>
+                                            <span class="small">@item.BaiDang.HoTen</span>
+                                        </div>
+
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-map-marker-alt text-muted me-2"></i>
+                                            <span class="small">@item.BaiDang.KhuVuc</span>
+                                        </div>
+
+                                        <div class="d-flex align-items-center mb-3">
+                                            <i class="fas fa-calendar-alt text-muted me-2"></i>
+                                            <span class="small">@item.BaiDang.NgayDang.ToString("dd/MM/yyyy")</span>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <h6 class="small fw-bold mb-2">Đặc điểm nhận dạng:</h6>
+                                            <div class="d-flex flex-wrap gap-1">
+                                                @foreach (var dd in item.BaiDang.DaciemNhanDang.Split(',').Take(9)) // lấy 9
+                                                {
+                                                    <!-- Trong phần kết quả tìm kiếm -->
+                                                    <span class="badge bg-light text-dark border text-truncate"
+                                                          style="max-width: 120px;"
+                                                          data-bs-toggle="tooltip" data-bs-placement="top"
+                                                          title="@dd.Trim()">
+                                                        @dd.Trim()
+                                                    </span>
+                                                }
+                                                @if (item.BaiDang.DaciemNhanDang.Split(',').Length > 9) // lấy 9
+                                                {
+                                                    <span class="badge bg-light text-dark border">
+                                                        +@(item.BaiDang.DaciemNhanDang.Split(',').Length - 9) 
+                                                    </span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card-footer bg-transparent border-0 pt-0">
+                                        <a asp-action="ChiTietBaiTimNguoi" asp-route-id="@item.BaiDang.Id"
+                                           class="btn btn-sm btn-outline-primary w-100">
+                                            <i class="fas fa-info-circle me-1"></i> Chi tiết
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning mb-0">
+                        <i class="fas fa-exclamation-circle me-2"></i> Không tìm thấy kết quả phù hợp
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        /* Custom scrollbar */
+        .card-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .card-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .card-body::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+
+        /* Badge styling */
+        .badge.bg-light {
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Card title truncation */
+        .card-title.text-truncate {
+            max-width: 100%;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Match percentage badge */
+        .position-absolute.bg-success {
+            z-index: 1;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+    </style>
+
+        @* tooltip *@
+
+    <style>
+        /* Thêm vào phần style */
+        .tooltip-inner {
+            max-width: 300px;
+            padding: 8px 12px;
+            font-size: 0.875rem;
+            background-color: rgba(0,0,0,0.9);
+        }
+
+        .bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before,
+        .bs-tooltip-top .tooltip-arrow::before {
+            border-top-color: rgba(0,0,0,0.9);
+        }
+    </style>
+
+        @* end tooltip *@
+}
+
+@section Scripts {
+
+    @* tooltip *@
+    <script>
+                // Thêm vào phần script
+        $(document).ready(function() {
+            // Khởi tạo tooltip
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl, {
+                    delay: { "show": 300, "hide": 100 }
+                });
+            });
+        });
+    </script>
+
+        @* end tooltip *@
+
+    <script>
+        $(document).ready(function() {
+            // Xử lý xóa đặc điểm đã chọn
+            $('[data-feature]').click(function() {
+                var feature = $(this).data('feature');
+                $('input[value="' + feature + '"]').prop('checked', false);
+                $('form').submit();
+            });
+
+            // Tự động submit form khi chọn checkbox
+            $('.form-check-input').change(function() {
+                $('form').submit();
+            });
+
+            // Highlight matching features in results
+            $('.badge.bg-light').each(function() {
+                var featureText = $(this).text().trim();
+                if ($('input[name="dacDiemDaChon"][value="' + featureText + '"]').is(':checked')) {
+                    $(this).removeClass('bg-light').addClass('bg-warning text-dark');
+                }
+            });
+        });
+    </script>
+}

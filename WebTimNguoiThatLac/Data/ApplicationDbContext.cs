@@ -30,5 +30,6 @@ namespace WebTimNguoiThatLac.Data
 
         public DbSet<TinhThanh> TinhThanhs { get; set; }
         public DbSet<QuanHuyen> QuanHuyens { get; set; }
+
     }
 }

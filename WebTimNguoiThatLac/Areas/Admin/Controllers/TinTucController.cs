@@ -69,20 +69,39 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(TinTuc t, IFormFile? HinhAnhCapNhat)
         {
-            if (ModelState.IsValid)
+            // Kiểm tra ModelState.IsValid trước khi xử lý
+            if (!ModelState.IsValid)
             {
+                TempData["ErrorMessage"] = "Vui lòng nhập đầy đủ thông tin!";
+                return View(t);
+            }
 
+            try
+            {
                 if (HinhAnhCapNhat != null)
                 {
-
                     t.HinhAnh = await SaveImage(HinhAnhCapNhat, "TinTuc");
                 }
+                else
+                {
+                    // Xử lý trường hợp không có hình ảnh (nếu cần)
+                    TempData["ErrorMessage"] = "Vui lòng chọn hình ảnh!";
+                    return View(t);
+                }
+
+                t.NgayDang = DateTime.Now; // Thêm ngày đăng tự động
                 db.TinTucs.Add(t);
                 await db.SaveChangesAsync();
-                return RedirectToAction("Index");
 
+                TempData["SuccessMessage"] = "Thêm tin tức thành công!";
+                return RedirectToAction("Index");
             }
-            return View(t);
+            catch (Exception ex)
+            {
+                // Ghi log lỗi ở đây nếu cần
+                TempData["ErrorMessage"] = "Có lỗi xảy ra khi thêm tin tức: " + ex.Message;
+                return View(t);
+            }
         }
         public async Task<string> SaveImage(IFormFile ImageURL, string subFolder)
         {
@@ -120,7 +139,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         {
             if (string.IsNullOrEmpty(ImageURL))
             {
-                throw new ArgumentException("Đường dẫn ảnh không hợp lệ!");
+                return;
             }
 
             // Lấy đường dẫn tuyệt đối của ảnh trong thư mục wwwroot/uploads/
@@ -146,40 +165,45 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Update(TinTuc t, IFormFile? HinhAnhCapNhat)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                TinTuc x = await db.TinTucs.FindAsync(t.Id);
-                if (x == null)
-                {
-                    return RedirectToAction("Index");
-                }
+                TempData["ErrorMessage"] = "Vui lòng nhập đủ thông tin!";
+                return View(t);
+            }
+            TinTuc x = await db.TinTucs.FindAsync(t.Id);
+            if (x == null)
+            {
+            TempData["ErrorMessage"] = "Không có tin tức này!";
+            return RedirectToAction("Index");
+            }
 
-                if (HinhAnhCapNhat != null)
-                {
-                    x.TieuDe = t.TieuDe;
-                    x.NoiDung = t.NoiDung;
-                    x.TacGia = t.TacGia;
-                    x.Active = t.Active;
-                    x.MoTaNgan = t.MoTaNgan;
-
-                    DeleteImage(x.HinhAnh, "TinTuc");
-
-                    x.HinhAnh = await SaveImage(HinhAnhCapNhat, "TinTuc");
-
-                    db.SaveChanges();
-                    return RedirectToAction("Index");
-                }
-
+            if (HinhAnhCapNhat != null)
+            {
                 x.TieuDe = t.TieuDe;
                 x.NoiDung = t.NoiDung;
                 x.TacGia = t.TacGia;
                 x.Active = t.Active;
                 x.MoTaNgan = t.MoTaNgan;
+
+                DeleteImage(x.HinhAnh, "TinTuc");
+
+                x.HinhAnh = await SaveImage(HinhAnhCapNhat, "TinTuc");
+
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
 
-            return View(t);
+            x.TieuDe = t.TieuDe;
+            x.NoiDung = t.NoiDung;
+            x.TacGia = t.TacGia;
+            x.Active = t.Active;
+            x.MoTaNgan = t.MoTaNgan;
+            db.SaveChanges();
+
+            TempData["SuccessMessage"] = "Cập nhật tin tức thành công!";
+            return RedirectToAction("Index");
+            
+            
 
         }
 
@@ -193,13 +217,13 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 TinTuc y = db.TinTucs.FirstOrDefault(i => i.Id == id);
                 if (y == null)
                 {
-                    return Json(new { success = false, message = "Ko Có Id Cần Xóa" });
+                    return Json(new { success = false, message = "Không Có Id Cần Cập Nhật" });
                 }
 
                 y.Active = !y.Active;
 
                 db.SaveChanges();
-                return Json(new { success = true, message = "Thành Công" });
+                return Json(new { success = true, message = " Mở/Đóng Thành Công" });
             }
             catch (Exception ex)
             {
@@ -215,14 +239,15 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 TinTuc y = db.TinTucs.FirstOrDefault(i => i.Id == id);
                 if (y == null)
                 {
-                    return Json(new { success = false, message = "Ko Có Id Cần Xóa" });
+                    return Json(new { success = false, message = "Không Có Id Cần Xóa" });
                 }
+              
                 DeleteImage(y.HinhAnh, "TinTuc");
                 db.TinTucs.Remove(y);
 
                 db.SaveChanges();
 
-                return Json(new { success = true, message = "Thành Công" });
+                return Json(new { success = true, message = " Xóa Thành Công Thành Công" });
             }
             catch (Exception ex)
             {

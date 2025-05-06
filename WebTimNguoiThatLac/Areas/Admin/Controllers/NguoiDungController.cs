@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.VariantTypes;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -22,13 +23,15 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         private ApplicationDbContext db;
         private UserManager<ApplicationUser> userManager;
         private RoleManager<IdentityRole> roleManager;
+        private readonly IWebHostEnvironment _env;
 
-        public  NguoiDungController(ApplicationDbContext db, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public NguoiDungController(IWebHostEnvironment env,ApplicationDbContext db, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             this.db = db;
             this.userManager = userManager;
             this.roleManager = roleManager;
-           
+            _env = env;
+
         }
        
         public async Task<IActionResult> Index(string TimKiem = "", string Role = "", int Page = 1)
@@ -140,104 +143,230 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 System.IO.File.Delete(filePath);
             }
         }
+        //public async Task<IActionResult> Update(string id)
+        //{
+        //    // Kiểm tra quyền của người dùng hiện tại
+        //    var currentUser = await userManager.GetUserAsync(User);
+        //    var currentUserRoles = await userManager.GetRolesAsync(currentUser);
+        //    var isModerator = currentUserRoles.Contains("Moderator");
+
+        //    ApplicationUser x = await db.Users.FirstOrDefaultAsync(i => i.Id == id);
+        //    if (x == null)
+        //    {
+        //        return RedirectToAction("Index");
+        //    }
+
+        //    // Kiểm tra nếu là Moderator và người được chỉnh sửa là Admin
+        //    if (isModerator)
+        //    {
+        //        var userRoles = await userManager.GetRolesAsync(x);
+        //        if (userRoles.Contains("Admin"))
+        //        {
+        //            TempData["Error"] = "Bạn không có quyền chỉnh sửa thông tin của Admin";
+        //            return RedirectToAction("Index");
+        //        }
+        //    }
+        //    List<IdentityRole> ds = await db.Roles.ToListAsync();
+        //    if (isModerator)
+        //    {
+        //        ds = ds.Where(r => r.Name != "Admin").ToList();
+        //    }
+        //    var dsLTT = new SelectList(ds, "Name", "Name");
+        //    ViewBag.DanhSachRole = dsLTT;
+        //    var roles = await userManager.GetRolesAsync(x);
+        //    ViewBag.RoleHienTai = roles.Any() ? roles[0] : "";
+        //    return View(x);
+        //}
+
+        //[HttpPost]
+        //public async Task<IActionResult> Update(ApplicationUser t, string? LoaiTaiKhoan)
+        //{
+        //    // Kiểm tra quyền của người dùng hiện tại
+        //    var currentUser = await userManager.GetUserAsync(User);
+        //    var currentUserRoles = await userManager.GetRolesAsync(currentUser);
+        //    var isModerator = currentUserRoles.Contains("Moderator");
+
+        //    if (ModelState.IsValid)
+        //    {
+        //        ApplicationUser x = await db.Users.FirstOrDefaultAsync(i => i.Id == t.Id);
+        //        if (x == null)
+        //        {
+        //            return RedirectToAction("Index");
+        //        }
+
+        //        // Kiểm tra nếu là Moderator
+        //        if (isModerator)
+        //        {
+        //            // Kiểm tra xem người được chỉnh sửa có phải là Admin không
+        //            var userRoles = await userManager.GetRolesAsync(x);
+        //            if (userRoles.Contains("Admin"))
+        //            {
+        //                TempData["Error"] = "Bạn không có quyền chỉnh sửa thông tin của Admin";
+        //                return RedirectToAction("Index");
+        //            }
+
+        //            // Giới hạn việc nâng cấp quyền
+        //            if (LoaiTaiKhoan == "Admin")
+        //            {
+        //                TempData["Error"] = "Bạn không có quyền nâng cấp tài khoản lên Admin";
+        //                return RedirectToAction("Index");
+        //            }
+        //        }
+
+        //        if (LoaiTaiKhoan != null)
+        //        {
+        //            var dsrole = await userManager.GetRolesAsync(x);
+        //            await userManager.RemoveFromRolesAsync(x, dsrole);
+        //            await userManager.AddToRoleAsync(x, LoaiTaiKhoan);
+        //        }
+
+        //        x.FullName = t.FullName;
+        //        x.Address = t.Address;
+        //        x.NgaySinh = t.NgaySinh;
+        //        x.CCCD = t.CCCD;
+        //        x.PhoneNumber = t.PhoneNumber;
+        //        x.Active = t.Active;
+
+        //        await db.SaveChangesAsync();
+        //        return RedirectToAction("Index");
+        //    }
+
+
+        //    List<IdentityRole> ds = await db.Roles.ToListAsync();
+        //    var dsLTT = new SelectList(ds, "Id", "Name");
+        //    ViewBag.DanhSachRole = dsLTT;
+        //    var roles = await userManager.GetRolesAsync(t);
+        //    ViewBag.RoleHienTai = roles.Any() ? roles[0] : "";
+        //    return View(t);
+
+        //}
+        [HttpGet]
         public async Task<IActionResult> Update(string id)
         {
-            // Kiểm tra quyền của người dùng hiện tại
-            var currentUser = await userManager.GetUserAsync(User);
-            var currentUserRoles = await userManager.GetRolesAsync(currentUser);
-            var isModerator = currentUserRoles.Contains("Moderator");
-
-            ApplicationUser x = await db.Users.FirstOrDefaultAsync(i => i.Id == id);
-            if (x == null)
+            if (string.IsNullOrEmpty(id))
             {
-                return RedirectToAction("Index");
+                return NotFound();
             }
 
-            // Kiểm tra nếu là Moderator và người được chỉnh sửa là Admin
-            if (isModerator)
+            var user = await userManager.FindByIdAsync(id);
+            if (user == null)
             {
-                var userRoles = await userManager.GetRolesAsync(x);
-                if (userRoles.Contains("Admin"))
-                {
-                    TempData["Error"] = "Bạn không có quyền chỉnh sửa thông tin của Admin";
-                    return RedirectToAction("Index");
-                }
+                return NotFound();
             }
-            List<IdentityRole> ds = await db.Roles.ToListAsync();
-            if (isModerator)
-            {
-                ds = ds.Where(r => r.Name != "Admin").ToList();
-            }
-            var dsLTT = new SelectList(ds, "Name", "Name");
-            ViewBag.DanhSachRole = dsLTT;
-            var roles = await userManager.GetRolesAsync(x);
-            ViewBag.RoleHienTai = roles.Any() ? roles[0] : "";
-            return View(x);
+
+            // Get current roles
+            var currentRoles = await userManager.GetRolesAsync(user);
+
+            // Prepare roles for dropdown
+            var allRoles = await roleManager.Roles.ToListAsync();
+            ViewBag.DanhSachRole = new SelectList(allRoles, "Name", "Name");
+
+            return View(user);
         }
-      
+
         [HttpPost]
-        public async Task<IActionResult> Update(ApplicationUser t, string? LoaiTaiKhoan)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Update(ApplicationUser model, IFormFile? HinhAnhCapNhat, string? LoaiTaiKhoan)
         {
-            // Kiểm tra quyền của người dùng hiện tại
-            var currentUser = await userManager.GetUserAsync(User);
-            var currentUserRoles = await userManager.GetRolesAsync(currentUser);
-            var isModerator = currentUserRoles.Contains("Moderator");
-
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                ApplicationUser x = await db.Users.FirstOrDefaultAsync(i => i.Id == t.Id);
-                if (x == null)
-                {
-                    return RedirectToAction("Index");
-                }
-
-                // Kiểm tra nếu là Moderator
-                if (isModerator)
-                {
-                    // Kiểm tra xem người được chỉnh sửa có phải là Admin không
-                    var userRoles = await userManager.GetRolesAsync(x);
-                    if (userRoles.Contains("Admin"))
-                    {
-                        TempData["Error"] = "Bạn không có quyền chỉnh sửa thông tin của Admin";
-                        return RedirectToAction("Index");
-                    }
-
-                    // Giới hạn việc nâng cấp quyền
-                    if (LoaiTaiKhoan == "Admin")
-                    {
-                        TempData["Error"] = "Bạn không có quyền nâng cấp tài khoản lên Admin";
-                        return RedirectToAction("Index");
-                    }
-                }
-
-                if (LoaiTaiKhoan != null)
-                {
-                    var dsrole = await userManager.GetRolesAsync(x);
-                    await userManager.RemoveFromRolesAsync(x, dsrole);
-                    await userManager.AddToRoleAsync(x, LoaiTaiKhoan);
-                }
-
-                x.FullName = t.FullName;
-                x.Address = t.Address;
-                x.NgaySinh = t.NgaySinh;
-                x.CCCD = t.CCCD;
-                x.PhoneNumber = t.PhoneNumber;
-                x.Active = t.Active;
-
-                await db.SaveChangesAsync();
-                return RedirectToAction("Index");
+                var allRoles = await roleManager.Roles.ToListAsync();
+                ViewBag.DanhSachRole = new SelectList(allRoles, "Name", "Name");
+                TempData["ErrorMessage"] = "Vui lòng kiểm tra lại thông tin nhập";
+                return View(model);
             }
 
+            try
+            {
+                var user = await userManager.FindByIdAsync(model.Id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
 
-            List<IdentityRole> ds = await db.Roles.ToListAsync();
-            var dsLTT = new SelectList(ds, "Id", "Name");
-            ViewBag.DanhSachRole = dsLTT;
-            var roles = await userManager.GetRolesAsync(t);
-            ViewBag.RoleHienTai = roles.Any() ? roles[0] : "";
-            return View(t);
+                // Update basic info
+                user.FullName = model.FullName;
+                user.Email = model.Email;
+                user.PhoneNumber = model.PhoneNumber;
+                user.CCCD = model.CCCD;
+                user.NgaySinh = model.NgaySinh;
+                user.Address = model.Address;
+                user.Active = model.Active;
 
+                // Handle image upload
+                if (HinhAnhCapNhat != null && HinhAnhCapNhat.Length > 0)
+                {
+                    // Validate image
+                    if (HinhAnhCapNhat.Length > 5 * 1024 * 1024) // 5MB
+                    {
+                        TempData["ErrorMessage"] = "Kích thước ảnh tối đa là 5MB";
+                        return RedirectToAction("Update", new { id = model.Id });
+                    }
+
+                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+                    var fileExtension = Path.GetExtension(HinhAnhCapNhat.FileName).ToLower();
+                    if (!allowedExtensions.Contains(fileExtension))
+                    {
+                        TempData["ErrorMessage"] = "Chỉ chấp nhận file ảnh JPG, JPEG hoặc PNG";
+                        return RedirectToAction("Update", new { id = model.Id });
+                    }
+
+                    // Save new image
+                    var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "avatars");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    var uniqueFileName = Guid.NewGuid().ToString() + fileExtension;
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await HinhAnhCapNhat.CopyToAsync(fileStream);
+                    }
+
+                    // Delete old image if exists
+                    if (!string.IsNullOrEmpty(user.HinhAnh))
+                    {
+                        var oldImagePath = Path.Combine(_env.WebRootPath, user.HinhAnh.TrimStart('/'));
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                    }
+
+                    user.HinhAnh = $"/uploads/avatars/{uniqueFileName}";
+                }
+
+                // Update user
+                var result = await userManager.UpdateAsync(user);
+                if (!result.Succeeded)
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    return View(model);
+                }
+
+                // Handle role change
+                if (!string.IsNullOrEmpty(LoaiTaiKhoan))
+                {
+                    var currentRoles = await userManager.GetRolesAsync(user);
+                    await userManager.RemoveFromRolesAsync(user, currentRoles);
+                    await userManager.AddToRoleAsync(user, LoaiTaiKhoan);
+                }
+
+                TempData["SuccessMessage"] = "Cập nhật thông tin người dùng thành công";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Lỗi khi cập nhật: {ex.Message}";
+                return RedirectToAction("Update", new { id = model.Id });
+            }
         }
-
 
         [HttpPost]
         public async Task<IActionResult> HoatDong(string id)
@@ -457,7 +586,10 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     await userManager.RemoveFromRolesAsync(y, usrole);
                 }
 
-                DeleteImage(y.HinhAnh, "avatars");
+                if(y.HinhAnh != "/uploads/avatars/default-avatar.png" || y.HinhAnh != null || y.HinhAnh != "/uploads/avatars/default-avatar.svg")
+                {
+                    DeleteImage(y.HinhAnh, "avatars");
+                }
 
                 // Xóa user
                 db.Users.Remove(y);

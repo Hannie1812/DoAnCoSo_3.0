@@ -32,7 +32,6 @@ namespace WebTimNguoiThatLac.Controllers
         private readonly OtpService _otpService;
         private readonly ILogger<TimNguoiController> _logger;
         private const int ReportThreshold = 3;// vi pham
-        private const int ReportThreshold = 3;// vi pham
 
         /*private static readonly IEnumerable<string> TinhThanhIEnumerable = new List<string>
         {
@@ -355,12 +354,7 @@ namespace WebTimNguoiThatLac.Controllers
                 d++;
             }
 
-            if (quanHuyenId.HasValue)
-            {
-                query = query.Where(x => x.IdQuanHuyen == quanHuyenId.Value);
-                coBoLoc = true;
-            }
-
+            // Áp dụng bộ lọc đặc điểm nhận dạng (nâng cấp)
             if (!string.IsNullOrEmpty(dacDiem))
             {
                 // Tách các đặc điểm bằng dấu phẩy và loại bỏ khoảng trắng thừa

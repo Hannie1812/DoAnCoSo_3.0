@@ -563,29 +563,23 @@
                         </div>
                     </div>
 
-                    <!-- Khu vực -->
-                    <div class="col-md-3">
-                        <div class="form-floating">
-                            @Html.DropDownList("khuVuc", ViewBag.TinhThanhList as SelectList,
-                                     "-- Chọn khu vực --", new { @class = "form-select", id = "khuVuc" })
-                            <label for="khuVuc">
-                                <i class="fas fa-map-marker-alt me-2 text-muted"></i>Khu vực
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Đặc điểm nhận dạng -->
-                    <div class="col-md-5">
-                        <div class="form-floating">
-                            <input type="text" name="dacDiem" class="form-control"
-                                   id="dacDiem"
-                                   placeholder="Ví dụ: sẹo mắt trái, nốt ruồi má phải, áo đỏ"
-                                   value="@ViewBag.DacDiemFilter">
-                            <label for="dacDiem">
-                                <i class="fas fa-id-card me-2 text-muted"></i>Đặc điểm nhận dạng
-                            </label>
-                            <div class="form-text ps-4">
-                                <small><i class="fas fa-info-circle me-1 text-primary"></i>Nhập các đặc điểm cách nhau bằng dấu phẩy</small>
+                            <!-- Tỉnh Thành -->
+                            <div class="col-lg-2 col-md-6">
+                                <label class="form-label text-muted small mb-1">Tỉnh/Thành</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0">
+                                        <i class="fas fa-map-marker-alt text-primary"></i>
+                                    </span>
+                                    <select id="TinhThanh" name="tinhThanhId" class="form-select border-start-0 ps-0" onchange="loadQuanHuyen(this.value)">
+                                        <option value="">Tất cả tỉnh</option>
+                                        @foreach (var tinh in ViewBag.TinhThanhList as List<TinhThanh>)
+                                        {
+                                            <option value="@tinh.Id" selected="@(ViewBag.SelectedTinhThanh == tinh.Id ? "selected" : null)">
+                                                @tinh.TenTinhThanh
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
                             </div>
 
                             <!-- Quận Huyện -->

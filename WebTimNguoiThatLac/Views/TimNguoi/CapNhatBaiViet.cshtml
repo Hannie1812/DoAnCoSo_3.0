@@ -138,13 +138,26 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label asp-for="KhuVuc" class="font-weight-bold">Khu vực</label>
-                                    <select asp-for="KhuVuc" class="form-control" required>
-                                        @foreach (string i in ViewBag.DanhSachTinhThanh)
+                                    <label class="font-weight-bold">Tỉnh Thành</label>
+                                    <select id="TinhThanh" name="IdTinhThanh" class="form-control" onchange="loadQuanHuyen(this.value)">
+                                        <option value="">-- Chọn tỉnh/thành phố --</option>
+                                        @foreach (var tinh in ViewBag.DanhSachTinhThanh as List<TinhThanh> ?? new List<TinhThanh>())
                                         {
-                                            <option value="@i" selected="@(i == Model.KhuVuc)">@i</option>
+                                            <option value="@tinh.Id">@tinh.TenTinhThanh</option>
                                         }
                                     </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="font-weight-bold">Quận Huyện</label>
+                                    <select id="QuanHuyen" name="IdQuanHuyen" class="form-control">
+                                        <option value="">-- Chọn quận/huyện --</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="KhuVuc" class="font-weight-bold">Địa chỉ Cụ Thể</label>
+                                    <input asp-for="KhuVuc" class="form-control" placeholder="Nhập địa chỉ cụ thể (nếu có)" />
                                     <span asp-validation-for="KhuVuc" class="text-danger small"></span>
                                 </div>
                             </div>
@@ -212,19 +225,26 @@
 
                         <!-- Nút submit -->
                         <div class="form-group mt-4 text-right">
+                            <!-- Nút Cập nhật -->
                             <button type="submit" class="btn btn-primary px-4">
                                 <i class="fas fa-save mr-2"></i>Cập nhật
                             </button>
                             <a asp-action="BaiVietCuaToi" asp-controller="NguoiDung" class="btn btn-outline-secondary px-4">
                                 <i class="fas fa-times mr-2"></i>Hủy bỏ
                             </a>
+
                         </div>
+
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
 
 @section Styles {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
@@ -353,6 +373,22 @@
     </script>
     @* end so sánh với cơ sửo dl *@
     <script>
+        window.loadQuanHuyen = function(tinhThanhId) {
+            const quanHuyenSelect = document.getElementById('QuanHuyen');
+            quanHuyenSelect.innerHTML = '<option value="">-- Chọn quận/huyện --</option>';
+
+            if (!tinhThanhId) return;
+
+            fetch(`/Home/GetQuanHuyenByTinhThanh?tinhThanhId=${tinhThanhId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(item => {
+                        const option = new Option(item.tenQuanHuyen, item.id);
+                        quanHuyenSelect.add(option);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
         $(function () {
             // Khởi tạo Summernote
             $('#compose-textarea').summernote({

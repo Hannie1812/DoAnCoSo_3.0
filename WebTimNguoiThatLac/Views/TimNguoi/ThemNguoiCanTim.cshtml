@@ -1,7 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @model WebTimNguoiThatLac.Models.TimNguoi
 @inject UserManager<ApplicationUser> UserManager
-
 @{
     ViewData["Title"] = "Thêm Người Cần Tìm";
     ApplicationUser us = await UserManager.GetUserAsync(User);
@@ -109,7 +108,7 @@
                                 <span asp-validation-for="MoTa" class="text-danger small"></span>
                             </div>
 
-                            <div class="form-group">
+                            @* <div class="form-group">
                                 <label asp-for="KhuVuc" class="font-weight-bold">Khu Vực Mất Tích</label>
                                 <select asp-for="KhuVuc" class="form-control">
                                     <option value="">-- Chọn tỉnh/thành phố --</option>
@@ -119,7 +118,31 @@
                                     }
                                 </select>
                                 <span asp-validation-for="KhuVuc" class="text-danger small"></span>
+                            </div> *@
+                            <div class="form-group">
+                                <label class="font-weight-bold">Tỉnh Thành</label>
+                                <select id="TinhThanh" name="IdTinhThanh" class="form-control" onchange="loadQuanHuyen(this.value)">
+                                    <option value="">-- Chọn tỉnh/thành phố --</option>
+                                    @foreach (var tinh in ViewBag.DanhSachTinhThanh as List<TinhThanh> ?? new List<TinhThanh>())
+                                    {
+                                        <option value="@tinh.Id">@tinh.TenTinhThanh</option>
+                                    }
+                                </select>
                             </div>
+
+                            <div class="form-group">
+                                <label class="font-weight-bold">Quận Huyện</label>
+                                <select id="QuanHuyen" name="IdQuanHuyen" class="form-control">
+                                    <option value="">-- Chọn quận/huyện --</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="KhuVuc" class="font-weight-bold">Địa chỉ Cụ Thể</label>
+                                <input asp-for="KhuVuc" class="form-control" placeholder="Nhập địa chỉ cụ thể (nếu có)" />
+                                <span asp-validation-for="KhuVuc" class="text-danger small"></span>
+                            </div>
+
                         </div>
 
                         <!-- Image Upload Section -->
@@ -281,6 +304,23 @@
     <!-- Summernote -->
     <script src="~/clients/plugins/summernote/summernote-bs4.min.js"></script>
     <script>
+                   // Đảm bảo hàm này được định nghĩa trong global scope
+        window.loadQuanHuyen = function(tinhThanhId) {
+            const quanHuyenSelect = document.getElementById('QuanHuyen');
+            quanHuyenSelect.innerHTML = '<option value="">-- Chọn quận/huyện --</option>';
+
+            if (!tinhThanhId) return;
+
+            fetch(`/Home/GetQuanHuyenByTinhThanh?tinhThanhId=${tinhThanhId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(item => {
+                        const option = new Option(item.tenQuanHuyen, item.id);
+                        quanHuyenSelect.add(option);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
         $(function () {
             // Initialize Summernote
             $('#compose-textarea').summernote({

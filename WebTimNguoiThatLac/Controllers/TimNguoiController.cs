@@ -327,12 +327,12 @@ namespace WebTimNguoiThatLac.Controllers
                 .Include(u => u.AnhTimNguois)
                 .Where(i => i.active == true);
 
-            bool coBoLoc = false;
+            int d = 0;
 
             if (!string.IsNullOrEmpty(ten))
             {
                 query = query.Where(x => x.HoTen.Contains(ten) || x.TieuDe.Contains(ten));
-                coBoLoc = true;
+                d++;
             }
 
             // //Áp dụng bộ lọc khu vực
@@ -408,8 +408,7 @@ namespace WebTimNguoiThatLac.Controllers
                         return Redirect("/Identity/Account/Login");
                     }
 
-                    string tenTinhThanh = "";
-                    string tenQuanHuyen = "";
+
 
                     if (tinhThanhId.HasValue)
                     {
@@ -425,7 +424,7 @@ namespace WebTimNguoiThatLac.Controllers
                             tenQuanHuyen = quan.TenQuanHuyen;
                     }
 
-                    string khuVuc = $"{tenQuanHuyen} {tenTinhThanh}".Trim();
+                     khuVuc = $"{tenQuanHuyen} {tenTinhThanh}".Trim();
 
                     db.LichSuTimKiems.Add(new LichSuTimKiem
                     {
@@ -447,9 +446,8 @@ namespace WebTimNguoiThatLac.Controllers
                             NguoiDungId = nguoiDung.Id,
                             HanhDong = "Tìm kiếm quá nhiều",
                             ThoiGian = DateTime.UtcNow,
-                            ChiTiet = $"Đã tìm kiếm {soLanTimTrong1Phut} lần trong vòng 1 phút, Nghi ngờ bạn đang có ý định xâm hại hệ thống"
-                        };
-                        db.HanhViDangNgos.Add(hanhVi);
+                            ChiTiet = $"Đã tìm kiếm {soLanTim} lần trong vòng 1 phút, Nghi ngờ bạn đang có ý định xâm hại hệ thống"
+                        });
                         await db.SaveChangesAsync();
 
                         // 👉 Tăng số lần vi phạm của người dùng

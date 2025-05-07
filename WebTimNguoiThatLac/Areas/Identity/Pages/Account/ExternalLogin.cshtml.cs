@@ -130,17 +130,21 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
                               info.Principal.FindFirstValue("name") ??
                               email;
 
+                // Lấy URL avatar từ claims
+                var picture = info.Principal.Claims.FirstOrDefault(c => c.Type == "urn:google:picture")?.Value ?? 
+                                info.Principal.Claims.FirstOrDefault(c => c.Type == "picture")?.Value;
+
                 // Tạo user mới
                 user = new ApplicationUser
                 {
                     UserName = email,
                     Email = email,
                     EmailConfirmed = true,
-                    FullName = fullName, // Thêm giá trị cho trường bắt buộc
+                    FullName = fullName,
                     Active = true,
-                    // Thêm các trường bắt buộc khác nếu có
                     Address = "Chưa cập nhật",
-                    PhoneNumber = info.Principal.FindFirstValue(ClaimTypes.MobilePhone) ?? ""
+                    PhoneNumber = info.Principal.FindFirstValue(ClaimTypes.MobilePhone) ?? "",
+                    HinhAnh = picture // Lưu URL avatar
                 };
 
                 var createResult = await _userManager.CreateAsync(user);

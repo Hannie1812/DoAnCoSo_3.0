@@ -1,11 +1,19 @@
 is_global = true
 build_property.TargetFramework = net8.0
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
 build_property.TargetPlatformMinVersion = 
 build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
 build_property.ProjectTypeGuids = 
 build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
 build_property.PlatformNeutralAssembly = 
 build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = WebTimNguoiThatLac
 build_property.RootNamespace = WebTimNguoiThatLac
@@ -26,6 +34,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/Admin/Documents/Zalo Received Files/DoAnCoSo_3.0/WebTimNguoiThatLac/Areas/Admin/Views/BaiViet/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcQmFpVmlldFxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Admin/Documents/Zalo Received Files/DoAnCoSo_3.0/WebTimNguoiThatLac/Areas/Admin/Views/BaiViet/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcQmFpVmlldFxVcGRhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Admin/Documents/Zalo Received Files/DoAnCoSo_3.0/WebTimNguoiThatLac/Areas/Admin/Views/BaoCaoBaiViet/Details.cshtml]
@@ -114,6 +126,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/Admin/Documents/Zalo Received Files/DoAnCoSo_3.0/WebTimNguoiThatLac/Areas/Admin/Views/TrungBay/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcVHJ1bmdCYXlcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Admin/Documents/Zalo Received Files/DoAnCoSo_3.0/WebTimNguoiThatLac/Areas/Admin/Views/TrungBay/Update.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5cVmlld3NcVHJ1bmdCYXlcVXBkYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Admin/Documents/Zalo Received Files/DoAnCoSo_3.0/WebTimNguoiThatLac/Areas/Admin/Views/_ViewImports.cshtml]
@@ -328,6 +344,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmhhbkNodW5nXENyZWF0ZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Admin/Documents/Zalo Received Files/DoAnCoSo_3.0/WebTimNguoiThatLac/Views/NhanChung/Detail.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmhhbkNodW5nXERldGFpbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Admin/Documents/Zalo Received Files/DoAnCoSo_3.0/WebTimNguoiThatLac/Views/NhanChung/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTmhhbkNodW5nXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -360,8 +380,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Admin/Documents/Zalo Received Files/DoAnCoSo_3.0/WebTimNguoiThatLac/Views/Shared/_LayoutLienHeAdmin.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXRMaWVuSGVBZG1pbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Admin/Documents/Zalo Received Files/DoAnCoSo_3.0/WebTimNguoiThatLac/Views/Shared/_LayoutNavBar.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXROYXZCYXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Admin/Documents/Zalo Received Files/DoAnCoSo_3.0/WebTimNguoiThatLac/Views/Shared/_LayoutNguoiDungLienHe.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXROZ3VvaUR1bmdMaWVuSGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Admin/Documents/Zalo Received Files/DoAnCoSo_3.0/WebTimNguoiThatLac/Views/Shared/_LayoutStickyCallButton.cshtml]
@@ -394,6 +422,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/Admin/Documents/Zalo Received Files/DoAnCoSo_3.0/WebTimNguoiThatLac/Views/TimNguoi/ThemNguoiCanTim.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGltTmd1b2lcVGhlbU5ndW9pQ2FuVGltLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Admin/Documents/Zalo Received Files/DoAnCoSo_3.0/WebTimNguoiThatLac/Views/TimNguoi/TimKiemNangCao.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGltTmd1b2lcVGltS2llbU5hbmdDYW8uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Admin/Documents/Zalo Received Files/DoAnCoSo_3.0/WebTimNguoiThatLac/Views/TimNguoi/VerifyOtp.cshtml]

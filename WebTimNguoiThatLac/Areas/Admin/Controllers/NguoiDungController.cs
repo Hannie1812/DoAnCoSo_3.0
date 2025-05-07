@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using DocumentFormat.OpenXml.VariantTypes;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -21,20 +23,30 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         private ApplicationDbContext db;
         private UserManager<ApplicationUser> userManager;
         private RoleManager<IdentityRole> roleManager;
+        private readonly IWebHostEnvironment _env;
 
-        public  NguoiDungController(ApplicationDbContext db, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public NguoiDungController(IWebHostEnvironment env,ApplicationDbContext db, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             this.db = db;
             this.userManager = userManager;
             this.roleManager = roleManager;
-           
+            _env = env;
+
         }
        
-        public async Task<IActionResult> Index(string TimKiem = "", int Page = 1)
+        public async Task<IActionResult> Index(string TimKiem = "", string Role = "", int Page = 1)
         {
             IEnumerable<ApplicationUser> ds = await db.Users.ToListAsync();
             ViewBag.TimKiem = TimKiem;
+            ViewBag.Role = Role;
             int sodongtren1trang = 5;
+
+            // Lọc theo role nếu được chọn
+            if (!string.IsNullOrEmpty(Role))
+            {
+                var usersInRole = await userManager.GetUsersInRoleAsync(Role);
+                ds = ds.Where(u => usersInRole.Contains(u));
+            }
 
             if (TimKiem.IsNullOrEmpty())
             {
@@ -117,8 +129,9 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         {
             if (string.IsNullOrEmpty(ImageURL))
             {
-                throw new ArgumentException("Đường dẫn ảnh không hợp lệ!");
+                return; // Không làm gì nếu không có ảnh
             }
+          
 
             // Lấy đường dẫn tuyệt đối của ảnh trong thư mục wwwroot/uploads/
             string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", subFolder);
@@ -130,63 +143,230 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 System.IO.File.Delete(filePath);
             }
         }
+        //public async Task<IActionResult> Update(string id)
+        //{
+        //    // Kiểm tra quyền của người dùng hiện tại
+        //    var currentUser = await userManager.GetUserAsync(User);
+        //    var currentUserRoles = await userManager.GetRolesAsync(currentUser);
+        //    var isModerator = currentUserRoles.Contains("Moderator");
+
+        //    ApplicationUser x = await db.Users.FirstOrDefaultAsync(i => i.Id == id);
+        //    if (x == null)
+        //    {
+        //        return RedirectToAction("Index");
+        //    }
+
+        //    // Kiểm tra nếu là Moderator và người được chỉnh sửa là Admin
+        //    if (isModerator)
+        //    {
+        //        var userRoles = await userManager.GetRolesAsync(x);
+        //        if (userRoles.Contains("Admin"))
+        //        {
+        //            TempData["Error"] = "Bạn không có quyền chỉnh sửa thông tin của Admin";
+        //            return RedirectToAction("Index");
+        //        }
+        //    }
+        //    List<IdentityRole> ds = await db.Roles.ToListAsync();
+        //    if (isModerator)
+        //    {
+        //        ds = ds.Where(r => r.Name != "Admin").ToList();
+        //    }
+        //    var dsLTT = new SelectList(ds, "Name", "Name");
+        //    ViewBag.DanhSachRole = dsLTT;
+        //    var roles = await userManager.GetRolesAsync(x);
+        //    ViewBag.RoleHienTai = roles.Any() ? roles[0] : "";
+        //    return View(x);
+        //}
+
+        //[HttpPost]
+        //public async Task<IActionResult> Update(ApplicationUser t, string? LoaiTaiKhoan)
+        //{
+        //    // Kiểm tra quyền của người dùng hiện tại
+        //    var currentUser = await userManager.GetUserAsync(User);
+        //    var currentUserRoles = await userManager.GetRolesAsync(currentUser);
+        //    var isModerator = currentUserRoles.Contains("Moderator");
+
+        //    if (ModelState.IsValid)
+        //    {
+        //        ApplicationUser x = await db.Users.FirstOrDefaultAsync(i => i.Id == t.Id);
+        //        if (x == null)
+        //        {
+        //            return RedirectToAction("Index");
+        //        }
+
+        //        // Kiểm tra nếu là Moderator
+        //        if (isModerator)
+        //        {
+        //            // Kiểm tra xem người được chỉnh sửa có phải là Admin không
+        //            var userRoles = await userManager.GetRolesAsync(x);
+        //            if (userRoles.Contains("Admin"))
+        //            {
+        //                TempData["Error"] = "Bạn không có quyền chỉnh sửa thông tin của Admin";
+        //                return RedirectToAction("Index");
+        //            }
+
+        //            // Giới hạn việc nâng cấp quyền
+        //            if (LoaiTaiKhoan == "Admin")
+        //            {
+        //                TempData["Error"] = "Bạn không có quyền nâng cấp tài khoản lên Admin";
+        //                return RedirectToAction("Index");
+        //            }
+        //        }
+
+        //        if (LoaiTaiKhoan != null)
+        //        {
+        //            var dsrole = await userManager.GetRolesAsync(x);
+        //            await userManager.RemoveFromRolesAsync(x, dsrole);
+        //            await userManager.AddToRoleAsync(x, LoaiTaiKhoan);
+        //        }
+
+        //        x.FullName = t.FullName;
+        //        x.Address = t.Address;
+        //        x.NgaySinh = t.NgaySinh;
+        //        x.CCCD = t.CCCD;
+        //        x.PhoneNumber = t.PhoneNumber;
+        //        x.Active = t.Active;
+
+        //        await db.SaveChangesAsync();
+        //        return RedirectToAction("Index");
+        //    }
+
+
+        //    List<IdentityRole> ds = await db.Roles.ToListAsync();
+        //    var dsLTT = new SelectList(ds, "Id", "Name");
+        //    ViewBag.DanhSachRole = dsLTT;
+        //    var roles = await userManager.GetRolesAsync(t);
+        //    ViewBag.RoleHienTai = roles.Any() ? roles[0] : "";
+        //    return View(t);
+
+        //}
+        [HttpGet]
         public async Task<IActionResult> Update(string id)
         {
-            ApplicationUser x = await db.Users.FirstOrDefaultAsync(i => i.Id == id);
-            if (x == null)
+            if (string.IsNullOrEmpty(id))
             {
-                return RedirectToAction("Index");
+                return NotFound();
             }
-            List<IdentityRole> ds = await db.Roles.ToListAsync();
-            var dsLTT = new SelectList(ds, "Name", "Name");
-            ViewBag.DanhSachRole = dsLTT;
-            var roles = await userManager.GetRolesAsync(x);
-            ViewBag.RoleHienTai = roles.Any() ? roles[0] : "";
-            return View(x);
+
+            var user = await userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // Get current roles
+            var currentRoles = await userManager.GetRolesAsync(user);
+
+            // Prepare roles for dropdown
+            var allRoles = await roleManager.Roles.ToListAsync();
+            ViewBag.DanhSachRole = new SelectList(allRoles, "Name", "Name");
+
+            return View(user);
         }
-      
+
         [HttpPost]
-        public async Task<IActionResult> Update(ApplicationUser t, string? LoaiTaiKhoan)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Update(ApplicationUser model, IFormFile? HinhAnhCapNhat, string? LoaiTaiKhoan)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                ApplicationUser x = await db.Users.FirstOrDefaultAsync(i => i.Id == t.Id);
-                if (x == null)
-                {
-                    return RedirectToAction("Index");
-                }
-
-                if (LoaiTaiKhoan != null)
-                {
-
-                    var dsrole = await userManager.GetRolesAsync(x);
-                    await userManager.RemoveFromRolesAsync(x, dsrole);
-
-                    await userManager.AddToRoleAsync(x, LoaiTaiKhoan);
-
-                }
-
-                x.FullName = t.FullName;
-                x.Address = t.Address;
-                x.NgaySinh = t.NgaySinh;
-                x.CCCD = t.CCCD;
-                x.PhoneNumber = t.PhoneNumber;
-                x.Active = t.Active;
-
-                await db.SaveChangesAsync();
-                return RedirectToAction("Index");
+                var allRoles = await roleManager.Roles.ToListAsync();
+                ViewBag.DanhSachRole = new SelectList(allRoles, "Name", "Name");
+                TempData["ErrorMessage"] = "Vui lòng kiểm tra lại thông tin nhập";
+                return View(model);
             }
 
+            try
+            {
+                var user = await userManager.FindByIdAsync(model.Id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
 
-            List<IdentityRole> ds = await db.Roles.ToListAsync();
-            var dsLTT = new SelectList(ds, "Id", "Name");
-            ViewBag.DanhSachRole = dsLTT;
-            var roles = await userManager.GetRolesAsync(t);
-            ViewBag.RoleHienTai = roles.Any() ? roles[0] : "";
-            return View(t);
+                // Update basic info
+                user.FullName = model.FullName;
+                user.Email = model.Email;
+                user.PhoneNumber = model.PhoneNumber;
+                user.CCCD = model.CCCD;
+                user.NgaySinh = model.NgaySinh;
+                user.Address = model.Address;
+                user.Active = model.Active;
 
+                // Handle image upload
+                if (HinhAnhCapNhat != null && HinhAnhCapNhat.Length > 0)
+                {
+                    // Validate image
+                    if (HinhAnhCapNhat.Length > 5 * 1024 * 1024) // 5MB
+                    {
+                        TempData["ErrorMessage"] = "Kích thước ảnh tối đa là 5MB";
+                        return RedirectToAction("Update", new { id = model.Id });
+                    }
+
+                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+                    var fileExtension = Path.GetExtension(HinhAnhCapNhat.FileName).ToLower();
+                    if (!allowedExtensions.Contains(fileExtension))
+                    {
+                        TempData["ErrorMessage"] = "Chỉ chấp nhận file ảnh JPG, JPEG hoặc PNG";
+                        return RedirectToAction("Update", new { id = model.Id });
+                    }
+
+                    // Save new image
+                    var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "avatars");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    var uniqueFileName = Guid.NewGuid().ToString() + fileExtension;
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await HinhAnhCapNhat.CopyToAsync(fileStream);
+                    }
+
+                    // Delete old image if exists
+                    if (!string.IsNullOrEmpty(user.HinhAnh))
+                    {
+                        var oldImagePath = Path.Combine(_env.WebRootPath, user.HinhAnh.TrimStart('/'));
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                    }
+
+                    user.HinhAnh = $"/uploads/avatars/{uniqueFileName}";
+                }
+
+                // Update user
+                var result = await userManager.UpdateAsync(user);
+                if (!result.Succeeded)
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    return View(model);
+                }
+
+                // Handle role change
+                if (!string.IsNullOrEmpty(LoaiTaiKhoan))
+                {
+                    var currentRoles = await userManager.GetRolesAsync(user);
+                    await userManager.RemoveFromRolesAsync(user, currentRoles);
+                    await userManager.AddToRoleAsync(user, LoaiTaiKhoan);
+                }
+
+                TempData["SuccessMessage"] = "Cập nhật thông tin người dùng thành công";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Lỗi khi cập nhật: {ex.Message}";
+                return RedirectToAction("Update", new { id = model.Id });
+            }
         }
-
 
         [HttpPost]
         public async Task<IActionResult> HoatDong(string id)
@@ -211,6 +391,8 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             }
         }
 
+        
+
         [HttpPost]
         public async Task<IActionResult> Delete(string id)
         {
@@ -222,139 +404,207 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     return Json(new { success = false, message = "Ko Có Id Cần Xóa" });
                 }
 
+                ApplicationUser hientai = await userManager.GetUserAsync(User);
+                if(hientai == null || y.Id == hientai.Id)
+                {
+                    return Json(new { success = false, message = "Ko xóa Bản Thân Mình" });
+                }
 
+                // Xóa các bài tìm người liên quan
                 List<TimNguoi> ds = await db.TimNguois
-                                                        .Include(u => u.ApplicationUser)
-                                                        .Include(u => u.AnhTimNguois)
-                                                        .Where(i => i.IdNguoiDung == id)
-                                                        .ToListAsync();
+                                            .Include(u => u.AnhTimNguois)
+                                            .Include(u => u.ApplicationUser)
+                                            .Include(u => u.BaoCaoBaiViets)
+                                                .ThenInclude(v => v.ApplicationUser)
+                                            .Include(u => u.NhanChungs)
+                                            .Include(u => u.BinhLuans)
+                                                .ThenInclude(v => v.ApplicationUser)
+                                            .Include(u => u.TimThayNguoiThatLacs)
+                                            .Where(i => i.IdNguoiDung == id)
+                                            .ToListAsync();
+
+
+                // Xóa Báo Cáo Bình Luận
+                var dsBCBLUS = await db.BaoCaoBinhLuans
+                                 .Where(m => m.MaNguoiBaoCao == y.Id)
+                                 .ToListAsync();
+                db.BaoCaoBinhLuans.RemoveRange(dsBCBLUS);
+
+                // Xóa bình luận của us
+                var dsBLus = await db.BinhLuans
+                                   .Where(m => m.UserId == y.Id)
+                                   .ToListAsync();
+
+
+                foreach(var d in dsBLus)
+                {
+                    List<BaoCaoBinhLuan> dsBCBLCUAUS = db.BaoCaoBinhLuans.Where(i => i.MaBinhLuan == d.Id).ToList();
+                    db.BaoCaoBinhLuans.RemoveRange(dsBCBLCUAUS);
+                }
+
+                foreach (var d in dsBLus)
+                {
+                    DeleteImage(d.HinhAnh, "BinhLuan");
+                }
+                db.BinhLuans.RemoveRange(dsBLus);
+
+                // xóa người dùng báo cáo bài viết
+                var dsBCBVUS = await db.BaoCaoBaiViets
+                                 .Where(m => m.MaNguoiBaoCao == y.Id)
+                                 .ToListAsync();
+                foreach (var d in dsBCBVUS)
+                {
+                    DeleteImage(d.HinhAnh, "AnhMinhTrungBaoCaoBaiViet");
+                }
+                db.BaoCaoBaiViets.RemoveRange(dsBCBVUS);
+
+
+                // Xóa Tìm Thấy Thất Lạc
+                var dsTimThayUS = await db.TimThayNguoiThatLacs
+                                  .Where(m => m.IdNguoiLamDon == y.Id)
+                                  .ToListAsync();
+                foreach (var d in dsTimThayUS)
+                {
+                    DeleteImage(d.AnhMinhChung, "AnhMinhChungTimThay");
+                }
+                db.TimThayNguoiThatLacs.RemoveRange(dsTimThayUS);
+
+
                 foreach (TimNguoi i in ds)
                 {
-                    // Xóa ảnh tìm người
-                    List<AnhTimNguoi> dsHA = await db.AnhTimNguois.Where(m => m.IdNguoiCanTim == i.Id).ToListAsync();
-                    foreach (AnhTimNguoi j in dsHA)
+                    // Xóa ảnh liên quan đến bài tìm người
+                    var dsHA = await db.AnhTimNguois
+                                       .Where(m => m.IdNguoiCanTim == i.Id)
+                                       .ToListAsync();
+                    foreach(var d in dsHA)
                     {
-                        DeleteImage(j.HinhAnh, "AnhNguoiCanTim");
-                        db.AnhTimNguois.Remove(j);
-                        //await db.SaveChangesAsync();
+                        DeleteImage(d.HinhAnh, "AnhNguoiCanTim");
                     }
+                    db.AnhTimNguois.RemoveRange(dsHA);
 
-                    // Xóa Bình luôanj trong bài viết
-                    List<BinhLuan> dsBL = await db.BinhLuans.Where(m => m.IdBaiViet == i.Id).ToListAsync();
-                    foreach (BinhLuan z in dsBL)
+
+                   
+
+                    // Xóa bình luận của bài viết
+                    var dsBLBV = await db.BinhLuans
+                                       .Where(m => m.IdBaiViet == i.Id)
+                                       .ToListAsync();
+                    foreach (var d in dsBLBV)
                     {
-                        if (z.HinhAnh != null)
-                        {
-                            DeleteImage(z.HinhAnh, "BinhLuan");
-                        }
-                        db.BinhLuans.Remove(z);
-                        //await db.SaveChangesAsync();
-                    }
+                        // Xóa Báo Cáo Bình Luận Trong Bài viết
+                        var dsBCBL = await db.BaoCaoBinhLuans
+                                         .Where(m => m.MaBinhLuan == d.Id)
+                                         .ToListAsync();
+                        db.BaoCaoBinhLuans.RemoveRange(dsBCBL);
+                        DeleteImage(d.HinhAnh, "BinhLuan");
 
+                    }
+                    db.BinhLuans.RemoveRange(dsBLBV);
+
+
+
+                    // Xóa Nhân Chứng
+                    var dsNhanChung = await db.NhanChungs
+                                      .Where(m => m.TimNguoiId == i.Id)
+                                      .ToListAsync();
+                    foreach (var d in dsNhanChung)
+                    {
+                        DeleteImage(d.FileDinhKem, "AnhNhanChung");
+                    }
+                    db.NhanChungs.RemoveRange(dsNhanChung);
+
+
+                    
+
+                    // Xóa Báo Cáo Bài viết
+
+                    var dsBCBV = await db.BaoCaoBaiViets
+                                      .Where(m => m.MaBaiViet == i.Id)
+                                      .ToListAsync();
+                    foreach (var d in dsBCBV)
+                    {
+                        DeleteImage(d.HinhAnh, "AnhMinhTrungBaoCaoBaiViet");
+                    }
+                    db.BaoCaoBaiViets.RemoveRange(dsBCBV);
+
+
+                    // Xóa Tìm Thấy Thất Lạc
+                    var dsTimThay = await db.TimThayNguoiThatLacs
+                                      .Where(m => m.TimNguoiId == i.Id)
+                                      .ToListAsync();
+                    foreach (var d in dsTimThay)
+                    {
+                        DeleteImage(d.AnhMinhChung, "AnhMinhChungTimThay");
+                    }
+                    db.TimThayNguoiThatLacs.RemoveRange(dsTimThay);
+
+                    // Xóa bài tìm người
                     db.TimNguois.Remove(i);
-                    //await db.SaveChangesAsync();
                 }
 
-                // Xóa toàm bộ bình luận người dùng
-                List<BinhLuan> BLUS = await db.BinhLuans
-                                                     .Include(u => u.ApplicationUser)
-                                                     .Where(i => i.UserId == y.Id)
-                                                     .ToListAsync();
+                // xóa tin nhắn
 
-                foreach (BinhLuan j in BLUS)
+                var dsNguoiThamGia = db.NguoiThamGias.Where(m => m.MaNguoiThamGia == y.Id);
+
+                List<HopThoaiTinNhan> hopThoaiTinNhans = new List<HopThoaiTinNhan>();
+                foreach(var d in dsNguoiThamGia)
                 {
-                    if (j.HinhAnh != null)
-                    {
-                        DeleteImage(j.HinhAnh, "BinhLuan");
-                    }
-                    db.BinhLuans.Remove(j);
+                    HopThoaiTinNhan ht = db.HopThoaiTinNhans.FirstOrDefault(u => u.Id == d.MaHopThoaiTinNhan);
+                    hopThoaiTinNhans.Add(ht);
                 }
 
+                foreach(var d in hopThoaiTinNhans)
+                {
+                    // xóa tin nhắn trong họp thoại
+                    List<TinNhan> tinnhan = db.TinNhans.Where(z => z.MaHopThoaiTinNhan == d.Id).ToList();
+                    foreach(var t in tinnhan)
+                    {
+                        DeleteImage(t.HinhAnh, "AnhTinNhan");
+                    }
+                    db.TinNhans.RemoveRange(tinnhan);
+
+                    // xóa nguòi tham gia 
+                    List<NguoiThamGia> nguoiThamGias = db.NguoiThamGias.Where(u => u.MaHopThoaiTinNhan == d.Id).ToList();
+                    db.NguoiThamGias.RemoveRange(nguoiThamGias);
+                }
+                // xóa họp thoại
+                db.HopThoaiTinNhans.RemoveRange(hopThoaiTinNhans);
+
+                // Xóa Lí Tim Kiếm
+                var lstimkiem = db.LichSuTimKiems.Where(i=> i.IdNguoiDung == y.Id).ToList();
+                db.LichSuTimKiems.RemoveRange(lstimkiem);
+
+                // 
+                var hanhvidangngo = db.HanhViDangNgos.Where(i => i.NguoiDungId == y.Id).ToList();
+                db.HanhViDangNgos.RemoveRange(hanhvidangngo);
 
 
+                // Xóa vai trò của user
                 var usrole = await userManager.GetRolesAsync(y);
-
-                if (usrole != null)
+                if (usrole != null && usrole.Any())
                 {
                     await userManager.RemoveFromRolesAsync(y, usrole);
                 }
 
+                if(y.HinhAnh != "/uploads/avatars/default-avatar.png" || y.HinhAnh != null || y.HinhAnh != "/uploads/avatars/default-avatar.svg")
+                {
+                    DeleteImage(y.HinhAnh, "avatars");
+                }
+
+                // Xóa user
                 db.Users.Remove(y);
 
-
+                // Lưu thay đổi chỉ một lần
                 await db.SaveChangesAsync();
 
-                return Json(new { success = true, message = "Thành Công" });
+                return Json(new { success = true, message = "Xóa thành công" });
             }
             catch (Exception ex)
             {
                 return Json(new { success = false, message = "Lỗi: " + ex.Message });
             }
+
         }
-
-
-        //[HttpPost]
-        //public async Task<IActionResult> Delete(string id)
-        //{
-        //    try
-        //    {
-        //        ApplicationUser y = await db.Users.FirstOrDefaultAsync(i => i.Id == id);
-        //        if (y == null)
-        //        {
-        //            return Json(new { success = false, message = "Ko Có Id Cần Xóa" });
-        //        }
-
-        //        // Xóa các bài tìm người liên quan
-        //        List<TimNguoi> ds = await db.TimNguois
-        //                                    .Include(u => u.AnhTimNguois)
-        //                                    .Where(i => i.IdNguoiDung == id)
-        //                                    .ToListAsync();
-
-        //        foreach (TimNguoi i in ds)
-        //        {
-        //            // Xóa ảnh liên quan đến bài tìm người
-        //            var dsHA = await db.AnhTimNguois
-        //                               .Where(m => m.IdNguoiCanTim.HasValue && m.IdNguoiCanTim.Value == i.Id)
-        //                               .ToListAsync();
-        //            db.AnhTimNguois.RemoveRange(dsHA);
-
-        //            // Xóa bình luận của bài viết
-        //            var dsBLBV = await db.BinhLuans
-        //                               .Where(m => m.IdBaiViet == i.Id)
-        //                               .ToListAsync();
-        //            db.BinhLuans.RemoveRange(dsBLBV);
-
-        //            // Xóa bình luận của us
-        //            var dsBLus = await db.BinhLuans
-        //                               .Where(m => m.UserId == y.Id)
-        //                               .ToListAsync();
-        //            db.BinhLuans.RemoveRange(dsBLus);
-
-        //            // Xóa bài tìm người
-        //            db.TimNguois.Remove(i);
-        //        }
-
-        //        // Xóa vai trò của user
-        //        var usrole = await userManager.GetRolesAsync(y);
-        //        if (usrole != null && usrole.Any())
-        //        {
-        //            await userManager.RemoveFromRolesAsync(y, usrole);
-        //        }
-
-        //        // Xóa user
-        //        db.Users.Remove(y);
-
-        //        // Lưu thay đổi chỉ một lần
-        //        await db.SaveChangesAsync();
-
-        //        return Json(new { success = true, message = "Xóa thành công" });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Json(new { success = false, message = "Lỗi: " + ex.InnerException?.Message ?? ex.Message });
-        //    }
-
-        //}
 
 
     }

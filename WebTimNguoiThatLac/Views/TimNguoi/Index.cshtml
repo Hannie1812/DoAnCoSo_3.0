@@ -3,240 +3,559 @@
 @using X.PagedList.Mvc.Core;
 
 @{
-    ViewData["Title"] = "Danh Sách Bài Viết";
+    ViewData["Title"] = "Danh Sách Người Thất Lạc";
 }
 
-<style >
-    /* Style cho phân trang */
-    .pagination {
-    margin-top: 20px;
-    }
-
-    .page-item .page-link {
-    border-radius: 50% !important;
-    margin: 0 5px;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    color: #333;
-    }
-
-    .page-item.active .page-link {
-    background-color: #ff6a00; /* Màu cam */
-    border-color: #ff6a00;
-    color: white;
-    }
-
-    .page-item:not(.active) .page-link:hover {
-    background-color: #ffe0cc; /* Màu cam nhạt khi hover */
-    color: #ff6a00;
-    }
-
-    /* Căn giữa toàn bộ phần phân trang */
-    .pagination-container {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    }
-</style>
-
-<!-- Thêm vào phần đầu trang -->
-<div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
-
 <style>
-    .notification {
-        padding: 15px 20px;
-        margin-bottom: 10px;
-        border-radius: 5px;
-        color: white;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        animation: slideIn 0.3s, fadeOut 0.5s 4.5s;
+    /* Main container */
+    .search-container {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        padding: 25px;
+        margin-bottom: 30px;
+    }
+
+    /* Search form elements */
+    .search-form .form-group {
+        margin-bottom: 1.2rem;
+    }
+
+    .search-form label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+    .search-form .form-control {
+        border-radius: 8px;
+        padding: 10px 15px;
+        border: 1px solid #ced4da;
         transition: all 0.3s;
     }
 
-        .notification.success {
-            background-color: #28a745;
+        .search-form .form-control:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
         }
 
-        .notification.error {
-            background-color: #dc3545;
-        }
-
-        .notification.warning {
-            background-color: #ffc107;
-            color: #212529;
-        }
-
-        .notification.info {
-            background-color: #17a2b8;
-        }
-
-    @@keyframes slideIn {
-        from {
-            transform: translateX(100%);
-        }
-
-        to {
-            transform: translateX(0);
-        }
+    /* Search buttons */
+    .btn-search {
+        background-color: #28a745;
+        color: white;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 600;
+        transition: all 0.3s;
     }
 
-    @@keyframes fadeOut {
-        from {
-            opacity: 1;
+        .btn-search:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
         }
 
-        to {
-            opacity: 0;
+    .btn-reset {
+        background-color: #6c757d;
+        color: white;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+        .btn-reset:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+        }
+
+    /* Result cards */
+    .person-card {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        margin-bottom: 25px;
+        border: none;
+    }
+
+        .person-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+        }
+
+        .person-card .card-img-top {
+            height: 250px;
+            object-fit: cover;
+            width: 100%;
+        }
+
+        .person-card .card-body {
+            padding: 20px;
+        }
+
+        .person-card .card-title {
+            font-weight: 700;
+            color: #343a40;
+            margin-bottom: 15px;
+        }
+
+        .person-card .card-text {
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .person-card .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+    .status-searching {
+        background-color: #ffc107;
+        color: #212529;
+    }
+
+    .status-found {
+        background-color: #28a745;
+        color: white;
+    }
+
+    /* Tags */
+    .tag-container {
+        margin-top: 10px;
+        margin-bottom: 15px;
+    }
+
+    .tag {
+        display: inline-block;
+        background-color: #e9ecef;
+        color: #495057;
+        padding: 4px 10px;
+        margin: 0 5px 5px 0;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        transition: all 0.2s;
+    }
+
+        .tag:hover {
+            background-color: #dee2e6;
+            transform: translateY(-1px);
+        }
+
+    .tag-highlight {
+        background-color: #fff3cd;
+        color: #856404;
+        font-weight: 600;
+    }
+
+    /* Pagination */
+    .pagination-container {
+        margin-top: 30px;
+    }
+
+    .page-item .page-link {
+        border-radius: 8px !important;
+        margin: 0 3px;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #dee2e6;
+        color: #495057;
+        font-weight: 600;
+    }
+
+    .page-item.active .page-link {
+        background-color: #28a745;
+        border-color: #28a745;
+        color: white;
+    }
+
+    .page-item:not(.active) .page-link:hover {
+        background-color: #e9ecef;
+        color: #28a745;
+    }
+
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+    }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h4 {
+            color: #343a40;
+            margin-bottom: 15px;
+        }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .search-form .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .person-card {
+            margin-bottom: 20px;
         }
     }
 </style>
 
+ <!-- Thêm vào phần đầu trang --> 
+ <div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div> 
 
+ <style> 
+     .notification { 
+         padding: 15px 20px; 
+         margin-bottom: 10px; 
+         border-radius: 5px; 
+         color: white; 
+         box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+         animation: slideIn 0.3s, fadeOut 0.5s 4.5s; 
+         transition: all 0.3s; 
+     } 
 
-<!-- Nội dung -->
-<!-- Search Form -->
-<section class="ftco-section">
-    <div class="container">
-        <div class="row justify-content-center mb-5">
-            <div class="col-md-10">
-                <div class="card shadow">
-                    <div class="card-body">
-                        <form asp-action="Index" method="get" class="form-inline">
-                            <div class="form-group mx-2 mb-2">
-                                <input type="text" name="ten" class="form-control" placeholder="Tên hoặc tiêu đề" value="@ViewBag.TenFilter">
-                            </div>
-                            <div class="form-group mx-2 mb-2">
-                                @Html.DropDownList("khuVuc", ViewBag.TinhThanhList as SelectList, "-- Chọn khu vực --", new { @class = "form-control" })
-                            </div>
-                            <div class="form-group mx-2 mb-2">
-                                <input type="text" name="dacDiem" class="form-control" placeholder="Đặc điểm nhận dạng" value="@ViewBag.DacDiemFilter">
-                            </div>
-                            <button type="submit" class="btn btn-primary mb-2 mx-2">
-                                <i class="fa fa-search"></i> Tìm kiếm
-                            </button>
-                            <a asp-action="Index" class="btn btn-secondary mb-2">
-                                <i class="fa fa-refresh"></i> Xóa lọc
-                            </a>
-                        </form>
-                    </div>
-                </div>
+         .notification.success { 
+             background-color: #28a745; 
+         } 
+
+         .notification.error { 
+             background-color: #dc3545; 
+         } 
+
+         .notification.warning { 
+             background-color: #ffc107; 
+             color: #212529; 
+         } 
+
+         .notification.info { 
+             background-color: #17a2b8; 
+         } 
+
+     @@keyframes slideIn { 
+         from { 
+             transform: translateX(100%); 
+         } 
+
+         to { 
+             transform: translateX(0); 
+         } 
+     } 
+
+     @@keyframes fadeOut { 
+         from { 
+             opacity: 1; 
+         } 
+
+         to { 
+             opacity: 0;
+         } 
+     } 
+ </style>
+
+<style>
+    .search-form .form-floating label {
+        padding-left: 2.5rem;
+    }
+
+    .search-form .form-floating > .form-control ~ label::after,
+    .search-form .form-floating > .form-select ~ label::after {
+        background-color: transparent !important;
+    }
+
+    .search-form .form-floating > .form-control:not(:placeholder-shown) ~ label,
+    .search-form .form-floating > .form-select ~ label {
+        opacity: 1;
+        transform: scale(0.85) translateY(-1.2rem) translateX(0.5rem);
+    }
+
+    .search-form .form-text {
+        margin-top: 0.25rem;
+        margin-left: 0.5rem;
+    }
+
+    .card-header i.fs-4 {
+        width: 24px;
+        text-align: center;
+    }
+</style>
+
+<!-- Search Section - Redesigned -->
+<div class="container my-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white py-3">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-search me-3 fs-4"></i>
+                <h4 class="mb-0">Tìm kiếm người thất lạc</h4>
             </div>
         </div>
 
-        <!-- Results -->
-        <div class="row">
-            @if (Model != null && Model.Any())
-            {
-                foreach (var i in Model)
-                {
-                    AnhTimNguoi anhdau = i.AnhTimNguois?.FirstOrDefault(z => z.IdNguoiCanTim == i.Id && z.TrangThai == 1);
-                    <div class="col-md-4 ftco-animate">
-                        <div class="cause-entry">
-                            @if (anhdau!=null)
-                            {
-                                <a asp-controller="TimNguoi" asp-action="ChiTietBaiTimNguoi" asp-route-id="@i.Id" class="img" style="background-image: url(@anhdau.HinhAnh);"></a>
-                            }
-                            else
-                            {
-                                <p class="p-3 text-center">Xem Tin</p>
+        <div class="card-body">
+            <form asp-action="Index" method="get" class="search-form">
+                <div class="row g-3">
+                    <!-- Tên/Tiêu đề -->
+                    <div class="col-md-12">
+                        <div class="form-floating">
+                            <input type="text" name="ten" class="form-control"
+                                   id="ten" placeholder="Nhập tên hoặc tiêu đề"
+                                   value="@ViewBag.TenFilter">
+                            <label for="ten">
+                                <i class="fas fa-user-tag me-2 text-muted"></i>Tên hoặc tiêu đề
+                            </label>
+                        </div>
+                    </div>
 
-                            }
-                            <div class="text p-3 p-md-4">
-                                <h3><a asp-controller="TimNguoi" asp-action="ChiTietBaiTimNguoi" asp-route-id="@i.Id">@i.TieuDe</a></h3>
-                                <p>@i.HoTen</p>
-                                <p>@i.DaciemNhanDang</p>
-                                <span class="donation-time mb-3 d-block">@i.KhuVuc</span>
-                                <span class="donation-time mb-3 d-block">@i.NgayDang.ToString()</span>
-                                <div class="progress custom-progress-success">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 28%" aria-valuenow="28" aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
-                                <span class="fund-raised d-block">$12,000 raised of $30,000</span>
+                    <!-- Khu vực -->
+                    @* <div class="col-md-3"> *@
+                    @*     <div class="form-floating"> *@
+                    @*         @Html.DropDownList("khuVuc", ViewBag.TinhThanhList as SelectList, *@
+                    @*                  "-- Chọn khu vực --", new { @class = "form-select", id = "khuVuc" }) *@
+                    @*         <label for="khuVuc"> *@
+                    @*             <i class="fas fa-map-marker-alt me-2 text-muted"></i>Khu vực *@
+                    @*         </label> *@
+                    @*     </div> *@
+                    @* </div> *@
+
+                    <!-- Tỉnh Thành -->
+                    <div class=" col-md-6">
+                        <label class="form-label text-muted small mb-1">Tỉnh/Thành</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fas fa-map-marker-alt text-primary"></i>
+                            </span>
+                            <select id="TinhThanh" name="tinhThanhId" class="form-select border-start-0 ps-0" onchange="loadQuanHuyen(this.value)">
+                                <option value="">Tất cả tỉnh</option>
+                                @foreach (var tinh in ViewBag.TinhThanhList as List<WebTimNguoiThatLac.Models.TinhThanh>)
+                                {
+                                    <option value="@tinh.Id" selected="@(ViewBag.SelectedTinhThanh == tinh.Id ? "selected" : null)">
+                                        @tinh.TenTinhThanh
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Quận Huyện -->
+                    <div class=" col-md-6">
+                        <label class="form-label text-muted small mb-1">Quận/Huyện</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fas fa-map-pin text-primary"></i>
+                            </span>
+                            <select id="QuanHuyen" name="quanHuyenId" class="form-select border-start-0 ps-0">
+                                <option value="">Tất cả quận</option>
+                                @if (ViewBag.SelectedTinhThanh != null)
+                                {
+                                    var quanHuyenList = ViewBag.QuanHuyenList as List<WebTimNguoiThatLac.Models.QuanHuyen>;
+                                    foreach (var huyen in quanHuyenList.Where(q => q.IdTinhThanh == ViewBag.SelectedTinhThanh))
+                                    {
+                                        <option value="@huyen.Id" selected="@(ViewBag.SelectedQuanHuyen == huyen.Id ? "selected" : null)">
+                                            @huyen.TenQuanHuyen
+                                        </option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Đặc điểm nhận dạng -->
+                    <div class="col-md-5">
+                        <div class="form-floating">
+                            <input type="text" name="dacDiem" class="form-control"
+                                   id="dacDiem"
+                                   placeholder="Ví dụ: sẹo mắt trái, nốt ruồi má phải, áo đỏ"
+                                   value="@ViewBag.DacDiemFilter">
+                            <label for="dacDiem">
+                                <i class="fas fa-id-card me-2 text-muted"></i>Đặc điểm nhận dạng
+                            </label>
+                            <div class="form-text ps-4">
+                                <small><i class="fas fa-info-circle me-1 text-primary"></i>Nhập các đặc điểm cách nhau bằng dấu phẩy</small>
                             </div>
                         </div>
                     </div>
-                    
-                }
-            }
-            else
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="row mt-4">
+                    <div class="col-12 d-flex justify-content-end gap-2">
+                        <button type="submit" class="btn btn-primary px-4 py-2">
+                            <i class="fas fa-search me-2"></i> Tìm kiếm
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4 py-2">
+                            <i class="fas fa-undo me-2"></i> Đặt lại
+                        </a>
+                        <a asp-action="TimKiemNangCao" class="btn btn-outline-primary px-4 py-2">
+                            <i class="fas fa-sliders-h me-2"></i> Nâng cao
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Results Section -->
+<div class="container">
+    @if (Model != null && Model.Any())
+    {
+        <div class="row">
+            @foreach (var item in Model)
             {
-                <div class="col-12 text-center py-5">
-                    <div class="alert alert-info">
-                        <i class="fa fa-info-circle"></i> Không tìm thấy kết quả phù hợp
+                var mainImage = item.AnhTimNguois?.FirstOrDefault(z => z.IdNguoiCanTim == item.Id && z.TrangThai == 1);
+                var dacDiemFilter = ViewBag.DacDiemFilter as string;
+                var dacDiemItems = item.DaciemNhanDang?.Split(new[] { ',', ';', ':', '-' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Trim())
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToList();
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card person-card h-100">
+                        @if (mainImage != null)
+                        {
+                            <img src="@mainImage.HinhAnh" class="card-img-top" alt="@item.HoTen">
+                        }
+                        else
+                        {
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:250px;">
+                                <i class="fas fa-user-slash fa-4x text-secondary"></i>
+                            </div>
+                        }
+
+                        <div class="card-body">
+                            <span class="status-badge @(item.TrangThai == "Đã tìm thấy" ? "status-found" : "status-searching")">
+                                @item.TrangThai
+                            </span>
+
+                            <h5 class="card-title">@item.TieuDe</h5>
+                            <p class="card-text"><strong>Họ tên:</strong> @item.HoTen</p>
+                            <p class="card-text"><strong>Khu vực:</strong> @item.KhuVuc</p>
+                            <p class="card-text"><strong>Ngày đăng:</strong> @item.NgayDang.ToString("dd/MM/yyyy")</p>
+
+                            @if (dacDiemItems != null && dacDiemItems.Any())
+                            {
+                                <div class="tag-container">
+                                    <strong>Đặc điểm:</strong><br>
+                                    @foreach (var tag in dacDiemItems)
+                                    {
+                                        var isHighlight = !string.IsNullOrEmpty(dacDiemFilter) &&
+                                        dacDiemFilter.Split(',')
+                                        .Select(x => x.Trim())
+                                        .Any(keyword => tag.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+
+                                        <span class="tag @(isHighlight ? "tag-highlight" : "")" data-toggle="tooltip" title="@tag">
+                                            @tag
+                                        </span>
+                                    }
+                                </div>
+                            }
+
+                            <a href="@Url.Action("ChiTietBaiTimNguoi", "TimNguoi", new { id = item.Id })"
+                               class="btn btn-outline-primary btn-sm mt-2">
+                                <i class="fas fa-info-circle me-1"></i> Xem chi tiết
+                            </a>
+                        </div>
                     </div>
                 </div>
             }
         </div>
 
-        <!-- Phân trang -->
-        <div class="row mt-5">
-            <div class="col-12 d-flex justify-content-center">
+        <!-- Pagination -->
+        <div class="row">
+            <div class="col-md-12 pagination-container">
                 @Html.PagedListPager(Model, page => Url.Action("Index", new
                     {
                         page,
                         ten = ViewBag.TenFilter,
-                        khuVuc = ViewBag.KhuVucFilter,
+                        tinhThanhId = ViewBag.SelectedTinhThanh,
+                        quanHuyenId = ViewBag.SelectedQuanHuyen,
                         dacDiem = ViewBag.DacDiemFilter
                     }), new PagedListRenderOptions
-               {
-                   LiElementClasses = new[] { "page-item" },
-                   PageClasses = new[] { "page-link" },
-                   UlElementClasses = new[] { "pagination", "justify-content-center" }
-               })
+       {
+           LiElementClasses = new[] { "page-item" },
+           PageClasses = new[] { "page-link" },
+           UlElementClasses = new[] { "pagination", "justify-content-center" },
+           DisplayLinkToFirstPage = PagedListDisplayMode.IfNeeded,
+           DisplayLinkToLastPage = PagedListDisplayMode.IfNeeded,
+           MaximumPageNumbersToDisplay = 5
+       })
             </div>
         </div>
-    </div>
-</section>
-
-<section class="ftco-section-3 img" style="background-image: url(/Templet/images/bg_3.jpg);">
-    <div class="overlay"></div>
-    <div class="container">
-        <div class="row d-md-flex">
-            <div class="col-md-6 d-flex ftco-animate">
-                <div class="img img-2 align-self-stretch" style="background-image: url(/Templet/images/bg_4.jpg);"></div>
-            </div>
-            <div class="col-md-6 volunteer pl-md-5 ftco-animate">
-                <h3 class="mb-3">Be a volunteer</h3>
-                <form action="#" class="volunter-form">
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Your Name">
-                    </div>
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Your Email">
-                    </div>
-                    <div class="form-group">
-                        <textarea name="" id="" cols="30" rows="3" class="form-control" placeholder="Message"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <input type="submit" value="Send Message" class="btn btn-white py-3 px-5">
-                    </div>
-                </form>
-            </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <i class="fas fa-user-times"></i>
+            <h4>Không tìm thấy kết quả phù hợp</h4>
+            <p class="text-muted">Hãy thử thay đổi tiêu chí tìm kiếm hoặc đăng bài nếu bạn đang tìm người thất lạc</p>
+            <a href="@Url.Action("Create", "TimNguoi")" class="btn btn-primary mt-3">
+                <i class="fas fa-plus me-1"></i> Đăng bài tìm người
+            </a>
         </div>
-    </div>
-</section>
+    }
+</div>
 
 @section Scripts {
 
+	<script>
+        // Khu Vực
+        function loadQuanHuyen(tinhThanhId) {
+            const quanHuyenDropdown = document.getElementById("QuanHuyen");
+            quanHuyenDropdown.innerHTML = '<option value="">Tất cả quận</option>';
+
+            if (!tinhThanhId) return;
+
+            fetch(`/TimNguoi/GetQuanHuyenByTinhThanh?tinhThanhId=${tinhThanhId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(huyen => {
+                        const option = document.createElement("option");
+                        option.value = huyen.id;
+                        option.textContent = huyen.tenQuanHuyen;
+                        quanHuyenDropdown.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Error loading districts:", error));
+        }
+
+        // Hiển thị thông báo từ TempData
+        document.addEventListener('DOMContentLoaded', function() {
+        @if (ViewData["Warning"] != null)
+        {
+            <text>
+                                showNotification('warning', '@Html.Raw(ViewData["Warning"])');
+            </text>
+        }
+        });
+    </script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
 
     <script>
         // Hiển thị thông báo từ TempData
-        document.addEventListener('DOMContentLoaded', function() {
-            @if (ViewData["Warning"] != null)
-            {
-                <text>
-                            showNotification('warning', '@Html.Raw(ViewData["Warning"])');
-                </text>
-            }
+        $(document).ready(function() {
+            // Khởi tạo tooltip
+            $('[data-toggle="tooltip"]').tooltip();
+
+        @if (ViewData["Warning"] != null)
+        {
+            <text>
+                        showNotification('warning', '@Html.Raw(ViewData["Warning"])');
+            </text>
+        }
         });
-        
 
         function showNotification(type, message) {
-            console.log("nd:"+message);
             const notificationArea = document.getElementById('notification-area');
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
@@ -252,37 +571,17 @@
                 notification.remove();
             }, 5000);
 
-			// Tự động xóa khi nhấn vào
-			notification.addEventListener('click', () => {
-				notification.remove();
-			});
+            notification.addEventListener('click', () => {
+                notification.remove();
+            });
 
-			// Thêm hiệu ứng hover
-			notification.addEventListener('mouseover', () => {
-				notification.style.transform = 'scale(1.05)';
-			});
-			notification.addEventListener('mouseout', () => {
-				notification.style.transform = 'scale(1)';
-			});
-
-			// Thêm hiệu ứng slide-in
-			notification.style.transform = 'translateX(100%)';
-			setTimeout(() => {
-				notification.style.transform = 'translateX(0)';
-			}, 10);
-
-            console.log("nd2:"+message+"type:"+type);
-            // chuyuển sang trang login
             // Chuyển trang nếu là thông báo đăng nhập
-            if (type === 'warning' && message.includes('Bạn đang bị nghi ngờ phá hoại hệ thống. Cần Đăng Nhập Lại')) 
-            {
-                console.log('Redirect condition met - redirecting to login');
+            if (type === 'warning' && message.includes('Bạn đang bị nghi ngờ phá hoại hệ thống. Cần Đăng Nhập Lại')) {
                 setTimeout(() => {
                     window.location.href = '/Identity/Account/Login';
                 }, 2000);
             }
-            
-        }    
+        }
 
         function getIconForType(type) {
             switch(type) {
@@ -293,6 +592,33 @@
                 default: return 'fa-bell';
             }
         }
-       
+    </script>
+
+    <script>
+
+
+        $(document).ready(function() {
+            // Khởi tạo tooltip
+            $('[data-toggle="tooltip"]').tooltip();
+
+            // Highlight các tag khi click
+            $('.tag').click(function() {
+                var tagText = $(this).text().trim();
+                var currentSearch = $('#dacDiem').val();
+
+                if (currentSearch.includes(tagText)) {
+                    // Nếu tag đã có trong search thì bỏ đi
+                    var newSearch = currentSearch.split(',')
+                        .map(item => item.trim())
+                        .filter(item => item !== tagText)
+                        .join(', ');
+                } else {
+                    // Nếu tag chưa có thì thêm vào
+                    var newSearch = currentSearch ? currentSearch + ', ' + tagText : tagText;
+                }
+
+                $('#dacDiem').val(newSearch);
+            });
+        });
     </script>
 }

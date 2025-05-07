@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using WebTimNguoiThatLac.BoTro;
 using WebTimNguoiThatLac.Data;
 using WebTimNguoiThatLac.Models;
 using WebTimNguoiThatLac.ViewModels;
@@ -13,11 +14,11 @@ namespace WebTimNguoiThatLac.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        private const string AdminId = "19dbf6fb-5ed5-4393-831d-640b5e30d6c1"; // Thay bằng ID thực của admin
+        //private const string AdminId = "19dbf6fb-5ed5-4393-831d-640b5e30d6c1"; // Thay bằng ID thực của admin
 
         private RoleManager<IdentityRole> _roleManager;
 
-
+       
         public ChatController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
@@ -28,6 +29,18 @@ namespace WebTimNguoiThatLac.Controllers
         // Trang chat chính
         public async Task<IActionResult> Index(int? hopThoaiId)
         {
+            // Kiểm tra người dùng đã đăng nhập chưa
+            if (!User.Identity.IsAuthenticated)
+            {
+                TempData["WarningMessage"] = "Vui lòng đăng nhập để sử dụng chức năng này.";
+                return RedirectToAction("Login", "Account", new {area = "Identity"});
+            }
+            var nguoiDung = await _userManager.GetUserAsync(User);
+            // kiểm tra hộp thoại có đang nhắn với admin không 
+            
+
+
+
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             // Lấy danh sách hộp thoại - SỬA LẠI CÁC ĐIỀU KIỆN
@@ -49,11 +62,14 @@ namespace WebTimNguoiThatLac.Controllers
                     .Where(t => t.IsRead == false && t.MaNguoiGui != userId)
                     .ToListAsync();
 
+                
+             
+
                 foreach (TinNhan i in unreadMessages)
                 {
                     i.IsRead = true;
-                    _context.SaveChangesAsync();
                 }
+                await _context.SaveChangesAsync();
             }
             
 
@@ -71,14 +87,36 @@ namespace WebTimNguoiThatLac.Controllers
                                            h.NguoiThamGias.Any(ng => ng.MaNguoiThamGia == userId));
             }
 
+            CacAdmin cacAdmin = new CacAdmin(_context);
+
             var viewModel = new ChatViewModel
             {
                 HopThoais = conversations.Select(ng => ng.HopThoai).ToList(),
                 HopThoaiHienTai = currentConversation,
-                AdminId = AdminId
+                AdminId = cacAdmin.IdAdmin(),
             };
 
+            if (nguoiDung.Active == false)
+            {
 
+                if (hopThoaiId == null)
+                {
+                    TempData["WarningMessage"] = "Vui lòng đăng nhập để sử dụng chức năng này.";
+                    return RedirectToAction("Login", "Account", new { area = "Identity" });
+                }
+                else
+                {
+                    var isAdmin = await _context.NguoiThamGias
+                                            .FirstOrDefaultAsync(i => i.MaHopThoaiTinNhan == hopThoaiId && i.IsAdmin == true);
+
+                    if (isAdmin == null)
+                    {
+                        TempData["WarningMessage"] = "Chỉ được phép nhắn với admin";
+                        return RedirectToAction("Login", "Account", new { area = "Identity" });
+                    }
+                }
+
+            }
 
             return View(viewModel);
         }
@@ -86,6 +124,17 @@ namespace WebTimNguoiThatLac.Controllers
         // Tạo hộp thoại mới
         public async Task<IActionResult> BatDauChat(string nguoiNhanId)
         {
+            // Kiểm tra người dùng đã đăng nhập chưa
+            if (!User.Identity.IsAuthenticated)
+            {
+                TempData["WarningMessage"] = "Vui lòng đăng nhập để sử dụng chức năng này.";
+                return RedirectToAction("Login", "Account", new { area = "Identity" });
+            }
+            var nguoiDung = await _userManager.GetUserAsync(User);
+            //if (nguoiDung.Active == false)
+            //{
+            //    return RedirectToAction("Login", "Account", new { area = "Identity" });
+            //}
             var nguoiGuiId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             // Kiểm tra đã có hộp thoại nào chưa (thêm AsNoTracking)
@@ -112,6 +161,8 @@ namespace WebTimNguoiThatLac.Controllers
             _context.HopThoaiTinNhans.Add(hopThoai);
             await _context.SaveChangesAsync();
 
+
+            CacAdmin cacAdmin = new CacAdmin(_context);
             // Thêm thành viên - SỬA LẠI CÁCH TẠO MỚI Ở ĐÂY
             var thanhVien = new List<NguoiThamGia>
             {
@@ -124,7 +175,7 @@ namespace WebTimNguoiThatLac.Controllers
                     MaHopThoaiTinNhan = hopThoai.Id, // Sửa thành MaHopThoaiTinNhan
                     MaNguoiThamGia = nguoiNhanId,
                     NgayThamGia = DateTime.Now,
-                    IsAdmin = nguoiNhanId == AdminId
+                    IsAdmin = nguoiNhanId == cacAdmin.IdAdmin() // Kiểm tra nếu người nhận là admin
                 }
             };
 
@@ -176,6 +227,7 @@ namespace WebTimNguoiThatLac.Controllers
         public async Task<IActionResult> GuiTinNhan(int hopThoaiId, string noiDung, IFormFile? file)
         {
             var nguoiGuiId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
 
             // Kiểm tra người dùng có trong hộp thoại không - SỬA ĐIỀU KIỆN
             var isValid = await _context.NguoiThamGias

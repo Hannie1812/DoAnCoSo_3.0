@@ -1,275 +1,272 @@
 ﻿@model IPagedList<WebTimNguoiThatLac.Models.NhanChung>
-@using X.PagedList;
-@using X.PagedList.Mvc.Core;
+@using Humanizer
+@using X.PagedList
+@using X.PagedList.Mvc.Core
+@inject UserManager<ApplicationUser> _userManager
 
 @{
     ViewData["Title"] = "Danh Sách Nhân Chứng";
     int stt = (Model.PageNumber - 1) * Model.PageSize + 1;
     int timNguoiId = ViewBag.TimNguoiId ?? 0;
+    var currentUser = await _userManager.GetUserAsync(User);
 }
 
+
+<div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+<!-- Thêm vào phần đầu trang -->
+
 <style>
-    :root {
-        --primary-color: #3498db;
-        --secondary-color: #2980b9;
-        --danger-color: #e74c3c;
-        --light-color: #ecf0f1;
-        --dark-color: #2c3e50;
-    }
-
-    .page-link {
-        color: var(--primary-color);
-        padding: 0.5rem 0.75rem;
-    }
-
-    .page-item.active .page-link {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-    }
-
-    .btn-primary {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-    }
-
-        .btn-primary:hover {
-            background-color: var(--secondary-color);
-            border-color: var(--secondary-color);
-        }
-
-    .btn-outline-danger {
-        color: var(--danger-color);
-        border-color: var(--danger-color);
-    }
-
-        .btn-outline-danger:hover {
-            background-color: var(--danger-color);
-            color: white;
-        }
-
-    .card-header {
-        background-color: var(--primary-color);
+    .notification {
+        padding: 15px 20px;
+        margin-bottom: 10px;
+        border-radius: 5px;
         color: white;
-        padding: 1rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        animation: slideIn 0.3s, fadeOut 0.5s 4.5s;
+        transition: all 0.3s;
     }
 
-    .table-hover tbody tr:hover {
-        background-color: rgba(52, 152, 219, 0.1);
-    }
-
-    .badge-info {
-        background-color: var(--primary-color);
-    }
-
-    .search-box {
-        border-radius: 1.25rem;
-        border: 1px solid #ddd;
-        padding: 0.5rem 1rem;
-        width: 100%;
-    }
-
-    .witness-card {
-        border-left: 0.25rem solid var(--primary-color);
-        transition: all 0.3s ease;
-    }
-
-        .witness-card:hover {
-            transform: translateY(-0.2rem);
-            box-shadow: 0 0.3rem 0.9rem rgba(0,0,0,0.1);
+        .notification.success {
+            background-color: #28a745;
         }
 
-    .file-preview {
-        max-width: 6rem;
-        max-height: 6rem;
-        cursor: pointer;
-        object-fit: cover;
+        .notification.error {
+            background-color: #dc3545;
+        }
+
+        .notification.warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .notification.info {
+            background-color: #17a2b8;
+        }
+
+    @@keyframes slideIn {
+        from {
+            transform: translateX(100%);
+        }
+
+        to {
+            transform: translateX(0);
+        }
     }
 
-    .modal-header {
-        background-color: var(--primary-color);
+    @@keyframes fadeOut {
+        from {
+            opacity: 1;
+        }
+
+        to {
+            opacity: 0;
+        }
+    }
+
+    /* Style cho progress bar trong bảng */
+    .progress {
+        min-width: 80px;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        position: relative;
+    }
+
+    .progress-bar {
+        border-radius: 4px;
+        transition: width 0.6s ease;
+    }
+
+    .progress-text {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.75rem;
+        font-weight: bold;
         color: white;
+        text-shadow: 0 0 2px rgba(0,0,0,0.5);
     }
 
-    .empty-state {
-        padding: 2rem;
-        text-align: center;
+    /* Màu sắc cho các mức độ */
+    .bg-success {
+        background-color: #28a745 !important;
     }
 
-    .contact-info {
-        display: flex;
-        flex-direction: column;
+    .bg-warning {
+        background-color: #ffc107 !important;
     }
 
-    .action-buttons {
-        white-space: nowrap;
-    }
-
-    @@media (max-width: 768px) {
-        .table-responsive {
-            border: 0;
-        }
-
-        .table thead {
-            display: none;
-        }
-
-        .table tr {
-            display: block;
-            margin-bottom: 1rem;
-            border: 1px solid #dee2e6;
-            border-radius: 0.25rem;
-        }
-
-        .table td {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-            .table td:before {
-                content: attr(data-label);
-                font-weight: bold;
-                margin-right: 1rem;
-                flex: 1;
-            }
-
-            .table td:last-child {
-                border-bottom: 0;
-            }
-
-        .action-buttons {
-            justify-content: flex-end;
-        }
+    .bg-danger {
+        background-color: #dc3545 !important;
     }
 </style>
 
-<div class="container-fluid mt-3">
-    <div class="row mb-3">
+<div class="container-fluid my-2">
+    <div class="row mb-4">
         <div class="col-12">
             <div class="card shadow-sm">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0">
-                        <i class="fas fa-user-friends mr-2"></i>@ViewData["Title"]
-                    </h4>
-                    <a href="@Url.Action("Details", "TimNguoi", new { id = timNguoiId })" class="btn btn-light">
-                        <i class="fas fa-arrow-left mr-1"></i>Quay lại
-                    </a>
+                <!-- Header thẻ card -->
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">
+                    <div>
+                        <h4 class="mb-0">
+                            <i class="fas fa-user-friends mr-2"></i>@ViewData["Title"]
+                        </h4>
+                        <small class="text-white-50">Tổng cộng: @Model.TotalItemCount nhân chứng</small>
+                    </div>
+                    <div>
+                        <a href="@Url.Action("ChiTietBaiTimNguoi", "TimNguoi", new { id = timNguoiId })" class="btn btn-light btn-sm">
+                            <i class="fas fa-arrow-left mr-1"></i> Quay lại
+                        </a>
+                       
+                    </div>
                 </div>
+
+                <!-- Nội dung thẻ card -->
                 <div class="card-body">
-                    <form method="get" action="@Url.Action("Index")" class="mb-4">
-                        <input type="hidden" name="id" value="@timNguoiId" />
-                        <div class="row g-2">
-                            <div class="col-md-3 col-sm-6">
-                                <input type="text" name="searchHoTen" class="form-control search-box"
-                                       placeholder="Tìm theo tên..." value="@Context.Request.Query["searchHoTen"]">
+                    <!-- Thanh tìm kiếm -->
+                    <div class="search-box mb-4 p-3 bg-light rounded">
+                        <form method="get" action="@Url.Action("Index")" class="row g-2">
+                            <input type="hidden" name="id" value="@timNguoiId" />
+
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="fas fa-user text-primary"></i></span>
+                                    <input type="text" name="searchHoTen" class="form-control"
+                                           placeholder="Tìm theo tên..." value="@Context.Request.Query["searchHoTen"]">
+                                </div>
                             </div>
-                            <div class="col-md-3 col-sm-6">
-                                <input type="text" name="searchEmail" class="form-control search-box"
-                                       placeholder="Tìm theo email..." value="@Context.Request.Query["searchEmail"]">
+
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="fas fa-envelope text-primary"></i></span>
+                                    <input type="text" name="searchEmail" class="form-control"
+                                           placeholder="Tìm theo email..." value="@Context.Request.Query["searchEmail"]">
+                                </div>
                             </div>
-                            <div class="col-md-3 col-sm-6">
-                                <input type="text" name="searchPhone" class="form-control search-box"
-                                       placeholder="Tìm theo điện thoại..." value="@Context.Request.Query["searchPhone"]">
+
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="fas fa-phone text-primary"></i></span>
+                                    <input type="text" name="searchPhone" class="form-control"
+                                           placeholder="Tìm theo điện thoại..." value="@Context.Request.Query["searchPhone"]">
+                                </div>
                             </div>
-                            <div class="col-md-3 col-sm-6 d-flex">
-                                <button type="submit" class="btn btn-primary flex-grow-1 mr-2">
-                                    <i class="fas fa-search mr-1"></i>Tìm kiếm
+
+                            <div class="col-md-12 mt-2 d-flex">
+                                <button type="submit" class="btn btn-primary mr-2">
+                                    <i class="fas fa-search mr-1"></i> Tìm kiếm
                                 </button>
                                 <a href="@Url.Action("Index", new { id = timNguoiId })" class="btn btn-outline-secondary">
-                                    <i class="fas fa-sync-alt"></i>
+                                    <i class="fas fa-sync-alt mr-1"></i> Làm mới
                                 </a>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
 
+                    <!-- Bảng danh sách -->
                     @if (Model != null && Model.Any())
                     {
                         <div class="table-responsive">
-                            <table class="table table-hover mb-4">
+                            <table class="table table-hover table-bordered mb-4">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th style="width: 5%">STT</th>
-                                        <th style="width: 15%">Nhân chứng</th>
-                                        <th style="width: 20%">Thông tin liên hệ</th>
-                                        <th style="width: 10%">Thời gian</th>
-                                        <th style="width: 15%">Địa điểm</th>
-                                        <th style="width: 10%">File đính kèm</th>
-                                        <th style="width: 15%">Ngày báo tin</th>
-                                        <th style="width: 10%">Thao tác</th>
+                                        <th width="50" class="text-center">STT</th>
+                                        <th>Nhân chứng</th>
+                                        <th>Thông tin liên hệ</th>
+                                        <th>Thời gian/Địa điểm</th>
+                                        <th width="120" class="text-center">Hình ảnh</th>
+                                        <th width="150">Ngày báo tin</th>
+                                        <th width="120" class="text-center">% Khớp</th>
+                                        <th width="130" class="text-center">Thao tác</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (var item in Model)
                                     {
-                                        <tr class="witness-card">
-                                            <td data-label="STT">@(stt++)</td>
-                                            <td data-label="Nhân chứng">
-                                                @if (!string.IsNullOrEmpty(item.HoTen))
-                                                {
-                                                    <strong>@item.HoTen</strong>
-                                                }
-                                                else
-                                                {
-                                                    <span class="text-muted">Không rõ</span>
-                                                }
+                                        <tr class="align-middle">
+                                            <td class="text-center">@(stt++)</td>
+
+                                            <td>
+                                                <div class="fw-bold">@(item.HoTen ?? "Không rõ")</div>
+                                                <small class="text-muted" data-bs-toggle="tooltip" title="@item.MoTaManhMoi">
+                                                    @item.MoTaManhMoi?.Truncate(50)
+                                                </small>
                                             </td>
-                                            <td data-label="Thông tin liên hệ" class="contact-info">
+
+                                            <td>
                                                 @if (!string.IsNullOrEmpty(item.Email))
                                                 {
-                                                    <span><i class="fas fa-envelope mr-1"></i> @item.Email</span>
+                                                    <div><i class="fas fa-envelope text-primary mr-2"></i> @item.Email</div>
                                                 }
                                                 @if (!string.IsNullOrEmpty(item.SoDienThoai))
                                                 {
-                                                    <span><i class="fas fa-phone mr-1"></i> @item.SoDienThoai</span>
+                                                    <div><i class="fas fa-phone text-success mr-2"></i> @item.SoDienThoai</div>
                                                 }
                                                 @if (string.IsNullOrEmpty(item.Email) && string.IsNullOrEmpty(item.SoDienThoai))
                                                 {
                                                     <span class="text-muted">Không có thông tin</span>
                                                 }
                                             </td>
-                                            <td data-label="Thời gian">
-                                                @if (item.ThoiGian.HasValue)
-                                                {
-                                                    @item.ThoiGian.Value.ToString("dd/MM/yyyy HH:mm")
-                                                }
-                                                else
-                                                {
-                                                    <span class="text-muted">Không rõ</span>
-                                                }
+
+                                            <td>
+                                                <div>
+                                                    <i class="fas fa-clock text-info mr-2"></i>
+                                                    @(item.ThoiGian?.ToString("dd/MM/yyyy HH:mm") ?? "Không rõ")
+                                                </div>
+                                                <div>
+                                                    <i class="fas fa-map-marker-alt text-danger mr-2"></i>
+                                                    @(item.DiaDiem ?? "Không rõ")
+                                                </div>
                                             </td>
-                                            <td data-label="Địa điểm">
-                                                @if (!string.IsNullOrEmpty(item.DiaDiem))
-                                                {
-                                                    @item.DiaDiem
-                                                }
-                                                else
-                                                {
-                                                    <span class="text-muted">Không rõ</span>
-                                                }
-                                            </td>
-                                            <td data-label="File đính kèm">
+
+                                            <td class="text-center">
                                                 @if (!string.IsNullOrEmpty(item.FileDinhKem))
                                                 {
-                                                    <img src="@item.FileDinhKem" class="file-preview img-thumbnail"
-                                                         data-toggle="modal" data-target="#imageModal"
-                                                         data-image="@item.FileDinhKem">
+                                                    <img src="@item.FileDinhKem" class="img-thumbnail file-preview"
+                                                         data-bs-toggle="modal" data-bs-target="#previewModal"
+                                                         data-src="@item.FileDinhKem"
+                                                         onerror="this.onerror=null;this.src='/images/no-image.png';">
                                                 }
                                                 else
                                                 {
-                                                    <span class="text-muted">Không có</span>
+                                                    <span class="badge bg-secondary">Không có</span>
                                                 }
                                             </td>
-                                            <td data-label="Ngày báo tin">
-                                                @item.NgayBaoTin.ToString("dd/MM/yyyy HH:mm")
+
+                                            <td>
+                                                <span class="badge bg-light text-dark">
+                                                    @item.NgayBaoTin.ToString("dd/MM/yyyy HH:mm")
+                                                </span>
                                             </td>
-                                            <td data-label="Thao tác" class="action-buttons">
-                                                <button class="btn btn-sm btn-outline-primary"
-                                                        data-toggle="modal" data-target="#detailModal"
-                                                        data-details="@item.MoTaManhMoi">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
+                                            <!-- Cột % khớp -->
+                                            <td class="text-center">
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar
+                             @(item.PhanTramDanhGia >= 70 ? "bg-success" :
+                               item.PhanTramDanhGia >= 30 ? "bg-warning" : "bg-danger")"
+                                                         role="progressbar"
+                                                         style="width: @item.PhanTramDanhGia%"
+                                                         aria-valuenow="@item.PhanTramDanhGia"
+                                                         aria-valuemin="0"
+                                                         aria-valuemax="100">
+                                                        <span class="progress-text">@item.PhanTramDanhGia%</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <a asp-action="Detail" asp-route-id="@item.Id"
+                                                       class="btn btn-outline-primary" title="Xem chi tiết">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+
+                                                    @if (currentUser.Id == item.TimNguoi.IdNguoiDung || User.IsInRole("Admin"))
+                                                    {
+                                                        <button class="btn btn-outline-danger delete-btn"
+                                                                data-id="@item.Id" title="Xóa nhân chứng">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    }
+                                                </div>
                                             </td>
                                         </tr>
                                     }
@@ -277,6 +274,7 @@
                             </table>
                         </div>
 
+                        <!-- Phân trang -->
                         <div class="row">
                             <div class="col-12">
                                 @Html.PagedListPager(Model, page => Url.Action("Index", new
@@ -294,10 +292,10 @@
                                 UlElementClasses = new[] { "pagination justify-content-center" },
                                 DisplayLinkToFirstPage = PagedListDisplayMode.IfNeeded,
                                 DisplayLinkToLastPage = PagedListDisplayMode.IfNeeded,
-                                LinkToFirstPageFormat = "««",
-                                LinkToPreviousPageFormat = "«",
-                                LinkToNextPageFormat = "»",
-                                LinkToLastPageFormat = "»»",
+                                LinkToFirstPageFormat = "« Đầu",
+                                LinkToPreviousPageFormat = "‹ Trước",
+                                LinkToNextPageFormat = "Sau ›",
+                                LinkToLastPageFormat = "Cuối »",
                                 MaximumPageNumbersToDisplay = 5
                             })
                             </div>
@@ -305,14 +303,16 @@
                     }
                     else
                     {
-                        <div class="empty-state">
-                            <div class="empty-state-icon">
-                                <i class="fas fa-user-friends fa-3x text-muted mb-3"></i>
+                        <!-- Trạng thái không có dữ liệu -->
+                        <div class="empty-state text-center py-5">
+                            <div class="empty-state-icon mb-3">
+                                <i class="fas fa-user-friends fa-4x text-muted"></i>
                             </div>
                             <h4 class="empty-state-title">Không tìm thấy nhân chứng nào</h4>
                             <p class="empty-state-text mb-4">
                                 Hiện chưa có thông tin nhân chứng nào được báo cáo cho trường hợp này.
                             </p>
+
                         </div>
                     }
                 </div>
@@ -321,66 +321,236 @@
     </div>
 </div>
 
-<!-- Modal xem chi tiết -->
-<div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="detailModalLabel">Chi tiết mô tả manh mối</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" id="modalDetailContent">
-                <!-- Nội dung chi tiết sẽ được điền ở đây bằng JS -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal xem ảnh -->
-<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-hidden="true">
+<!-- Modal xem trước file -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
-            <div class="modal-body text-center">
-                <img id="modalImage" src="" class="img-fluid" style="max-height: 80vh;">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Xem trước file đính kèm</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
             </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            <div class="modal-body text-center">
+                <img id="modalPreviewImage" src="" class="img-fluid" style="max-height: 70vh; display: none;">
+                <video id="modalPreviewVideo" controls class="img-fluid" style="max-height: 70vh; display: none;"></video>
+                <div id="modalUnsupported" class="alert alert-warning" style="display: none;">
+                    <i class="fas fa-exclamation-triangle me-2"></i> Không thể xem trước loại file này
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a id="downloadFile" href="#" class="btn btn-primary" download>
+                    <i class="fas fa-download me-1"></i> Tải xuống
+                </a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Đóng
+                </button>
             </div>
         </div>
     </div>
 </div>
 
-@section Scripts {
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Modal xác nhận xóa -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-exclamation-circle me-2"></i>Xác nhận xóa</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa nhân chứng này? Thao tác này không thể hoàn tác.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Hủy bỏ
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">
+                    <i class="fas fa-trash me-1"></i> Xóa
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
+
+@section Styles {
+    <style>
+        .file-preview {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+
+            .file-preview:hover {
+                transform: scale(1.1);
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            }
+
+        .empty-state {
+            padding: 3rem;
+            text-align: center;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .empty-state-icon {
+            color: #adb5bd;
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .search-box {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .table th {
+            white-space: nowrap;
+            background-color: #f8f9fa;
+            vertical-align: middle;
+        }
+
+        .card-header {
+            border-bottom: none;
+        }
+
+        .btn-group-sm > .btn {
+            padding: 0.25rem 0.5rem;
+        }
+    </style>
+
+    
+
+}
+
+@section Scripts {
     <script>
         $(document).ready(function() {
-            // Xử lý modal chi tiết
-            $('#detailModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget);
-                var details = button.data('details');
-                var modal = $(this);
+            // Khởi tạo tooltip
+            $('[data-bs-toggle="tooltip"]').tooltip();
 
-                if (details && details.trim() !== '') {
-                    modal.find('.modal-body').text(details);
+            // Xử lý modal xem trước file
+            $('#previewModal').on('show.bs.modal', function(event) {
+                var button = $(event.relatedTarget);
+                var fileUrl = button.data('src');
+                var fileExt = fileUrl.split('.').pop().toLowerCase();
+
+                // Ẩn tất cả các phần tử xem trước trước
+                $('#modalPreviewImage').hide();
+                $('#modalPreviewVideo').hide();
+                $('#modalUnsupported').hide();
+
+                // Thiết lập link tải xuống
+                $('#downloadFile').attr('href', fileUrl);
+
+                // Hiển thị phần xem trước phù hợp
+                if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExt)) {
+                    $('#modalPreviewImage').attr('src', fileUrl).show();
+                } else if (fileExt === 'mp4') {
+                    $('#modalPreviewVideo').attr('src', fileUrl).show()[0].load();
                 } else {
-                    modal.find('.modal-body').html('<p class="text-muted">Không có mô tả nào được cung cấp</p>');
+                    $('#modalUnsupported').show();
                 }
             });
 
-            // Xử lý modal ảnh
-            $('#imageModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget);
-                var imageUrl = button.data('image');
-                $('#modalImage').attr('src', imageUrl);
+            // Xử lý xác nhận xóa - ĐÃ SỬA
+            var deleteId;
+            $('.delete-btn').click(function() {
+                deleteId = $(this).data('id');
+                $('#deleteModal').modal('show');
             });
+
+            $('#confirmDelete').click(function() {
+                // Lấy token chống giả mạo
+                var token = $('input[name="__RequestVerificationToken"]').val();
+
+                $.ajax({
+                    url: '@Url.Action("Delete", "NhanChung")',
+                    type: 'POST',
+                    data: {
+                        id: deleteId,
+                        __RequestVerificationToken: token
+                    },
+                    success: function(response) {
+                        $('#deleteModal').modal('hide');
+                        if (response.success) {
+                            showNotification('success', response.message || 'Đã xóa nhân chứng thành công!');
+                            setTimeout(function() {
+                                location.reload();
+                            }, 1000);
+                        } else {
+                            showNotification('error', response.message || 'Xóa không thành công!');
+                        }
+                    },
+                    error: function(xhr) {
+                        $('#deleteModal').modal('hide');
+                        var errorMsg = 'Lỗi hệ thống';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMsg = xhr.responseJSON.message;
+                        }
+                        showNotification('error', errorMsg);
+                    }
+                });
+            });
+
+            // Hiển thị thông báo từ TempData
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>showNotification('success', '@Html.Raw(TempData["SuccessMessage"])');</text>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>showNotification('error', '@Html.Raw(TempData["ErrorMessage"])');</text>
+        }
+        @if (TempData["WarningMessage"] != null)
+        {
+            <text>showNotification('warning', '@Html.Raw(TempData["WarningMessage"])');</text>
+        }
+        @if (TempData["InfoMessage"] != null)
+        {
+            <text>showNotification('info', '@Html.Raw(TempData["InfoMessage"])');</text>
+        }
         });
+
+        function showNotification(type, message) {
+            const notificationArea = $('#notification-area');
+            const iconMap = {
+                success: 'fa-check-circle',
+                error: 'fa-times-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+
+            const notification = $(`
+                <div class="notification ${type}">
+                    <i class="fas ${iconMap[type] || 'fa-info-circle'} me-2"></i>
+                    ${message}
+                </div>
+            `);
+
+            notification.hide().appendTo(notificationArea).slideDown(300);
+
+            // Tự động xóa sau 5 giây
+            setTimeout(() => {
+                notification.slideUp(300, () => notification.remove());
+            }, 5000);
+
+            // Click để đóng
+            notification.click(function() {
+                $(this).slideUp(300, function() {
+                    $(this).remove();
+                });
+            });
+
+            // Hiệu ứng hover
+            notification.hover(
+                function() { $(this).css('transform', 'scale(1.02)'); },
+                function() { $(this).css('transform', 'scale(1)'); }
+            );
+        }
     </script>
 }

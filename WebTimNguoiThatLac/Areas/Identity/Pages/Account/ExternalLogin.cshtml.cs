@@ -151,9 +151,20 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
                     return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
                 }
             }
-
+            
             // Đăng nhập người dùng
             await _signInManager.SignInAsync(user, isPersistent: false);
+
+            // Kiểm tra trạng thái Active của tài khoản
+            if (!user.Active)
+            {
+     //           ErrorMessage = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
+                //return RedirectToPage("./Login", new { ReturnUrl = returnUrl });// test
+                TempData["WarningMessage"] = "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
+
+                return RedirectToAction("Index", "LoiViPham", new { area = "" });
+            }
+
             return LocalRedirect(returnUrl);
         }
 

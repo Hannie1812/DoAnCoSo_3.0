@@ -54,7 +54,7 @@ public class ThongBaoMoiViewComponent : ViewComponent
             var notification = new ThongBaoMoiViewModel
             {
                 TieuDe = comment.ApplicationUser.FullName,
-                LinkDuongDan = $"/TimNguoi/ChiTietBaiTimNguoi/{comment.TimNguoi.Id}",
+                LinkDuongDan = $"/TimNguoi/ChiTietBaiTimNguoi?id={comment.TimNguoi.Id}&idBinhLuan={comment.Id}",
                 NoiDung = comment.NoiDung,
                 DanhMuc = "Tin Nhắn Bài Viết",
                 HinhAnh = comment.ApplicationUser.HinhAnh,
@@ -91,7 +91,8 @@ public class ThongBaoMoiViewComponent : ViewComponent
                     HinhAnh = otherUser.HinhAnh,
                     DanhMuc = "Tin Nhắn Người Dùng",
                     LinkDuongDan = $"/Chat/Index?hopThoaiId={participant.HopThoai.Id}",
-                    ThoiGian = lastMessage.NgayGui
+                    ThoiGian = lastMessage.NgayGui,
+
                 };
                 model.UserMessages.Add(notification);
                 model.AllNotifications.Add(notification);

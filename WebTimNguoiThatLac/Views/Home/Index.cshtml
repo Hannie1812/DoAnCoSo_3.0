@@ -12,27 +12,27 @@
             <div class="col-md-5 d-flex justify-content-center counter-wrap ftco-animate">
                 <div class="block-18 color-1 align-items-stretch">
                     <div class="text">
-                        <span>Served Over</span>
-                        <strong class="number" data-number="1432805">0</strong>
-                        <span>Children in 190 countries in the world</span>
+                        <span>Tổng Số Người Mất Tích </span>
+                        <strong class="number" data-number="19999999">0</strong>
+                        <span>Được thống kê trong năm 2029</span>
                     </div>
                 </div>
             </div>
             <div class="col-md d-flex justify-content-center counter-wrap ftco-animate">
                 <div class="block-18 color-2 align-items-stretch">
                     <div class="text">
-                        <h3 class="mb-4">Donate Money</h3>
-                        <p>Even the all-powerful Pointing has no control about the blind texts.</p>
-                        <p><a href="#" class="btn btn-white px-3 py-2 mt-2">Donate Now</a></p>
+                        <h3 class="mb-4">Các bài viết</h3>
+                        <p>Cam kết bảo mật và cập nhật thông tin mới nhất của thông tin đối với bài viết </p>
+                        <p><a href="/TimNguoi" class="btn btn-white px-3 py-2 mt-2">Bài Viết</a></p>
                     </div>
                 </div>
             </div>
             <div class="col-md d-flex justify-content-center counter-wrap ftco-animate">
                 <div class="block-18 color-3 align-items-stretch">
                     <div class="text">
-                        <h3 class="mb-4">Be a Volunteer</h3>
-                        <p>Even the all-powerful Pointing has no control about the blind texts.</p>
-                        <p><a href="#" class="btn btn-white px-3 py-2 mt-2">Be A Volunteer</a></p>
+                        <h3 class="mb-4">Tin Tức Thế Giới</h3>
+                        <p>Cập Nhật Tin Tức, Phân Tích Xu Hướng, Chia Sẻ Bài Viết</p>
+                        <p><a href="/TinTuc" class="btn btn-white px-3 py-2 mt-2">Tin Tức</a></p>
                     </div>
                 </div>
             </div>
@@ -86,31 +86,6 @@
 
 @await Component.InvokeAsync("TinTucNgang")
 
+@await Html.PartialAsync("_LayoutNguoiDungLienHe")
 
-<section class="ftco-section-3 img" style="background-image: url(/Templet/images/bg_3.jpg);">
-    <div class="overlay"></div>
-    <div class="container">
-        <div class="row d-md-flex">
-            <div class="col-md-6 d-flex ftco-animate">
-                <div class="img img-2 align-self-stretch" style="background-image: url(/Templet/images/bg_4.jpg);"></div>
-            </div>
-            <div class="col-md-6 volunteer pl-md-5 ftco-animate">
-                <h3 class="mb-3">Be a volunteer</h3>
-                <form action="#" class="volunter-form">
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Your Name">
-                    </div>
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Your Email">
-                    </div>
-                    <div class="form-group">
-                        <textarea name="" id="" cols="30" rows="3" class="form-control" placeholder="Message"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <input type="submit" value="Send Message" class="btn btn-white py-3 px-5">
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</section>
+

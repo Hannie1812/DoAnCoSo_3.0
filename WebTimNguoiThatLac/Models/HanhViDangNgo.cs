@@ -18,6 +18,8 @@ namespace WebTimNguoiThatLac.Models
         public bool DaXem { get; set; } = false; // Mặc định là chưa xem
         public bool DaXuLy { get; set; } = false; // Mặc định là chưa xử lý
         public string? TrangThaiKhangNghi { get; set; }  // Kháng Nghị Thất Bại, Kháng Nghị Thành Công
+        public string LoaiViPham { get; set; } = "Người Dùng"; // Loại hành vi: Bình Luận , Bài Viết , người dùng
+        public int IdLoiViPham { get; set; } = -1; // id của mấy cái bài viết , Bình luận
 
     }
 

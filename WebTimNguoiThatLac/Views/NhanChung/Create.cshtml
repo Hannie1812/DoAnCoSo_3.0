@@ -4,9 +4,97 @@
     var timNguoi = ViewBag.BaiTimNguoi as WebTimNguoiThatLac.Models.TimNguoi;
 }
 
-
+<link rel="stylesheet" href="~/Templet/css/notification.css">
 <!-- Thêm vào phần đầu trang -->
 <div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+@section Styles {
+    <style>
+        .file-upload-area {
+            border: 2px dashed #dee2e6;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+
+            .file-upload-area:hover {
+                border-color: #0d6efd;
+                background-color: #f0f7ff;
+            }
+
+            .file-upload-area.dragover {
+                border-color: #0d6efd;
+                background-color: #e7f1ff;
+            }
+
+        #filePreview {
+            max-width: 100%;
+            max-height: 300px;
+        }
+
+        .preview-image {
+            max-height: 250px;
+            border-radius: 4px;
+        }
+
+        .preview-video-icon {
+            font-size: 5rem;
+            color: #0d6efd;
+        }
+
+        .remove-file-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #dc3545;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+
+@* dăc diẻm nhận dạng *@
+    <style>
+        .feature-checkbox:checked + label {
+            font-weight: bold;
+            color: #0d6efd;
+        }
+
+        .progress {
+            background-color: #e9ecef;
+        }
+
+        .feature-checkbox {
+            margin-right: 8px;
+        }
+
+            .feature-checkbox:checked + label {
+                font-weight: bold;
+                color: #0d6efd;
+            }
+
+        /* Màu cho progress bar */
+        .bg-danger {
+            background-color: #dc3545;
+        }
+
+        .bg-warning {
+            background-color: #ffc107;
+        }
+
+        .bg-success {
+            background-color: #28a745;
+        }
+
+        .progress {
+            background-color: #e9ecef;
+        }
+    </style>
+}
 
 @*
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
@@ -138,120 +226,175 @@
                     </div>
                 </div>
             </div>
+            <form asp-action="Create" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                @Html.AntiForgeryToken()
 
-            <!-- Main form -->
-            <div class="card border-0 shadow">
-                <div class="card-body p-4">
-                    <form asp-action="Create" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" asp-for="TimNguoiId" value="@timNguoi.Id" />
+                <input type="hidden" asp-for="PhanTramDanhGia" id="matchPercentageValue">
 
-                        <!-- Validation summary -->
-                        <div asp-validation-summary="All" class="alert alert-danger mb-4">
-                            <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
-                            <h5 class="alert-heading"><i class="fas fa-exclamation-circle me-2"></i>Vui lòng kiểm tra lại thông tin</h5>
+                @* Phần so sánh đặc điểm *@
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-fingerprint me-2"></i>
+                            Đối chiếu đặc điểm nhận dạng
+                            <span class="float-end badge bg-white text-primary" id="matchPercentageDisplay">0%</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3" id="featureContainer">
+                            @if (!string.IsNullOrEmpty(timNguoi.DaciemNhanDang))
+                            {
+                                var features = timNguoi.DaciemNhanDang.Split(
+                                new[] { ',', ';', ':', '-' },
+                                StringSplitOptions.RemoveEmptyEntries)
+                                .Select(f => f.Trim())
+                                .Where(f => !string.IsNullOrEmpty(f))
+                                .Distinct()
+                                .OrderBy(f => f);
+
+                                foreach (var feature in features)
+                                {
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input feature-checkbox"
+                                                   type="checkbox"
+                                                   name="MatchedFeatures"
+                                                   id="feature_@feature.GetHashCode()"
+                                                   value="@feature">
+                                            <label class="form-check-label" for="feature_@feature.GetHashCode()">
+                                                @feature
+                                            </label>
+                                        </div>
+                                    </div>
+                                }
+                            }
                         </div>
 
-                        <!-- Personal information section -->
-                        <div class="mb-4">
-                            <h5 class="border-bottom pb-2 mb-3">
-                                <i class="fas fa-user text-primary me-2"></i>
-                                Thông tin cá nhân
-                            </h5>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label asp-for="HoTen" class="form-label fw-bold"></label>
-                                    <input asp-for="HoTen" class="form-control" placeholder="Nhập họ tên đầy đủ" required />
-                                    <span asp-validation-for="HoTen" class="text-danger small"></span>
-                                </div>
-                                <div class="col-md-6">
-                                    <label asp-for="SoDienThoai" class="form-label fw-bold"></label>
-                                    <input asp-for="SoDienThoai" class="form-control" placeholder="Nhập số điện thoại" required />
-                                    <span asp-validation-for="SoDienThoai" class="text-danger small"></span>
-                                </div>
-                                <div class="col-12">
-                                    <label asp-for="Email" class="form-label fw-bold"></label>
-                                    <input asp-for="Email" class="form-control" type="email" placeholder="Nhập email (nếu có)" />
-                                    <span asp-validation-for="Email" class="text-danger small"></span>
-                                </div>
+                        <div class="progress mt-3" style="height: 10px;">
+                            <div id="matchProgress" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                @* end dăc diẻm nhận dạng *@
+
+                <!-- Main form -->
+                <div class="card border-0 shadow">
+                    <div class="card-body p-4">
+                   
+                            
+                            <input type="hidden" asp-for="TimNguoiId" value="@timNguoi.Id" />
+
+                            <!-- Validation summary -->
+                            <div asp-validation-summary="All" class="alert alert-danger mb-4">
+                                <button type="button" class="btn-close float-end" data-bs-dismiss="alert" aria-label="Close"></button>
+                                <h5 class="alert-heading"><i class="fas fa-exclamation-circle me-2"></i>Vui lòng kiểm tra lại thông tin</h5>
                             </div>
-                        </div>
 
-                        <!-- Sighting information section -->
-                        <div class="mb-4">
-                            <h5 class="border-bottom pb-2 mb-3">
-                                <i class="fas fa-eye text-primary me-2"></i>
-                                Thông tin nhìn thấy
-                            </h5>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label asp-for="ThoiGian" class="form-label fw-bold"></label>
-                                    <input asp-for="ThoiGian" type="datetime-local" class="form-control" required />
-                                    <span asp-validation-for="ThoiGian" class="text-danger small"></span>
-                                </div>
-                                <div class="col-md-6">
-                                    <label asp-for="DiaDiem" class="form-label fw-bold"></label>
-                                    <input asp-for="DiaDiem" class="form-control" placeholder="Địa điểm cụ thể" required />
-                                    <span asp-validation-for="DiaDiem" class="text-danger small"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Description section -->
-                        <div class="mb-4">
-                            <h5 class="border-bottom pb-2 mb-3">
-                                <i class="fas fa-align-left text-primary me-2"></i>
-                                Mô tả chi tiết
-                            </h5>
-                            <label asp-for="MoTaManhMoi" class="form-label fw-bold"></label>
-                            <textarea asp-for="MoTaManhMoi" class="form-control" rows="5"
-                                      placeholder="Mô tả chi tiết về người được nhìn thấy (trang phục, tình trạng sức khỏe, hành động, phương tiện di chuyển...)" required></textarea>
-                            <div class="form-text">Vui lòng mô tả càng chi tiết càng tốt để hỗ trợ công tác tìm kiếm</div>
-                            <span asp-validation-for="MoTaManhMoi" class="text-danger small"></span>
-                        </div>
-
-                        <!-- File upload section with improved preview -->
-                        <div class="mb-4">
-                            <h5 class="border-bottom pb-2 mb-3">
-                                <i class="fas fa-camera text-primary me-2"></i>
-                                Hình ảnh/Video minh chứng
-                            </h5>
-
-                            <div class="file-upload-area border rounded p-3 text-center">
-                                <div id="filePreviewContainer" class="mb-3" style="display:none;">
-                                    <div id="filePreview" class="position-relative d-inline-block">
-                                        <!-- Preview will be inserted here -->
+                            <!-- Personal information section -->
+                            <div class="mb-4">
+                                <h5 class="border-bottom pb-2 mb-3">
+                                    <i class="fas fa-user text-primary me-2"></i>
+                                    Thông tin cá nhân
+                                </h5>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label asp-for="HoTen" class="form-label fw-bold"></label>
+                                        <input asp-for="HoTen" class="form-control" placeholder="Nhập họ tên đầy đủ" required />
+                                        <span asp-validation-for="HoTen" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label asp-for="SoDienThoai" class="form-label fw-bold"></label>
+                                        <input asp-for="SoDienThoai" class="form-control" placeholder="Nhập số điện thoại" required />
+                                        <span asp-validation-for="SoDienThoai" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-12">
+                                        <label asp-for="Email" class="form-label fw-bold"></label>
+                                        <input asp-for="Email" class="form-control" type="email" placeholder="Nhập email (nếu có)" />
+                                        <span asp-validation-for="Email" class="text-danger small"></span>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div id="uploadPrompt" class="py-4">
-                                    <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
-                                    <p class="mb-2 fw-bold">Kéo thả file vào đây hoặc click để chọn file</p>
-                                    <p class="small text-muted">Chấp nhận ảnh (JPEG, PNG) hoặc video (MP4), tối đa 10MB</p>
-                                    <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="selectFileBtn">
-                                        <i class="fas fa-folder-open me-1"></i> Chọn file
-                                    </button>
-                                </div>
-
-                                <input type="file" name="file" id="fileInput" class="d-none" accept="image/*,video/*" required />
-
-                                <div class="mt-2">
-                                    <small id="fileName" class="text-muted"></small>
-                                    <small id="fileSize" class="d-block text-muted"></small>
+                            <!-- Sighting information section -->
+                            <div class="mb-4">
+                                <h5 class="border-bottom pb-2 mb-3">
+                                    <i class="fas fa-eye text-primary me-2"></i>
+                                    Thông tin nhìn thấy
+                                </h5>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label asp-for="ThoiGian" class="form-label fw-bold"></label>
+                                        <input asp-for="ThoiGian" type="datetime-local" class="form-control" required />
+                                        <span asp-validation-for="ThoiGian" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label asp-for="DiaDiem" class="form-label fw-bold"></label>
+                                        <input asp-for="DiaDiem" class="form-control" placeholder="Địa điểm cụ thể" required />
+                                        <span asp-validation-for="DiaDiem" class="text-danger small"></span>
+                                    </div>
                                 </div>
                             </div>
-                            <span asp-validation-for="FileDinhKem" class="text-danger small"></span>
-                        </div>
 
-                        <!-- Submit button -->
-                        <div class="d-grid mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg py-3">
-                                <i class="fas fa-paper-plane me-2"></i> Gửi báo cáo
-                            </button>
-                        </div>
-                    </form>
+                            <!-- Description section -->
+                            <div class="mb-4">
+                                <h5 class="border-bottom pb-2 mb-3">
+                                    <i class="fas fa-align-left text-primary me-2"></i>
+                                    Mô tả chi tiết
+                                </h5>
+                                <label asp-for="MoTaManhMoi" class="form-label fw-bold"></label>
+                                <textarea asp-for="MoTaManhMoi" class="form-control" rows="5"
+                                          placeholder="Mô tả chi tiết về người được nhìn thấy (trang phục, tình trạng sức khỏe, hành động, phương tiện di chuyển...)" required></textarea>
+                                <div class="form-text">Vui lòng mô tả càng chi tiết càng tốt để hỗ trợ công tác tìm kiếm</div>
+                                <span asp-validation-for="MoTaManhMoi" class="text-danger small"></span>
+                            </div>
+
+                            <!-- File upload section with improved preview -->
+                            <div class="mb-4">
+                                <h5 class="border-bottom pb-2 mb-3">
+                                    <i class="fas fa-camera text-primary me-2"></i>
+                                    Hình ảnh/Video minh chứng
+                                </h5>
+
+                                <div class="file-upload-area border rounded p-3 text-center">
+                                    <div id="filePreviewContainer" class="mb-3" style="display:none;">
+                                        <div id="filePreview" class="position-relative d-inline-block">
+                                            <!-- Preview will be inserted here -->
+                                        </div>
+                                    </div>
+
+                                    <div id="uploadPrompt" class="py-4">
+                                        <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                        <p class="mb-2 fw-bold">Kéo thả file vào đây hoặc click để chọn file</p>
+                                        <p class="small text-muted">Chấp nhận ảnh (JPEG, PNG) hoặc video (MP4), tối đa 10MB</p>
+                                        <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="selectFileBtn">
+                                            <i class="fas fa-folder-open me-1"></i> Chọn file
+                                        </button>
+                                    </div>
+
+                                    <input type="file" name="file" id="fileInput" class="d-none" accept="image/*,video/*" required />
+
+                                    <div class="mt-2">
+                                        <small id="fileName" class="text-muted"></small>
+                                        <small id="fileSize" class="d-block text-muted"></small>
+                                    </div>
+                                </div>
+                                <span asp-validation-for="FileDinhKem" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Submit button -->
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg py-3">
+                                    <i class="fas fa-paper-plane me-2"></i> Gửi báo cáo
+                                </button>
+                            </div>
+                    
+                    </div>
+               
                 </div>
-            </div>
+            </form>
 
             <!-- Legal notice -->
             <div class="alert alert-light mt-4 border">
@@ -273,55 +416,6 @@
     </div>
 </div>
 
-@section Styles {
-    <style>
-        .file-upload-area {
-            border: 2px dashed #dee2e6;
-            transition: all 0.3s ease;
-            background-color: #f8f9fa;
-        }
-
-            .file-upload-area:hover {
-                border-color: #0d6efd;
-                background-color: #f0f7ff;
-            }
-
-            .file-upload-area.dragover {
-                border-color: #0d6efd;
-                background-color: #e7f1ff;
-            }
-
-        #filePreview {
-            max-width: 100%;
-            max-height: 300px;
-        }
-
-        .preview-image {
-            max-height: 250px;
-            border-radius: 4px;
-        }
-
-        .preview-video-icon {
-            font-size: 5rem;
-            color: #0d6efd;
-        }
-
-        .remove-file-btn {
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: #dc3545;
-            color: white;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-    </style>
-}
 
 
 
@@ -329,6 +423,42 @@
 @section Scripts {
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    @* dăc diẻm nhận dạng *@
+
+    <script>
+        $(function() {
+            // Xử lý khi checkbox thay đổi
+            $(document).on('change', '.feature-checkbox', function() {
+                updateMatchStats();
+            });
+
+            function updateMatchStats() {
+                const total = $('.feature-checkbox').length;
+                const matched = $('.feature-checkbox:checked').length;
+                const percentage = total > 0 ? Math.round((matched / total) * 100) : 0;
+                
+                // Cập nhật giao diện
+                $('#matchPercentageDisplay').text(percentage + '%');
+                $('#matchProgress').css('width', percentage + '%');
+                $('#matchPercentageValue').val(percentage);
+                
+                // Đổi màu theo %
+                const progressBar = $('#matchProgress');
+                progressBar.removeClass('bg-danger bg-warning bg-success');
+                
+                if (percentage >= 70) {
+                    progressBar.addClass('bg-success');
+                } else if (percentage >= 30) {
+                    progressBar.addClass('bg-warning');
+                } else {
+                    progressBar.addClass('bg-danger');
+                }
+            }
+        });
+    </script>
+
+    @* end dăc diẻm nhận dạng *@
 
     <script>
         

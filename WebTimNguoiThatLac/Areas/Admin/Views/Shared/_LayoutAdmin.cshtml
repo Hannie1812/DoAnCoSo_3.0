@@ -49,6 +49,12 @@
     <link rel="stylesheet" href="~/clients/plugins/summernote/summernote-bs4.min.css">
 
     
+
+
+    @await RenderSectionAsync("Styles", required: false)
+
+
+    
 </head>
 <body>
     
@@ -285,7 +291,7 @@
           // DropzoneJS Demo Code End
     </script>
 
-  
+    
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

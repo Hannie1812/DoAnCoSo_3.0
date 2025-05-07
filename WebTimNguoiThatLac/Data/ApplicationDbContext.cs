@@ -24,5 +24,12 @@ namespace WebTimNguoiThatLac.Data
         public DbSet<HanhViDangNgo> HanhViDangNgos { get; set; }
         public DbSet<NhanChung> NhanChungs { get; set; }
         public DbSet<OtpVerification> OtpVerifications { get; set; }
+
+        // ghi log  -> thêm bảng ghi log
+        public DbSet<UserActivityLog> UserActivityLogs { get; set; }
+
+        public DbSet<TinhThanh> TinhThanhs { get; set; }
+        public DbSet<QuanHuyen> QuanHuyens { get; set; }
+
     }
 }

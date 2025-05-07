@@ -1,0 +1,614 @@
+﻿@* @model WebTimNguoiThatLac.Models.NhanChung *@
+@* @{ *@
+@*     ViewData["Title"] = "Chi tiết Nhân chứng"; *@
+@*     var timNguoi = ViewBag.TimNguoi as WebTimNguoiThatLac.Models.TimNguoi; *@
+@* } *@
+
+@* <style> *@
+@*     .witness-detail-card { *@
+@*         border-left: 4px solid #3498db; *@
+@*         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1); *@
+@*     } *@
+
+@*     .info-label { *@
+@*         font-weight: 600; *@
+@*         color: #2c3e50; *@
+@*         min-width: 150px; *@
+@*     } *@
+
+@*     .file-preview { *@
+@*         max-width: 100%; *@
+@*         border-radius: 8px; *@
+@*         cursor: zoom-in; *@
+@*         transition: transform 0.3s; *@
+@*     } *@
+
+@*         .file-preview:hover { *@
+@*             transform: scale(1.02); *@
+@*         } *@
+
+@*     .timeline-badge { *@
+@*         width: 30px; *@
+@*         height: 30px; *@
+@*         background: #3498db; *@
+@*         color: white; *@
+@*         border-radius: 50%; *@
+@*         display: flex; *@
+@*         align-items: center; *@
+@*         justify-content: center; *@
+@*     } *@
+@* </style> *@
+
+@* <div class="container py-4"> *@
+@*     <div class="row mb-4"> *@
+@*         <div class="col-12"> *@
+@*             <nav aria-label="breadcrumb"> *@
+@*                 <ol class="breadcrumb"> *@
+@*                     <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Trang chủ</a></li> *@
+@*                     <li class="breadcrumb-item"><a href="@Url.Action("Details", "TimNguoi", new { id = Model.TimNguoiId })">@timNguoi.TieuDe</a></li> *@
+@*                     <li class="breadcrumb-item active">Chi tiết nhân chứng</li> *@
+@*                 </ol> *@
+@*             </nav> *@
+@*             <h2 class="mb-0"> *@
+@*                 <i class="fas fa-user-circle mr-2 text-primary"></i>@ViewData["Title"] *@
+@*             </h2> *@
+@*         </div> *@
+@*     </div> *@
+
+@*     <div class="row"> *@
+@*         <!-- Thông tin chính --> *@
+@*         <div class="col-lg-8"> *@
+@*             <div class="card witness-detail-card mb-4"> *@
+@*                 <div class="card-header bg-primary text-white d-flex justify-content-between"> *@
+@*                     <h5 class="mb-0">Thông tin nhân chứng</h5> *@
+@*                     <div> *@
+@*                         <a href="/NhanChung/Index?id=@Model.TimNguoiId" class="btn btn-sm btn-light"> *@
+@*                             <i class="fas fa-arrow-left mr-1"></i> Quay lại *@
+@*                         </a> *@
+@*                     </div> *@
+@*                 </div> *@
+@*                 <div class="card-body"> *@
+@*                     <div class="row mb-3"> *@
+@*                         <div class="col-md-6"> *@
+@*                             <p class="mb-2"> *@
+@*                                 <span class="info-label"><i class="fas fa-user mr-2"></i>Tên nhân chứng:</span> *@
+@*                                 <span class="text-dark">@(Model.HoTen ?? "Không rõ")</span> *@
+@*                             </p> *@
+@*                         </div> *@
+@*                         <div class="col-md-6"> *@
+@*                             <p class="mb-2"> *@
+@*                                 <span class="info-label"><i class="fas fa-calendar-alt mr-2"></i>Ngày báo tin:</span> *@
+@*                                 <span class="text-dark">@Model.NgayBaoTin.ToString("dd/MM/yyyy HH:mm")</span> *@
+@*                             </p> *@
+@*                         </div> *@
+@*                     </div> *@
+
+@*                     <div class="row mb-3"> *@
+@*                         <div class="col-md-6"> *@
+@*                             <p class="mb-2"> *@
+@*                                 <span class="info-label"><i class="fas fa-envelope mr-2"></i>Email:</span> *@
+@*                                 <span class="text-dark">@(Model.Email ?? "Không có")</span> *@
+@*                             </p> *@
+@*                         </div> *@
+@*                         <div class="col-md-6"> *@
+@*                             <p class="mb-2"> *@
+@*                                 <span class="info-label"><i class="fas fa-phone mr-2"></i>Điện thoại:</span> *@
+@*                                 <span class="text-dark">@(Model.SoDienThoai ?? "Không có")</span> *@
+@*                             </p> *@
+@*                         </div> *@
+@*                     </div> *@
+
+@*                     <hr class="my-4"> *@
+
+@*                     <div class="row mb-3"> *@
+@*                         <div class="col-md-6"> *@
+@*                             <p class="mb-2"> *@
+@*                                 <span class="info-label"><i class="fas fa-map-marker-alt mr-2"></i>Địa điểm:</span> *@
+@*                                 <span class="text-dark">@(Model.DiaDiem ?? "Không rõ")</span> *@
+@*                             </p> *@
+@*                         </div> *@
+@*                         <div class="col-md-6"> *@
+@*                             <p class="mb-2"> *@
+@*                                 <span class="info-label"><i class="fas fa-clock mr-2"></i>Thời gian:</span> *@
+@*                                 <span class="text-dark">@(Model.ThoiGian?.ToString("dd/MM/yyyy HH:mm") ?? "Không rõ")</span> *@
+@*                             </p> *@
+@*                         </div> *@
+@*                     </div> *@
+
+@*                     <div class="mb-3"> *@
+@*                         <span class="info-label"><i class="fas fa-align-left mr-2"></i>Mô tả chi tiết:</span> *@
+@*                         <div class="border p-3 mt-2 rounded bg-light"> *@
+@*                             @if (!string.IsNullOrEmpty(Model.MoTaManhMoi)) *@
+@*                             { *@
+@*                                 @Html.Raw(Model.MoTaManhMoi.Replace("\n", "<br>")) *@
+@*                             } *@
+@*                             else *@
+@*                             { *@
+@*                                 <span class="text-muted">Không có mô tả</span> *@
+@*                             } *@
+@*                         </div> *@
+@*                     </div> *@
+@*                 </div> *@
+@*             </div> *@
+@*         </div> *@
+
+@*         <!-- Hình ảnh và liên hệ --> *@
+@*         <div class="col-lg-4"> *@
+@*             <!-- File đính kèm --> *@
+@*             <div class="card mb-4"> *@
+@*                 <div class="card-header bg-info text-white"> *@
+@*                     <h5 class="mb-0"><i class="fas fa-paperclip mr-2"></i>Tài liệu đính kèm</h5> *@
+@*                 </div> *@
+@*                 <div class="card-body text-center"> *@
+@*                     @if (!string.IsNullOrEmpty(Model.FileDinhKem)) *@
+@*                     { *@
+@*                         var extension = System.IO.Path.GetExtension(Model.FileDinhKem).ToLower(); *@
+@*                         if (extension == ".mp4") *@
+@*                         { *@
+@*                             <video controls class="file-preview w-100"> *@
+@*                                 <source src="@Model.FileDinhKem" type="video/mp4"> *@
+@*                                 Trình duyệt không hỗ trợ video *@
+@*                             </video> *@
+@*                         } *@
+@*                         else *@
+@*                         { *@
+@*                             <img src="@Model.FileDinhKem" class="file-preview img-fluid mb-2" *@
+@*                                  data-toggle="modal" data-target="#imageModal" *@
+@*                                  data-image="@Model.FileDinhKem"> *@
+@*                         } *@
+@*                         <a href="@Model.FileDinhKem" download class="btn btn-sm btn-primary mt-2"> *@
+@*                             <i class="fas fa-download mr-1"></i> Tải xuống *@
+@*                         </a> *@
+@*                     } *@
+@*                     else *@
+@*                     { *@
+@*                         <div class="text-muted py-4"> *@
+@*                             <i class="fas fa-file-image fa-3x mb-2"></i> *@
+@*                             <p>Không có file đính kèm</p> *@
+@*                         </div> *@
+@*                     } *@
+@*                 </div> *@
+@*             </div> *@
+
+@*             <!-- Thông tin liên hệ nhanh --> *@
+@*             <div class="card"> *@
+@*                 <div class="card-header bg-success text-white"> *@
+@*                     <h5 class="mb-0"><i class="fas fa-bolt mr-2"></i>Liên hệ nhanh</h5> *@
+@*                 </div> *@
+@*                 <div class="card-body"> *@
+@*                     <div class="d-flex flex-column"> *@
+@*                         @if (!string.IsNullOrEmpty(Model.SoDienThoai)) *@
+@*                         { *@
+@*                             <a href="tel:@Model.SoDienThoai" class="btn btn-outline-primary mb-2 text-left"> *@
+@*                                 <i class="fas fa-phone mr-2"></i> Gọi điện: @Model.SoDienThoai *@
+@*                             </a> *@
+@*                         } *@
+@*                         @if (!string.IsNullOrEmpty(Model.Email)) *@
+@*                         { *@
+@*                             <a href="mailto:@Model.Email" class="btn btn-outline-secondary mb-2 text-left"> *@
+@*                                 <i class="fas fa-envelope mr-2"></i> Email: @Model.Email *@
+@*                             </a> *@
+@*                         } *@
+@*                         @if (string.IsNullOrEmpty(Model.SoDienThoai) && string.IsNullOrEmpty(Model.Email)) *@
+@*                         { *@
+@*                             <p class="text-muted">Không có thông tin liên hệ</p> *@
+@*                         } *@
+@*                     </div> *@
+@*                 </div> *@
+@*             </div> *@
+@*         </div> *@
+@*     </div> *@
+
+@*     <!-- Timeline (nếu cần) --> *@
+@*     <div class="row mt-4"> *@
+@*         <div class="col-12"> *@
+@*             <div class="card"> *@
+@*                 <div class="card-header bg-warning text-dark"> *@
+@*                     <h5 class="mb-0"><i class="fas fa-history mr-2"></i>Dòng thời gian</h5> *@
+@*                 </div> *@
+@*                 <div class="card-body"> *@
+@*                     <div class="timeline"> *@
+@*                         <div class="d-flex mb-3"> *@
+@*                             <div class="timeline-badge mr-3"> *@
+@*                                 <i class="fas fa-user-plus"></i> *@
+@*                             </div> *@
+@*                             <div> *@
+@*                                 <h6 class="mb-1">Nhân chứng báo tin</h6> *@
+@*                                 <p class="mb-0 text-muted">@Model.NgayBaoTin.ToString("dd/MM/yyyy HH:mm")</p> *@
+@*                             </div> *@
+@*                         </div> *@
+@*                         @if (Model.ThoiGian.HasValue) *@
+@*                         { *@
+@*                             <div class="d-flex"> *@
+@*                                 <div class="timeline-badge mr-3"> *@
+@*                                     <i class="fas fa-eye"></i> *@
+@*                                 </div> *@
+@*                                 <div> *@
+@*                                     <h6 class="mb-1">Thời điểm nhìn thấy</h6> *@
+@*                                     <p class="mb-0 text-muted">@Model.ThoiGian.Value.ToString("dd/MM/yyyy HH:mm")</p> *@
+@*                                 </div> *@
+@*                             </div> *@
+@*                         } *@
+@*                     </div> *@
+@*                 </div> *@
+@*             </div> *@
+@*         </div> *@
+@*     </div> *@
+@* </div> *@
+
+@* <!-- Modal xem ảnh lớn --> *@
+@* <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-hidden="true"> *@
+@*     <div class="modal-dialog modal-dialog-centered modal-lg"> *@
+@*         <div class="modal-content"> *@
+@*             <div class="modal-body text-center p-0"> *@
+@*                 <img id="modalImage" src="" class="img-fluid w-100"> *@
+@*             </div> *@
+@*             <div class="modal-footer justify-content-center"> *@
+@*                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button> *@
+@*                 <a id="downloadImage" href="#" download class="btn btn-primary"> *@
+@*                     <i class="fas fa-download mr-1"></i> Tải xuống *@
+@*                 </a> *@
+@*             </div> *@
+@*         </div> *@
+@*     </div> *@
+@* </div> *@
+
+@* @section Scripts { *@
+@*     <script> *@
+@*         $(document).ready(function() { *@
+@*             // Xử lý modal ảnh *@
+@*             $('#imageModal').on('show.bs.modal', function (event) { *@
+@*                 var button = $(event.relatedTarget); *@
+@*                 var imageUrl = button.data('image'); *@
+@*                 $('#modalImage').attr('src', imageUrl); *@
+@*                 $('#downloadImage').attr('href', imageUrl); *@
+@*             }); *@
+@*         }); *@
+@*     </script> *@
+@* } *@
+
+
+@model WebTimNguoiThatLac.Models.NhanChung
+@{
+    ViewData["Title"] = "Chi tiết Nhân chứng";
+    var timNguoi = ViewBag.TimNguoi as WebTimNguoiThatLac.Models.TimNguoi;
+}
+
+<style>
+    .witness-detail-card {
+        border-left: 4px solid #3498db;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #2c3e50;
+        min-width: 150px;
+    }
+
+    .file-preview {
+        max-width: 100%;
+        border-radius: 8px;
+        cursor: zoom-in;
+        transition: transform 0.3s;
+    }
+
+        .file-preview:hover {
+            transform: scale(1.02);
+        }
+
+    .timeline-badge {
+        width: 30px;
+        height: 30px;
+        background: #3498db;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Style cho phần đánh giá khớp */
+    .match-card {
+        border-left: 4px solid #6c757d;
+    }
+
+    .match-progress {
+        height: 25px;
+        border-radius: 12px;
+    }
+
+    .match-features {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .feature-badge {
+        font-size: 0.85rem;
+        margin: 2px;
+    }
+</style>
+
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a href="@Url.Action("Details", "TimNguoi", new { id = Model.TimNguoiId })">@timNguoi.TieuDe</a></li>
+                    <li class="breadcrumb-item active">Chi tiết nhân chứng</li>
+                </ol>
+            </nav>
+            <h2 class="mb-0">
+                <i class="fas fa-user-circle mr-2 text-primary"></i>@ViewData["Title"]
+            </h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Thông tin chính -->
+        <div class="col-lg-8">
+            <div class="card witness-detail-card mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between">
+                    <h5 class="mb-0">Thông tin nhân chứng</h5>
+                    <div>
+                        <a href="/NhanChung/Index?id=@Model.TimNguoiId" class="btn btn-sm btn-light">
+                            <i class="fas fa-arrow-left mr-1"></i> Quay lại
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <span class="info-label"><i class="fas fa-user mr-2"></i>Tên nhân chứng:</span>
+                                <span class="text-dark">@(Model.HoTen ?? "Không rõ")</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <span class="info-label"><i class="fas fa-calendar-alt mr-2"></i>Ngày báo tin:</span>
+                                <span class="text-dark">@Model.NgayBaoTin.ToString("dd/MM/yyyy HH:mm")</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <span class="info-label"><i class="fas fa-envelope mr-2"></i>Email:</span>
+                                <span class="text-dark">@(Model.Email ?? "Không có")</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <span class="info-label"><i class="fas fa-phone mr-2"></i>Điện thoại:</span>
+                                <span class="text-dark">@(Model.SoDienThoai ?? "Không có")</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <span class="info-label"><i class="fas fa-map-marker-alt mr-2"></i>Địa điểm:</span>
+                                <span class="text-dark">@(Model.DiaDiem ?? "Không rõ")</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <span class="info-label"><i class="fas fa-clock mr-2"></i>Thời gian:</span>
+                                <span class="text-dark">@(Model.ThoiGian?.ToString("dd/MM/yyyy HH:mm") ?? "Không rõ")</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="info-label"><i class="fas fa-align-left mr-2"></i>Mô tả chi tiết:</span>
+                        <div class="border p-3 mt-2 rounded bg-light">
+                            @if (!string.IsNullOrEmpty(Model.MoTaManhMoi))
+                            {
+                                @Html.Raw(Model.MoTaManhMoi.Replace("\n", "<br>"))
+                            }
+                            else
+                            {
+                                <span class="text-muted">Không có mô tả</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thêm card đánh giá khớp -->
+            <div class="card match-card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-percentage mr-2"></i>Đánh giá mức độ khớp</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h6 class="mb-3">Tỷ lệ khớp với bài đăng</h6>
+                            <div class="progress match-progress mb-3">
+                                <div class="progress-bar
+                                     @(Model.PhanTramDanhGia >= 70 ? "bg-success" :
+                                       Model.PhanTramDanhGia >= 30 ? "bg-warning" : "bg-danger")"
+                                     role="progressbar"
+                                     style="width: @Model.PhanTramDanhGia%"
+                                     aria-valuenow="@Model.PhanTramDanhGia"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100">
+                                    <span class="font-weight-bold">@Model.PhanTramDanhGia%</span>
+                                </div>
+                            </div>
+                            <div class="text-muted small">
+                                @if (Model.PhanTramDanhGia >= 70)
+                                {
+                                    <span><i class="fas fa-check-circle text-success mr-1"></i> Khả năng cao là đúng người</span>
+                                }
+                                else if (Model.PhanTramDanhGia >= 30)
+                                {
+                                    <span><i class="fas fa-question-circle text-warning mr-1"></i> Cần kiểm tra thêm</span>
+                                }
+                                else
+                                {
+                                    <span><i class="fas fa-exclamation-circle text-danger mr-1"></i> Khả năng thấp</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="mb-3">Đặc điểm đã khớp</h6>
+                            <div class="match-features">
+                                @if (!string.IsNullOrEmpty(Model.NguoiDungChon))
+                                {
+                                    foreach (var feature in Model.NguoiDungChon.Split(','))
+                                    {
+                                        <span class="badge bg-primary feature-badge">@feature</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="text-muted">Không có đặc điểm khớp</div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hình ảnh và liên hệ -->
+        <div class="col-lg-4">
+            <!-- File đính kèm -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-paperclip mr-2"></i>Tài liệu đính kèm</h5>
+                </div>
+                <div class="card-body text-center">
+                    @if (!string.IsNullOrEmpty(Model.FileDinhKem))
+                    {
+                        var extension = System.IO.Path.GetExtension(Model.FileDinhKem).ToLower();
+                        if (extension == ".mp4")
+                        {
+                            <video controls class="file-preview w-100">
+                                <source src="@Model.FileDinhKem" type="video/mp4">
+                                Trình duyệt không hỗ trợ video
+                            </video>
+                        }
+                        else
+                        {
+                            <img src="@Model.FileDinhKem" class="file-preview img-fluid mb-2"
+                                 data-toggle="modal" data-target="#imageModal"
+                                 data-image="@Model.FileDinhKem">
+                        }
+                        <a href="@Model.FileDinhKem" download class="btn btn-sm btn-primary mt-2">
+                            <i class="fas fa-download mr-1"></i> Tải xuống
+                        </a>
+                    }
+                    else
+                    {
+                        <div class="text-muted py-4">
+                            <i class="fas fa-file-image fa-3x mb-2"></i>
+                            <p>Không có file đính kèm</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Thông tin liên hệ nhanh -->
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-bolt mr-2"></i>Liên hệ nhanh</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-column">
+                        @if (!string.IsNullOrEmpty(Model.SoDienThoai))
+                        {
+                            <a href="tel:@Model.SoDienThoai" class="btn btn-outline-primary mb-2 text-left">
+                                <i class="fas fa-phone mr-2"></i> Gọi điện: @Model.SoDienThoai
+                            </a>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.Email))
+                        {
+                            <a href="mailto:@Model.Email" class="btn btn-outline-secondary mb-2 text-left">
+                                <i class="fas fa-envelope mr-2"></i> Email: @Model.Email
+                            </a>
+                        }
+                        @if (string.IsNullOrEmpty(Model.SoDienThoai) && string.IsNullOrEmpty(Model.Email))
+                        {
+                            <p class="text-muted">Không có thông tin liên hệ</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeline (nếu cần) -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-history mr-2"></i>Dòng thời gian</h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="d-flex mb-3">
+                            <div class="timeline-badge mr-3">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">Nhân chứng báo tin</h6>
+                                <p class="mb-0 text-muted">@Model.NgayBaoTin.ToString("dd/MM/yyyy HH:mm")</p>
+                            </div>
+                        </div>
+                        @if (Model.ThoiGian.HasValue)
+                        {
+                            <div class="d-flex">
+                                <div class="timeline-badge mr-3">
+                                    <i class="fas fa-eye"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Thời điểm nhìn thấy</h6>
+                                    <p class="mb-0 text-muted">@Model.ThoiGian.Value.ToString("dd/MM/yyyy HH:mm")</p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xem ảnh lớn -->
+<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-body text-center p-0">
+                <img id="modalImage" src="" class="img-fluid w-100">
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                <a id="downloadImage" href="#" download class="btn btn-primary">
+                    <i class="fas fa-download mr-1"></i> Tải xuống
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Xử lý modal ảnh
+            $('#imageModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var imageUrl = button.data('image');
+                $('#modalImage').attr('src', imageUrl);
+                $('#downloadImage').attr('href', imageUrl);
+            });
+        });
+    </script>
+}

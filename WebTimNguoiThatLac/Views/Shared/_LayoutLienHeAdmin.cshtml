@@ -1,0 +1,23 @@
+﻿@using WebTimNguoiThatLac.BoTro
+@using WebTimNguoiThatLac.Data
+@inject ApplicationDbContext dbContext
+@{
+    CacAdmin cacAdmin = new CacAdmin(dbContext);
+    string idAdmin = cacAdmin.IdAdmin();
+}
+
+<div class="hotline-group">
+    <!-- Nút để nhân chứng điền thông tin -->
+    @if(idAdmin != "")
+    {
+        <div class="hotline-phone-ring">
+            <div class="hotline-phone-ring-img-circle">
+                <a href="@Url.Action("BatDauChat", "Chat", new { nguoiNhanId = idAdmin , area = ""})" title="Liên Hệ Với Admin"
+                   >
+                    <i class="fas fa-headset"></i>
+                </a>
+            </div>
+        </div>
+    }
+   
+</div>

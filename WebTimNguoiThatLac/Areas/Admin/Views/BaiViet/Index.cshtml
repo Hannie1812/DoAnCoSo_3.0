@@ -1,7 +1,551 @@
-﻿@using X.PagedList;
+﻿@* @using X.PagedList; *@
+@* @using X.PagedList.Mvc.Core; *@
+@* @model X.PagedList.IPagedList<WebTimNguoiThatLac.Models.TimNguoi> *@
+
+
+@* @using Microsoft.AspNetCore.Identity *@
+@* @inject UserManager<ApplicationUser> UserManager *@
+@* @inject RoleManager<IdentityRole> RoleManager *@
+
+@* @using WebTimNguoiThatLac.Data *@
+@* @inject ApplicationDbContext db; *@
+
+@* @{ *@
+@*     ViewData["Title"] = "Bài Viết"; *@
+
+@* } *@
+
+@* @section naviHeader { *@
+@*     <!-- Left navbar links --> *@
+@*     <ul class="navbar-nav"> *@
+@*         <li class="nav-item"> *@
+@*             <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a> *@
+@*         </li> *@
+@*         <li class="nav-item d-none d-sm-inline-block"> *@
+@*             <a href="/Admin" class="nav-link ">Trang Chủ</a> *@
+@*         </li> *@
+@*         <li class="nav-item d-none d-sm-inline-block"> *@
+@*             <a href="/Admin/BaiViet" class="nav-link active">Bài Viết</a> *@
+@*         </li> *@
+@*     </ul> *@
+@* } *@
+
+@* <link rel="stylesheet" href="~/Templet/css/notification.css"> *@
+
+@* <div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div> *@
+
+
+@* <div> *@
+@*     <form asp-action="index" asp-controller="BaiViet" asp-area="Admin"> *@
+@*         <div class="input-group mb-3"> *@
+@*             <input name="TimKiem" value="@ViewBag.TimKiem" type="text" class="form-control" placeholder="Nhập tên Email, Tên Người Dùng, Số Điện Thoại cần tìm"> *@
+@*             <button class="btn btn-primary">Tìm Kiếm</button> *@
+@*         </div> *@
+@*     </form> *@
+@* </div> *@
+
+@* <div class="card container-fluid "> *@
+@*     <div class="card-header d-flex "> *@
+@*         <div> *@
+@*             <h2 class="card-title">Danh Sách @ViewData["Title"]</h2> *@
+@*         </div> *@
+
+@*         <div class="ms-auto"> *@
+@*             <a href="/Admin/BaiViet/Create" class="btn btn-primary">Thêm</a> *@
+@*         </div> *@
+@*     </div> *@
+@*     <div class="card-body"> *@
+@*         <table class="table table-hover "> *@
+@*             <thead> *@
+@*                 <tr> *@
+@*                     <th scope="col">STT</th> *@
+@*                     <th scope="col">Bài Viết Của</th> *@
+@*                     <th scope="col">Người Cần Tìm</th> *@
+@*                     <th scope="col">Tiêu Đề Tin</th> *@
+@*                     <th scope="col">Trạng Thái</th> *@
+@*                     <th scope="col">Ngày Đăng</th> *@
+@*                     <th scope="col">Ảnh Đại Diện</th> *@
+@*                     <th scope="col">Active</th> *@
+@*                     <th scope="col">Chức Năng</th> *@
+@*                 </tr> *@
+@*             </thead> *@
+@*             <tbody> *@
+@*                 @if (Model == null || Model.Count() <= 0) *@
+@*                 { *@
+@*                     <tr> *@
+@*                         <td colspan="9">Chưa có @ViewData["Title"]</td> *@
+@*                     </tr> *@
+@*                 } *@
+@*                 else *@
+@*                 { *@
+@*                     int d = 1; *@
+@*                     foreach (WebTimNguoiThatLac.Models.TimNguoi i in Model) *@
+@*                     { *@
+@*                         <tr id="Dong_ID_@i.Id"> *@
+@*                             <th scope="col" data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id">@d</th> *@
+@*                             <td data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id"> @i.ApplicationUser?.UserName</td> *@
+@*                             <td data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id">@i.HoTen</td> *@
+@*                             <td data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id">@i.TieuDe</td> *@
+@*                             <td data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id">@i.TrangThai</td> *@
+@*                             <td data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id">@i.NgayDang</td> *@
+@*                             <td data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id"> *@
+@*                                 @{ *@
+@*                                     AnhTimNguoi anhdd = db.AnhTimNguois.Where(m => m.IdNguoiCanTim == i.Id && m.TrangThai == 1).FirstOrDefault(); *@
+@*                                     if (anhdd != null) *@
+@*                                     { *@
+@*                                         <img src="@anhdd.HinhAnh" width="75" height="75" /> *@
+@*                                     } *@
+@*                                 } *@
+@*                             </td> *@
+
+@*                             @if (i.active == true) *@
+@*                             { *@
+@*                                 <td class="trangthaiActive" id="active_id_@i.Id"> *@
+@*                                     <i class="fa-regular fa-circle-check text-success hoatdong" id="logo_@i.Id" data-check="v" data-id="@i.Id"></i> *@
+@*                                 </td> *@
+@*                             } *@
+@*                             else *@
+@*                             { *@
+@*                                 <td class="trangthaiActive" id="active_id_@i.Id"> *@
+@*                                     <i class="fa-regular fa-circle-xmark text-danger hoatdong" id="logo_@i.Id" data-check="x" data-id="@i.Id"></i> *@
+@*                                 </td> *@
+@*                             } *@
+@*                             <td> *@
+@*                                 <a href="#" onclick="XuatDon('@i.Id')" class="btn btn-info"> *@
+@*                                     <i class="fas fa-file-word"></i> Xuất đơn *@
+@*                                 </a> *@
+
+@*                                 <a asp-area="Admin" *@
+@*                                    asp-controller="BaiViet" *@
+@*                                    asp-action="Update" *@
+@*                                    asp-route-id="@i.Id" *@
+@*                                    class="btn btn-success">Sửa</a> *@
+
+@*                                 <a asp-area="" *@
+@*                                    asp-controller="NhanChung" *@
+@*                                    asp-action="Index" *@
+@*                                    asp-route-id="@i.Id" *@
+@*                                    class="btn btn-info">Nhân Chứng</a> *@
+
+@*                                 <!-- Button trigger modal --> *@
+@*                                 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#CheckXoaBaiViet_@i.Id"> *@
+@*                                     Xóa *@
+@*                                 </button> *@
+
+@*                                 <!-- Modal --> *@
+@*                                 <div class="modal fade" id="CheckXoaBaiViet_@i.Id" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"> *@
+@*                                     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg"> *@
+@*                                         <div class="modal-content"> *@
+@*                                             <div class="modal-header"> *@
+@*                                                 <h1 class="modal-title fs-5" id="staticBackdropLabel"> Bạn Có Muốn Xóa @ViewData["Title"] ?</h1> *@
+@*                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> *@
+@*                                             </div> *@
+@*                                             <div class="modal-body"> *@
+@*                                                 <div class="row">@i.ApplicationUser?.Email</div> *@
+@*                                                 <div class="row"> *@
+@*                                                     <div class="col-6"> *@
+@*                                                         <div class="row"> *@
+@*                                                             <div class="col-4 fw-bold">ID</div> *@
+@*                                                             <div class="col-8">@i.Id</div> *@
+@*                                                         </div> *@
+@*                                                     </div> *@
+@*                                                     <div class="col-6"> *@
+@*                                                         <div class="row"> *@
+@*                                                             <div class="col-4 fw-bold">Tên người cần tìm </div> *@
+@*                                                             <div class="col-8">@i.HoTen</div> *@
+@*                                                         </div> *@
+@*                                                     </div> *@
+@*                                                 </div> *@
+
+
+@*                                                 <div class="row"> *@
+@*                                                     <div class="col-6"> *@
+@*                                                         <div class="row"> *@
+@*                                                             <div class="col-4 fw-bold">Giới Tính</div> *@
+@*                                                             <div class="col-8"> *@
+@*                                                                 @if (@i.GioiTinh == 1) *@
+@*                                                                 { *@
+@*                                                                     <p>Nam</p> *@
+@*                                                                 } *@
+@*                                                                 else *@
+@*                                                                 { *@
+@*                                                                     <p>Nữ</p> *@
+@*                                                                 } *@
+
+@*                                                             </div> *@
+@*                                                         </div> *@
+@*                                                     </div> *@
+@*                                                     <div class="col-6"> *@
+@*                                                         <div class="row"> *@
+@*                                                             <div class="col-4 fw-bold">Trạng Thái </div> *@
+@*                                                             <div class="col-8">@i.TrangThai</div> *@
+@*                                                         </div> *@
+@*                                                     </div> *@
+@*                                                 </div> *@
+@*                                                 <div class="row"> *@
+@*                                                     <div class="col-6"> *@
+@*                                                         <div class="row"> *@
+@*                                                             <div class="col-4 fw-bold">Khu Vực</div> *@
+@*                                                             <div class="col-8">@i.KhuVuc</div> *@
+@*                                                         </div> *@
+@*                                                     </div> *@
+@*                                                     <div class="col-6"> *@
+@*                                                         <div class="row"> *@
+@*                                                             <div class="col-4 fw-bold">Ngày Đăng </div> *@
+@*                                                             <div class="col-8">@i.NgayDang</div> *@
+@*                                                         </div> *@
+@*                                                     </div> *@
+@*                                                 </div> *@
+@*                                                 <div class="row"> *@
+@*                                                     <div class="col-6"> *@
+@*                                                         <div class="row"> *@
+@*                                                             <div class="col-4 fw-bold">Đặc Điểm Nhận Dạng</div> *@
+@*                                                             <div class="col-8">@i.DaciemNhanDang</div> *@
+@*                                                         </div> *@
+@*                                                     </div> *@
+@*                                                     <div class="col-6"> *@
+@*                                                         <div class="row"> *@
+@*                                                             <div class="col-4 fw-bold">Tiêu Đề </div> *@
+@*                                                             <div class="col-8">@i.TieuDe</div> *@
+@*                                                         </div> *@
+@*                                                     </div> *@
+@*                                                 </div> *@
+
+@*                                                 <div class="row"> *@
+@*                                                     <div class="col-12"> *@
+@*                                                         @{ *@
+@*                                                             List<AnhTimNguoi> dsanh = db.AnhTimNguois.Where(m => m.IdNguoiCanTim == i.Id).ToList(); *@
+@*                                                             foreach (AnhTimNguoi z in dsanh) *@
+@*                                                             { *@
+@*                                                                 <img src="@z.HinhAnh" width="50" /> *@
+@*                                                             } *@
+@*                                                         } *@
+
+@*                                                     </div> *@
+@*                                                     <div class="col-12"> *@
+@*                                                         @Html.Raw(i.MoTa) *@
+@*                                                     </div> *@
+@*                                                 </div> *@
+@*                                                 <div class="modal-footer"> *@
+@*                                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Thoát</button> *@
+@*                                                     <button type="button" onclick="XoaBaiViet('@i.Id');" class="btn btn-danger" data-bs-dismiss="modal">Xóa</button> *@
+@*                                                 </div> *@
+@*                                             </div> *@
+@*                                         </div> *@
+@*                                     </div> *@
+@*                                 </div> *@
+@*                             </td> *@
+@*                         </tr> *@
+@*                         d++; *@
+
+@*                         <div class="modal fade" id="XemChiTietBaiViet_@i.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"> *@
+@*                             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg"> *@
+@*                                 <div class="modal-content"> *@
+@*                                     <div class="modal-header"> *@
+@*                                         <h1 class="modal-title fs-5" id="exampleModalLabel">Thông Tin @ViewData["Title"]</h1> *@
+@*                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> *@
+@*                                     </div> *@
+@*                                     <div class="modal-body"> *@
+@*                                         <div class="row">@i.ApplicationUser?.Email</div> *@
+@*                                         <div class="row"> *@
+@*                                             <div class="col-6"> *@
+@*                                                 <div class="row"> *@
+@*                                                     <div class="col-4 fw-bold">ID</div> *@
+@*                                                     <div class="col-8">@i.Id</div> *@
+@*                                                 </div> *@
+@*                                             </div> *@
+@*                                             <div class="col-6"> *@
+@*                                                 <div class="row"> *@
+@*                                                     <div class="col-4 fw-bold">Tên người cần tìm </div> *@
+@*                                                     <div class="col-8">@i.HoTen</div> *@
+@*                                                 </div> *@
+@*                                             </div> *@
+@*                                         </div> *@
+
+
+@*                                         <div class="row"> *@
+@*                                             <div class="col-6"> *@
+@*                                                 <div class="row"> *@
+@*                                                     <div class="col-4 fw-bold">Giới Tính</div> *@
+@*                                                     <div class="col-8"> *@
+@*                                                         @if (@i.GioiTinh == 1) *@
+@*                                                         { *@
+@*                                                             <p>Nam</p> *@
+@*                                                         } *@
+@*                                                         else *@
+@*                                                         { *@
+@*                                                             <p>Nữ</p> *@
+@*                                                         } *@
+
+@*                                                     </div> *@
+@*                                                 </div> *@
+@*                                             </div> *@
+@*                                             <div class="col-6"> *@
+@*                                                 <div class="row"> *@
+@*                                                     <div class="col-4 fw-bold">Trạng Thái </div> *@
+@*                                                     <div class="col-8">@i.TrangThai</div> *@
+@*                                                 </div> *@
+@*                                             </div> *@
+@*                                         </div> *@
+@*                                         <div class="row"> *@
+@*                                             <div class="col-6"> *@
+@*                                                 <div class="row"> *@
+@*                                                     <div class="col-4 fw-bold">Khu Vực</div> *@
+@*                                                     <div class="col-8">@i.KhuVuc</div> *@
+@*                                                 </div> *@
+@*                                             </div> *@
+@*                                             <div class="col-6"> *@
+@*                                                 <div class="row"> *@
+@*                                                     <div class="col-4 fw-bold">Ngày Đăng </div> *@
+@*                                                     <div class="col-8">@i.NgayDang</div> *@
+@*                                                 </div> *@
+@*                                             </div> *@
+@*                                         </div> *@
+@*                                         <div class="row"> *@
+@*                                             <div class="col-6"> *@
+@*                                                 <div class="row"> *@
+@*                                                     <div class="col-4 fw-bold">Đặc Điểm Nhận Dạng</div> *@
+@*                                                     <div class="col-8">@i.DaciemNhanDang</div> *@
+@*                                                 </div> *@
+@*                                             </div> *@
+@*                                             <div class="col-6"> *@
+@*                                                 <div class="row"> *@
+@*                                                     <div class="col-4 fw-bold">Tiêu Đề </div> *@
+@*                                                     <div class="col-8">@i.TieuDe</div> *@
+@*                                                 </div> *@
+@*                                             </div> *@
+@*                                         </div> *@
+
+@*                                         <div class="row"> *@
+@*                                             <div class="col-12"> *@
+@*                                                 @{ *@
+@*                                                     List<AnhTimNguoi> dsanh2 = db.AnhTimNguois.Where(m => m.IdNguoiCanTim == i.Id).ToList(); *@
+@*                                                     foreach (AnhTimNguoi z in dsanh2) *@
+@*                                                     { *@
+@*                                                         <img src="@z.HinhAnh" width="50" /> *@
+@*                                                     } *@
+@*                                                 } *@
+
+@*                                             </div> *@
+@*                                             <div class="col-12"> *@
+@*                                                 @Html.Raw(i.MoTa) *@
+@*                                             </div> *@
+@*                                         </div> *@
+
+@*                                     </div> *@
+@*                                     <div class="modal-footer"> *@
+@*                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button> *@
+@*                                     </div> *@
+@*                                 </div> *@
+@*                             </div> *@
+@*                         </div> *@
+@*                     } *@
+@*                 } *@
+@*             </tbody> *@
+@*         </table> *@
+
+@*     </div> *@
+@*     <!-- Hiển thị phân trang --> *@
+@*     <div class=" d-flex justify-content-center  text-center"> *@
+@*         <div> *@
+@*             @Html.PagedListPager(Model, Page => Url.Action("Index", *@
+@*                      new { Page, ViewBag.TimKiem }), *@
+@*                      new PagedListRenderOptions *@
+@*             { *@
+@*                 LiElementClasses = new[] { "page-item" }, *@
+@*                 PageClasses = new[] { "page-link" } *@
+@*             }) *@
+@*         </div> *@
+
+@*     </div> *@
+
+@*     <div class="card-footer"> *@
+@*     </div> *@
+@* </div> *@
+
+@* @section Scripts { *@
+@*     <script> *@
+@*         function XoaBaiViet(id) *@
+@*         { *@
+@*             $.ajax({ *@
+@*                 type :"POST", *@
+@*                 url: "/Admin/BaiViet/Delete", *@
+@*                 data:{id : id}, *@
+@*                 success : function(rs) *@
+@*                 { *@
+@*                     if(rs.success){ *@
+@*                         $("#Dong_ID_"+id).remove(); *@
+@*                         alert("Đã xóa thành công"); *@
+@*                     } *@
+@*                     else *@
+@*                     { *@
+@*                         alert("Lỗi: "+ rs.message); *@
+@*                     } *@
+@*                 }, *@
+@*                 error : () => *@
+@*                 { *@
+@*                     alert("Lỗi Hệ Thống"); *@
+@*                 } *@
+@*             }); *@
+@*         } *@
+
+@*         $(document).on("dblclick", ".hoatdong", function () { *@
+@*             let id = $(this).attr("data-id"); *@
+@*             $.ajax({ *@
+@*                 type :"POST", *@
+@*             url: "/Admin/BaiViet/HoatDong", *@
+@*                 data:{id : id}, *@
+@*                 success : function(rs) *@
+@*                 { *@
+@*                     if(rs.success){ *@
+@*                         let trangthai = $("#logo_"+id).attr("data-check"); *@
+@*                         let s = ``; *@
+@*                         if(trangthai === 'x') *@
+@*                         { *@
+@*                             s = `<i class="fa-regular fa-circle-check text-success hoatdong" id="logo_`+id+`" data-check="v" data-id="`+id+`"></i>`; *@
+@*                             $("#logo_"+id).remove() *@
+@*                         } *@
+@*                         else *@
+@*                         { *@
+@*                             s = `<i class="fa-regular fa-circle-xmark text-danger hoatdong" id="logo_`+id+`" data-check="x" data-id="`+id+`"></i>`; *@
+@*                             $("#logo_"+id).remove(); *@
+@*                         } *@
+@*                         $("#active_id_"+id).append(s); *@
+@*                         alert(rs.message) *@
+@*                     } *@
+
+@*                     else *@
+@*                     { *@
+@*                         alert("Lỗi: "+ rs.message); *@
+@*                     } *@
+@*                 }, *@
+@*                 error : () => *@
+@*                 { *@
+@*                     alert("Lỗi Hệ Thống"); *@
+@*                 } *@
+@*             }) *@
+@*         }); *@
+
+
+@*         function XuatDon(id) { *@
+@*             $.ajax({ *@
+@*                 type: "POST", *@
+@*                 url: "/Admin/BaiViet/ExportToWord", *@
+@*                 data: { id: id }, *@
+@*                 success: function(response) { *@
+@*                     // Tạo link tải file tự động *@
+@*                     var link = document.createElement('a'); *@
+@*                     link.href = window.URL.createObjectURL(new Blob([response])); *@
+@*                     link.download = `DonTrinhBao_${id}_${new Date().toISOString()}.docx`; *@
+@*                     link.click(); *@
+
+@*                     alert("Đã xuất file thành công và lưu vào hệ thống"); *@
+@*                 }, *@
+@*                 error: function() { *@
+@*                     alert("Lỗi khi xuất file"); *@
+@*                 } *@
+@*             }); *@
+@*         } *@
+@*     </script> *@
+
+
+@*     <script> *@
+
+@*         document.addEventListener('DOMContentLoaded', function() *@
+@*         { *@
+@*                     // Hiển thị thông báo từ TempData *@
+@*                 @if (TempData["SuccessMessage"] != null) *@
+@*                 { *@
+@*                     <text> *@
+@*                                         showNotification('success', '@Html.Raw(TempData["SuccessMessage"])'); *@
+@*                     </text> *@
+@*                 } *@
+@*                 @if (TempData["ErrorMessage"] != null) *@
+@*                 { *@
+@*                     <text> *@
+@*                                         showNotification('error', '@Html.Raw(TempData["ErrorMessage"])'); *@
+@*                     </text> *@
+@*                 } *@
+@*                 @if (TempData["WarningMessage"] != null) *@
+@*                 { *@
+@*                     <text> *@
+@*                                         showNotification('warning', '@Html.Raw(TempData["WarningMessage"])'); *@
+@*                     </text> *@
+@*                 } *@
+@*                 @if (TempData["InfoMessage"] != null) *@
+@*                 { *@
+@*                     <text> *@
+@*                                         showNotification('info', '@Html.Raw(TempData["InfoMessage"])'); *@
+@*                     </text> *@
+@*                 } *@
+
+@*         }); *@
+
+
+@*         function showNotification(type, message) *@
+@*         { *@
+@*             // alert(message); *@
+
+@*             const notificationArea = document.getElementById('notification-area'); *@
+@*             const notification = document.createElement('div'); *@
+@*             notification.className = `notification ${type}`; *@
+@*             notification.innerHTML = ` *@
+@*                                             <i class="fas ${getIconForType(type)} me-2"></i> *@
+@*                                             ${message} *@
+@*                                         `; *@
+
+
+@*             notificationArea.appendChild(notification); *@
+
+@*             // Tự động xóa sau 5 giây *@
+@*             setTimeout(() => { *@
+@*                 notification.remove(); *@
+@*             }, 5000); *@
+
+@*             // Tự động xóa khi nhấn vào *@
+@*             notification.addEventListener('click', () => { *@
+@*                 notification.remove(); *@
+@*             }); *@
+
+@*             // Thêm hiệu ứng hover *@
+@*             notification.addEventListener('mouseover', () => { *@
+@*                 notification.style.transform = 'scale(1.05)'; *@
+@*             }); *@
+@*             notification.addEventListener('mouseout', () => { *@
+@*                 notification.style.transform = 'scale(1)'; *@
+@*             }); *@
+
+@*             // Thêm hiệu ứng slide-in *@
+@*             notification.style.transform = 'translateX(100%)'; *@
+@*             setTimeout(() => { *@
+@*                 notification.style.transform = 'translateX(0)'; *@
+@*             }, 10); *@
+
+
+
+@*         } *@
+
+
+@*         // Chọn biểu tượng dựa trên loại thông báo *@
+@*         function getIconForType(type) { *@
+@*             switch(type) { *@
+@*                 case 'success': return 'fa-check-circle'; *@
+@*                 case 'error': return 'fa-times-circle'; *@
+@*                 case 'warning': return 'fa-exclamation-triangle'; *@
+@*                 case 'info': return 'fa-info-circle'; *@
+@*                 default: return 'fa-info-circle'; *@
+@*             } *@
+@*         } *@
+
+
+
+@*     </script> *@
+@* }    *@
+
+
+@using X.PagedList;
 @using X.PagedList.Mvc.Core;
 @model X.PagedList.IPagedList<WebTimNguoiThatLac.Models.TimNguoi>
-
 
 @using Microsoft.AspNetCore.Identity
 @inject UserManager<ApplicationUser> UserManager
@@ -11,8 +555,7 @@
 @inject ApplicationDbContext db;
 
 @{
-    ViewData["Title"] = "Bài Viết";
-
+    ViewData["Title"] = "Quản Lý Bài Viết Tìm Người";
 }
 
 @section naviHeader {
@@ -22,400 +565,610 @@
             <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="/Admin" class="nav-link ">Trang Chủ</a>
+            <a href="/Admin" class="nav-link">Trang Chủ</a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="/Admin/BaiViet" class="nav-link active">Bài Viết</a>
+            <a href="/Admin/BaiViet" class="nav-link active">Bài Viết Tìm Người</a>
         </li>
     </ul>
 }
 
+<style>
+    /* Modern styling */
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        border: none;
+        overflow: hidden;
+    }
 
-<div>
-    <form asp-action="index" asp-controller="BaiViet" asp-area="Admin">
-        <div class="input-group mb-3">
-            <input name="TimKiem" value="@ViewBag.TimKiem" type="text" class="form-control" placeholder="Nhập tên Email, Tên Người Dùng, Số Điện Thoại cần tìm">
-            <button class="btn btn-primary">Tìm Kiếm</button>
-        </div>
-    </form>
-</div>
+    .card-header {
+        /* background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); */
+        background: rgb(0, 123, 255);
+        color: white;
+        padding: 1.5rem;
+    }
 
-<div class="card container-fluid ">
-    <div class="card-header d-flex ">
-        <div>
-            <h2 class="card-title">Danh Sách @ViewData["Title"]</h2>
-        </div>
+    .card-title {
+        font-weight: 600;
+        margin: 0;
+    }
 
-        <div class="ms-auto">
-            <a href="/Admin/BaiViet/Create" class="btn btn-primary">Thêm</a>
-        </div>
-    </div>
-    <div class="card-body">
-        <table class="table table-hover ">
-            <thead>
-                <tr>
-                    <th scope="col">STT</th>
-                    <th scope="col">Bài Viết Của</th>
-                    <th scope="col">Người Cần Tìm</th>
-                    <th scope="col">Tiêu Đề Tin</th>
-                    <th scope="col">Trạng Thái</th>
-                    <th scope="col">Ngày Đăng</th>
-                    <th scope="col">Ảnh Đại Diện</th>
-                    <th scope="col">Active</th>
-                    <th scope="col">Chức Năng</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model == null || Model.Count() <= 0)
-                {
-                    <tr>
-                        <td colspan="9">Chưa có @ViewData["Title"]</td>
-                    </tr>
-                }
-                else
-                {
-                    int d = 1;
-                    foreach (WebTimNguoiThatLac.Models.TimNguoi i in Model)
-                    {
-                        <tr id="Dong_ID_@i.Id">
-                            <th scope="col" data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id">@d</th>
-                            <td data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id"> @i.ApplicationUser?.UserName</td>
-                            <td data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id">@i.HoTen</td>
-                            <td data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id">@i.TieuDe</td>
-                            <td data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id">@i.TrangThai</td>
-                            <td data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id">@i.NgayDang</td>
-                            <td data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id">
-                                @{
-                                    AnhTimNguoi anhdd = db.AnhTimNguois.Where(m => m.IdNguoiCanTim == i.Id && m.TrangThai == 1).FirstOrDefault();
-                                    if (anhdd != null)
-                                    {
-                                        <img src="@anhdd.HinhAnh" width="100" />
-                                    }
-                                }
-                            </td>
+    .table {
+        margin-bottom: 0;
+    }
 
-                            @if (i.active == true)
-                            {
-                                <td class="trangthaiActive" id="active_id_@i.Id">
-                                    <i class="fa-regular fa-circle-check text-success hoatdong" id="logo_@i.Id" data-check="v" data-id="@i.Id"></i>
-                                </td>
-                            }
-                            else
-                            {
-                                <td class="trangthaiActive" id="active_id_@i.Id">
-                                    <i class="fa-regular fa-circle-xmark text-danger hoatdong" id="logo_@i.Id" data-check="x" data-id="@i.Id"></i>
-                                </td>
-                            }
-                            <td>
-                                <a href="#" onclick="XuatDon('@i.Id')" class="btn btn-info">
-                                    <i class="fas fa-file-word"></i> Xuất đơn
-                                </a>
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            border-top: none;
+        }
 
-                                <a asp-area="Admin"
-                                   asp-controller="BaiViet"
-                                   asp-action="Update"
-                                   asp-route-id="@i.Id"
-                                   class="btn btn-success">Sửa</a>
+    .table-hover tbody tr:hover {
+        background-color: rgba(106, 17, 203, 0.05);
+    }
 
-                                <!-- Button trigger modal -->
-                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#CheckXoaBaiViet_@i.Id">
-                                    Xóa
+    .img-thumbnail {
+        border-radius: 8px;
+        transition: transform 0.3s;
+    }
+
+        .img-thumbnail:hover {
+            transform: scale(1.05);
+        }
+
+    .btn-action {
+        padding: 0.375rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        margin: 0 2px;
+    }
+
+    .search-box {
+        border-radius: 50px;
+        padding: 0.75rem 1.5rem;
+        border: 1px solid #e0e0e0;
+    }
+
+    .search-btn {
+        border-radius: 50px;
+        padding: 0.75rem 1.5rem;
+    }
+
+    /* Pagination styling */
+    .pagination {
+        margin-top: 20px;
+    }
+
+    .page-item .page-link {
+        border-radius: 50% !important;
+        margin: 0 5px;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        color: #333;
+    }
+
+    .page-item.active .page-link {
+        /* background-color: #6a11cb; */
+        /* border-color: #6a11cb; */
+        background-color: rgb(0, 123, 255);
+        border-color: rgb(0, 123, 255);
+        color: white;
+    }
+
+    .page-item:not(.active) .page-link:hover {
+        background-color: #f0e6ff;
+        /* color: #6a11cb; */
+        color: rgb(0, 123, 255);
+    }
+
+    /* Status badges */
+    .badge-active {
+        background-color: #28a745;
+    }
+
+    .badge-inactive {
+        background-color: #dc3545;
+    }
+
+    /* Modal styling */
+    .modal-content {
+        border-radius: 15px;
+        border: none;
+    }
+
+    .modal-header {
+        /* background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); */
+        background: rgb(0, 123, 255);
+        color: white;
+        border-radius: 15px 15px 0 0 !important;
+    }
+
+    /* Notification area */
+    #notification-area {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+    }
+
+    .notification {
+        padding: 15px 20px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        color: white;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+        .notification i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .notification.success {
+            background-color: #28a745;
+        }
+
+        .notification.error {
+            background-color: #dc3545;
+        }
+
+        .notification.warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .notification.info {
+            background-color: #17a2b8;
+        }
+</style>
+
+<div id="notification-area"></div>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="card-title"><i class="fas fa-search-location me-2"></i>@ViewData["Title"]</h3>
+                    </div>
+                    <div class="ms-auto">
+                        <a href="/Admin/BaiViet/Create" class="btn btn-light">
+                            <i class="fas fa-plus me-2"></i>Thêm Bài Viết
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <!-- Search Form -->
+                    <div class="mb-4">
+                        <form asp-action="index" asp-controller="BaiViet" asp-area="Admin" class="row g-3">
+                            <div class="col-md-10">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-search"></i></span>
+                                    <input name="TimKiem" value="@ViewBag.TimKiem" type="text" class="form-control search-box border-start-0"
+                                           placeholder="Nhập email, tên người dùng hoặc số điện thoại cần tìm">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-primary search-btn w-100">
+                                    <i class="fas fa-search me-2"></i>Tìm Kiếm
                                 </button>
+                            </div>
+                        </form>
+                    </div>
 
-                                <!-- Modal -->
-                                <div class="modal fade" id="CheckXoaBaiViet_@i.Id" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel">
-                                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h1 class="modal-title fs-5" id="staticBackdropLabel"> Bạn Có Muốn Xóa @ViewData["Title"] ?</h1>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <!-- Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col" width="5%">STT</th>
+                                    <th scope="col" width="15%">Người Đăng</th>
+                                    <th scope="col" width="15%">Người Cần Tìm</th>
+                                    <th scope="col" width="15%">Tiêu Đề</th>
+                                    <th scope="col" width="10%">Trạng Thái</th>
+                                    <th scope="col" width="10%">Ngày Đăng</th>
+                                    <th scope="col" width="10%">Ảnh Đại Diện</th>
+                                    <th scope="col" width="5%">Active</th>
+                                    <th scope="col" width="15%">Thao Tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model == null || Model.Count() <= 0)
+                                {
+                                    <tr>
+                                        <td colspan="9" class="text-center py-4">
+                                            <div class="alert alert-info mb-0">
+                                                <i class="fas fa-info-circle me-2"></i>Không có bài viết nào được tìm thấy
                                             </div>
-                                            <div class="modal-body">
-                                                <div class="row">@i.ApplicationUser?.Email</div>
-                                                <div class="row">
-                                                    <div class="col-6">
-                                                        <div class="row">
-                                                            <div class="col-4 fw-bold">ID</div>
-                                                            <div class="col-8">@i.Id</div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-6">
-                                                        <div class="row">
-                                                            <div class="col-4 fw-bold">Tên người cần tìm </div>
-                                                            <div class="col-8">@i.HoTen</div>
-                                                        </div>
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    int d = 1;
+                                    foreach (WebTimNguoiThatLac.Models.TimNguoi i in Model)
+                                    {
+                                        <tr id="Dong_ID_@i.Id" class="@(i.active ? "" : "table-secondary")">
+                                            <td data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id" style="cursor: pointer;">
+                                                <span class="badge bg-primary">@d</span>
+                                            </td>
+                                            <td data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id" style="cursor: pointer;">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-user-circle me-2 fs-4"></i>
+                                                    <div>
+                                                        <div class="fw-bold">@i.ApplicationUser?.UserName</div>
+                                                        <small class="text-muted">@i.ApplicationUser?.Email</small>
                                                     </div>
                                                 </div>
+                                            </td>
+                                            <td data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id" style="cursor: pointer;">
+                                                <div class="fw-bold">@i.HoTen</div>
+                                                <small class="text-muted">
+                                                    @i.KhuVuc, @i.QuanHuyen?.TenQuanHuyen, @i.TinhThanh?.TenTinhThanh
+                                                </small>
+                                            </td>
+                                            <td data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id" style="cursor: pointer;">
+                                                <div class="text-truncate" style="max-width: 200px;">@i.TieuDe</div>
+                                            </td>
+                                            <td data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id" style="cursor: pointer;">
+                                                <span class="badge @(i.TrangThai == "Đã tìm thấy" ? "bg-success" : "bg-warning text-dark")">
+                                                    @i.TrangThai
+                                                </span>
+                                            </td>
+                                            <td data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id" style="cursor: pointer;">
+                                                @i.NgayDang.ToString("dd/MM/yyyy")
+                                            </td>
+                                            <td data-bs-toggle="modal" data-bs-target="#XemChiTietBaiViet_@i.Id" style="cursor: pointer;">
+                                                @{
+                                                    AnhTimNguoi anhdd = db.AnhTimNguois.Where(m => m.IdNguoiCanTim == i.Id && m.TrangThai == 1).FirstOrDefault();
+                                                    if (anhdd != null)
+                                                    {
+                                                        <img src="@anhdd.HinhAnh" class="img-thumbnail" width="75" height="75" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width:75px;height:75px;">
+                                                            <i class="fas fa-image text-muted"></i>
+                                                        </div>
+                                                    }
+                                                }
+                                            </td>
+                                            <td class="trangthaiActive" id="active_id_@i.Id">
+                                                @if (i.active == true)
+                                                {
+                                                    <i class="fas fa-check-circle text-success hoatdong fs-4"
+                                                       id="logo_@i.Id"
+                                                       data-check="v"
+                                                       data-id="@i.Id"
+                                                       style="cursor: pointer;"
+                                                       title="Nhấn đúp để thay đổi trạng thái"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="fas fa-times-circle text-danger hoatdong fs-4"
+                                                       id="logo_@i.Id"
+                                                       data-check="x"
+                                                       data-id="@i.Id"
+                                                       style="cursor: pointer;"
+                                                       title="Nhấn đúp để thay đổi trạng thái"></i>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    <button onclick="XuatDon('@i.Id')" class="btn btn-info btn-action" title="Xuất đơn">
+                                                        <i class="fas fa-file-word"></i>
+                                                    </button>
 
+                                                    <a asp-area="Admin" asp-controller="BaiViet" asp-action="Update" asp-route-id="@i.Id"
+                                                       class="btn btn-success btn-action" title="Sửa">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
 
-                                                <div class="row">
-                                                    <div class="col-6">
-                                                        <div class="row">
-                                                            <div class="col-4 fw-bold">Giới Tính</div>
-                                                            <div class="col-8">
-                                                                @if (@i.GioiTinh == 1)
-                                                                {
-                                                                    <p>Nam</p>
-                                                                }
-                                                                else
-                                                                {
-                                                                    <p>Nữ</p>
-                                                                }
+                                                    <a asp-area="" asp-controller="NhanChung" asp-action="Index" asp-route-id="@i.Id"
+                                                       class="btn btn-secondary btn-action" title="Nhân chứng">
+                                                        <i class="fas fa-users"></i>
+                                                    </a>
 
+                                                    <button type="button" class="btn btn-danger btn-action"
+                                                            data-bs-toggle="modal" data-bs-target="#CheckXoaBaiViet_@i.Id" title="Xóa">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </div>
+
+                                                <!-- Delete Confirmation Modal -->
+                                                <div class="modal fade" id="CheckXoaBaiViet_@i.Id" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header bg-danger text-white">
+                                                                <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa bài viết</h5>
+                                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <div class="alert alert-warning">
+                                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                                    Bạn có chắc chắn muốn xóa bài viết này?
+                                                                </div>
+                                                                <div class="row mb-3">
+                                                                    <div class="col-md-6">
+                                                                        <div class="mb-2">
+                                                                            <label class="fw-bold">ID:</label>
+                                                                            <div>@i.Id</div>
+                                                                        </div>
+                                                                        <div class="mb-2">
+                                                                            <label class="fw-bold">Người đăng:</label>
+                                                                            <div>@i.ApplicationUser?.UserName</div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="mb-2">
+                                                                            <label class="fw-bold">Người cần tìm:</label>
+                                                                            <div>@i.HoTen</div>
+                                                                        </div>
+                                                                        <div class="mb-2">
+                                                                            <label class="fw-bold">Ngày đăng:</label>
+                                                                            <div>@i.NgayDang.ToString("dd/MM/yyyy")</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="text-center">
+                                                                    @{
+                                                                        AnhTimNguoi anhModal = db.AnhTimNguois.Where(m => m.IdNguoiCanTim == i.Id && m.TrangThai == 1).FirstOrDefault();
+                                                                        if (anhModal != null)
+                                                                        {
+                                                                            <img src="@anhModal.HinhAnh" class="img-thumbnail mb-3" width="150" />
+                                                                        }
+                                                                    }
+                                                                    <div class="fw-bold">@i.TieuDe</div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                                                <button type="button" onclick="XoaBaiViet('@i.Id');" class="btn btn-danger" data-bs-dismiss="modal">
+                                                                    <i class="fas fa-trash-alt me-2"></i>Xóa
+                                                                </button>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-6">
-                                                        <div class="row">
-                                                            <div class="col-4 fw-bold">Trạng Thái </div>
-                                                            <div class="col-8">@i.TrangThai</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Detail View Modal -->
+                                        <div class="modal fade" id="XemChiTietBaiViet_@i.Id" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                                                <div class="modal-content">
+                                                    <div class="modal-header bg-primary text-white">
+                                                        <h5 class="modal-title" id="detailModalLabel">Chi tiết bài viết</h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="row mb-4">
+                                                            <div class="col-md-6">
+                                                                <div class="d-flex align-items-center mb-3">
+                                                                    <div class="flex-shrink-0">
+                                                                        @{
+                                                                            AnhTimNguoi anhDetail = db.AnhTimNguois.Where(m => m.IdNguoiCanTim == i.Id && m.TrangThai == 1).FirstOrDefault();
+                                                                            if (anhDetail != null)
+                                                                            {
+                                                                                <img src="@anhDetail.HinhAnh" class="img-thumbnail" width="100" />
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <div class="bg-primary rounded d-flex align-items-center justify-content-center" style="width:100px;height:100px;">
+                                                                                    <i class="fas fa-image text-muted fs-1"></i>
+                                                                                </div>
+                                                                            }
+                                                                        }
+                                                                    </div>
+                                                                    <div class="flex-grow-1 ms-3">
+                                                                        <h5 class="mb-1">@i.HoTen</h5>
+                                                                        <p class="mb-1"><small class="text-muted">@i.KhuVuc</small></p>
+                                                                        <span class="badge @(i.TrangThai == "Đã tìm thấy" ? "bg-success" : "bg-warning text-dark")">
+                                                                            @i.TrangThai
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="card bg-primary">
+                                                                    <div class="card-body">
+                                                                        <h6 class="card-title">Thông tin người đăng</h6>
+                                                                        <ul class="list-unstyled mb-0">
+                                                                            <li><i class="fas fa-user me-2"></i> @i.ApplicationUser?.UserName</li>
+                                                                            <li><i class="fas fa-envelope me-2"></i> @i.ApplicationUser?.Email</li>
+                                                                            <li><i class="fas fa-calendar-alt me-2"></i> @i.NgayDang.ToString("dd/MM/yyyy HH:mm")</li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row mb-4">
+                                                            <div class="col-md-6">
+                                                                <div class="card mb-3">
+                                                                    <div class="card-header bg-primary">
+                                                                        <h6 class="mb-0">Thông tin cơ bản</h6>
+                                                                    </div>
+                                                                    <div class="card-body">
+                                                                        <div class="row">
+                                                                            <div class="col-md-6 mb-2">
+                                                                                <label class="fw-bold">Giới tính:</label>
+                                                                                <div>@(i.GioiTinh == 1 ? "Nam" : "Nữ")</div>
+                                                                            </div>
+                                                                            <div class="col-md-6 mb-2">
+                                                                                <label class="fw-bold">Khu vực:</label>
+                                                                                <div>@i.KhuVuc</div>
+                                                                            </div>
+                                                                            <div class="col-12 mb-2">
+                                                                                <label class="fw-bold">Đặc điểm nhận dạng:</label>
+                                                                                <div>@i.DaciemNhanDang</div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="card">
+                                                                    <div class="card-header bg-primary">
+                                                                        <h6 class="mb-0">Thông tin bài viết</h6>
+                                                                    </div>
+                                                                    <div class="card-body">
+                                                                        <div class="mb-2">
+                                                                            <label class="fw-bold">Tiêu đề:</label>
+                                                                            <div>@i.TieuDe</div>
+                                                                        </div>
+                                                                        <div>
+                                                                            <label class="fw-bold">Mô tả:</label>
+                                                                            <div class="border p-2 rounded bg-white">
+                                                                                @Html.Raw(i.MoTa)
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="card">
+                                                            <div class="card-header bg-primary">
+                                                                <h6 class="mb-0">Hình ảnh liên quan</h6>
+                                                            </div>
+                                                            <div class="card-body">
+                                                                <div class="row">
+                                                                    @{
+                                                                        List<AnhTimNguoi> dsanh2 = db.AnhTimNguois.Where(m => m.IdNguoiCanTim == i.Id).ToList();
+                                                                        if (dsanh2.Any())
+                                                                        {
+                                                                            foreach (AnhTimNguoi z in dsanh2)
+                                                                            {
+                                                                                <div class="col-md-3 mb-3">
+                                                                                    <img src="@z.HinhAnh" class="img-thumbnail w-100" style="height: 120px; object-fit: cover;" />
+                                                                                </div>
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <div class="col-12 text-center py-3">
+                                                                                <i class="fas fa-image fs-1 text-muted mb-2"></i>
+                                                                                <p class="text-muted">Không có hình ảnh nào</p>
+                                                                            </div>
+                                                                        }
+                                                                    }
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-6">
-                                                        <div class="row">
-                                                            <div class="col-4 fw-bold">Khu Vực</div>
-                                                            <div class="col-8">@i.KhuVuc</div>
-                                                        </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                                                     </div>
-                                                    <div class="col-6">
-                                                        <div class="row">
-                                                            <div class="col-4 fw-bold">Ngày Đăng </div>
-                                                            <div class="col-8">@i.NgayDang</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-6">
-                                                        <div class="row">
-                                                            <div class="col-4 fw-bold">Đặc Điểm Nhận Dạng</div>
-                                                            <div class="col-8">@i.DaciemNhanDang</div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-6">
-                                                        <div class="row">
-                                                            <div class="col-4 fw-bold">Tiêu Đề </div>
-                                                            <div class="col-8">@i.TieuDe</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="row">
-                                                    <div class="col-12">
-                                                        @{
-                                                            List<AnhTimNguoi> dsanh = db.AnhTimNguois.Where(m => m.IdNguoiCanTim == i.Id).ToList();
-                                                            foreach (AnhTimNguoi z in dsanh)
-                                                            {
-                                                                <img src="@z.HinhAnh" width="50" />
-                                                            }
-                                                        }
-
-                                                    </div>
-                                                    <div class="col-12">
-                                                        @Html.Raw(i.MoTa)
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Thoát</button>
-                                                    <button type="button" onclick="XoaBaiViet('@i.Id');" class="btn btn-danger" data-bs-dismiss="modal">Xóa</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        d++;
-
-                        <div class="modal fade" id="XemChiTietBaiViet_@i.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Thông Tin @ViewData["Title"]</h1>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="row">@i.ApplicationUser?.Email</div>
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <div class="row">
-                                                    <div class="col-4 fw-bold">ID</div>
-                                                    <div class="col-8">@i.Id</div>
-                                                </div>
-                                            </div>
-                                            <div class="col-6">
-                                                <div class="row">
-                                                    <div class="col-4 fw-bold">Tên người cần tìm </div>
-                                                    <div class="col-8">@i.HoTen</div>
                                                 </div>
                                             </div>
                                         </div>
 
+                                        d++;
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
 
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <div class="row">
-                                                    <div class="col-4 fw-bold">Giới Tính</div>
-                                                    <div class="col-8">
-                                                        @if (@i.GioiTinh == 1)
-                                                        {
-                                                            <p>Nam</p>
-                                                        }
-                                                        else
-                                                        {
-                                                            <p>Nữ</p>
-                                                        }
-
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-6">
-                                                <div class="row">
-                                                    <div class="col-4 fw-bold">Trạng Thái </div>
-                                                    <div class="col-8">@i.TrangThai</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <div class="row">
-                                                    <div class="col-4 fw-bold">Khu Vực</div>
-                                                    <div class="col-8">@i.KhuVuc</div>
-                                                </div>
-                                            </div>
-                                            <div class="col-6">
-                                                <div class="row">
-                                                    <div class="col-4 fw-bold">Ngày Đăng </div>
-                                                    <div class="col-8">@i.NgayDang</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <div class="row">
-                                                    <div class="col-4 fw-bold">Đặc Điểm Nhận Dạng</div>
-                                                    <div class="col-8">@i.DaciemNhanDang</div>
-                                                </div>
-                                            </div>
-                                            <div class="col-6">
-                                                <div class="row">
-                                                    <div class="col-4 fw-bold">Tiêu Đề </div>
-                                                    <div class="col-8">@i.TieuDe</div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="col-12">
-                                                @{
-                                                    List<AnhTimNguoi> dsanh2 = db.AnhTimNguois.Where(m => m.IdNguoiCanTim == i.Id).ToList();
-                                                    foreach (AnhTimNguoi z in dsanh2)
-                                                    {
-                                                        <img src="@z.HinhAnh" width="50" />
-                                                    }
-                                                }
-
-                                            </div>
-                                            <div class="col-12">
-                                                @Html.Raw(i.MoTa)
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                                    </div>
-                                </div>
-                            </div>
+                    <!-- Pagination -->
+                    <div class="row mt-4">
+                        <div class="col-12 d-flex justify-content-center">
+                            @Html.PagedListPager(Model, Page => Url.Action("Index",
+                                     new { Page, ViewBag.TimKiem }),
+                                     new PagedListRenderOptions
+                            {
+                                LiElementClasses = new[] { "page-item" },
+                                PageClasses = new[] { "page-link" },
+                                UlElementClasses = new[] { "pagination", "justify-content-center" }
+                            })
                         </div>
-                    }
-                }
-            </tbody>
-        </table>
+                    </div>
+                </div>
 
-    </div>
-    <!-- Hiển thị phân trang -->
-    <div class=" d-flex justify-content-center  text-center">
-        <div>
-            @Html.PagedListPager(Model, Page => Url.Action("Index",
-                     new { Page, ViewBag.TimKiem }),
-                     new PagedListRenderOptions
-            {
-                LiElementClasses = new[] { "page-item" },
-                PageClasses = new[] { "page-link" }
-            })
+                <div class="card-footer text-muted">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            Tổng số bài viết: <span class="fw-bold">@Model?.TotalItemCount</span>
+                        </div>
+                        <div>
+                            <a href="/Admin/BaiViet/Create" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Thêm Bài Viết Mới
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-    </div>
-
-    <div class="card-footer">
     </div>
 </div>
 
 @section Scripts {
     <script>
-        function XoaBaiViet(id)
-        {
+        function XoaBaiViet(id) {
             $.ajax({
-                type :"POST",
+                type: "POST",
                 url: "/Admin/BaiViet/Delete",
-                data:{id : id},
-                success : function(rs)
-                {
+                data: { id: id },
+                success: function(rs) {
                     if(rs.success){
                         $("#Dong_ID_"+id).remove();
-                        alert("Đã xóa thành công");
+                        showNotification('success', 'Đã xóa bài viết thành công');
                     }
-                    else
-                    {
-                        alert("Lỗi: "+ rs.message);
+                    else {
+                        showNotification('error', 'Lỗi: ' + rs.message);
                     }
                 },
-                error : () =>
-                {
-                    alert("Lỗi Hệ Thống");
+                error: function() {
+                    showNotification('error', 'Lỗi hệ thống khi xóa bài viết');
                 }
             });
         }
 
-        $(document).on("dblclick", ".hoatdong", function () {
+        $(document).on("dblclick", ".hoatdong", function() {
             let id = $(this).attr("data-id");
             $.ajax({
-                type :"POST",
-            url: "/Admin/BaiViet/HoatDong",
-                data:{id : id},
-                success : function(rs)
-                {
+                type: "POST",
+                url: "/Admin/BaiViet/HoatDong",
+                data: { id: id },
+                success: function(rs) {
                     if(rs.success){
                         let trangthai = $("#logo_"+id).attr("data-check");
                         let s = ``;
-                        if(trangthai === 'x')
-                        {
-                            s = `<i class="fa-regular fa-circle-check text-success hoatdong" id="logo_`+id+`" data-check="v" data-id="`+id+`"></i>`;
-                            $("#logo_"+id).remove()
-                        }
-                        else
-                        {
-                            s = `<i class="fa-regular fa-circle-xmark text-danger hoatdong" id="logo_`+id+`" data-check="x" data-id="`+id+`"></i>`;
+                        if(trangthai === 'x') {
+                            s = `<i class="fas fa-check-circle text-success hoatdong fs-4"
+                                   id="logo_${id}" data-check="v" data-id="${id}"
+                                   style="cursor: pointer;" title="Nhấn đúp để thay đổi trạng thái"></i>`;
                             $("#logo_"+id).remove();
+                            showNotification('success', rs.message);
+                        } else {
+                            s = `<i class="fas fa-times-circle text-danger hoatdong fs-4"
+                                   id="logo_${id}" data-check="x" data-id="${id}"
+                                   style="cursor: pointer;" title="Nhấn đúp để thay đổi trạng thái"></i>`;
+                            $("#logo_"+id).remove();
+                            showNotification('warning', rs.message);
                         }
                         $("#active_id_"+id).append(s);
-                        alert(rs.message)
-                    }
-
-                    else
-                    {
-                        alert("Lỗi: "+ rs.message);
+                    } else {
+                        showNotification('error', "Lỗi: " + rs.message);
                     }
                 },
-                error : () =>
-                {
-                    alert("Lỗi Hệ Thống");
+                error: function() {
+                    showNotification('error', "Lỗi hệ thống khi thay đổi trạng thái");
                 }
-            })
+            });
         });
-
 
         function XuatDon(id) {
             $.ajax({
@@ -423,18 +1176,88 @@
                 url: "/Admin/BaiViet/ExportToWord",
                 data: { id: id },
                 success: function(response) {
-                    // Tạo link tải file tự động
+                    // Create download link
                     var link = document.createElement('a');
                     link.href = window.URL.createObjectURL(new Blob([response]));
-                    link.download = `DonTrinhBao_${id}_${new Date().toISOString()}.docx`;
+                    link.download = `DonTrinhBao_${id}_${new Date().toISOString().slice(0,10)}.docx`;
                     link.click();
 
-                    alert("Đã xuất file thành công và lưu vào hệ thống");
+                    showNotification('success', 'Đã xuất file đơn trình báo thành công');
                 },
                 error: function() {
-                    alert("Lỗi khi xuất file");
+                    showNotification('error', 'Lỗi khi xuất file đơn trình báo');
                 }
             });
         }
+
+        // Notification function
+        function showNotification(type, message) {
+            const notificationArea = document.getElementById('notification-area');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas ${getIconForType(type)} me-2"></i>
+                ${message}
+            `;
+
+            notificationArea.appendChild(notification);
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+
+            // Remove on click
+            notification.addEventListener('click', () => {
+                notification.remove();
+            });
+
+            // Add hover effects
+            notification.addEventListener('mouseover', () => {
+                notification.style.transform = 'translateY(-5px)';
+                notification.style.boxShadow = '0 6px 15px rgba(0,0,0,0.2)';
+            });
+            notification.addEventListener('mouseout', () => {
+                notification.style.transform = 'translateY(0)';
+                notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            });
+
+            // Add slide-in effect
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 10);
+        }
+
+        // Get icon for notification type
+        function getIconForType(type) {
+            switch(type) {
+                case 'success': return 'fa-check-circle';
+                case 'error': return 'fa-times-circle';
+                case 'warning': return 'fa-exclamation-triangle';
+                case 'info': return 'fa-info-circle';
+                default: return 'fa-info-circle';
+            }
+        }
+
+        // Show notifications from TempData
+        document.addEventListener('DOMContentLoaded', function() {
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>showNotification('success', '@Html.Raw(TempData["SuccessMessage"])');</text>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>showNotification('error', '@Html.Raw(TempData["ErrorMessage"])');</text>
+        }
+        @if (TempData["WarningMessage"] != null)
+        {
+            <text>showNotification('warning', '@Html.Raw(TempData["WarningMessage"])');</text>
+        }
+        @if (TempData["InfoMessage"] != null)
+        {
+            <text>showNotification('info', '@Html.Raw(TempData["InfoMessage"])');</text>
+        }
+        });
     </script>
-}   
+}

@@ -3,72 +3,73 @@
 @model WebTimNguoiThatLac.ViewModels.ChatViewModel
 
 @section Styles {
-    <style>
-        /* Main chat container */
-        .chat-container {
-            display: flex;
-            height: calc(100vh - 200px);
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            background: #fff;
-        }
+<style>
+    /* Main chat container */
+    .chat-container {
+    display: flex;
+    height: calc(100vh - 200px);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    background: #fff;
+    }
 
-        /* Sidebar styling */
-        .chat-sidebar {
-            width: 350px;
-            background: #f8f9fa;
-            border-right: 1px solid #eaeaea;
-            display: flex;
-            flex-direction: column;
-        }
+    /* Sidebar styling */
+    .chat-sidebar {
+    width: 350px;
+    background: #f8f9fa;
+    border-right: 1px solid #eaeaea;
+    display: flex;
+    flex-direction: column;
+    }
 
-        .chat-header {
-            padding: 20px;
-            background: #4e73df;
-            color: white;
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
+    .chat-header {
+    padding: 20px;
+    background: #4e73df;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 600;
+    }
 
-        .search-box {
-            padding: 15px;
-            background: #f1f3f5;
-        }
+    .search-box {
+    padding: 15px;
+    background: #f1f3f5;
+    }
 
-            .search-box input {
-                width: 100%;
-                padding: 10px 15px;
-                border-radius: 20px;
-                border: 1px solid #ddd;
-                background: white;
-            }
+    .search-box input {
+    width: 100%;
+    padding: 10px 15px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    background: white;
+    }
 
-        /* Conversation list */
-        .conversation-list {
-            flex: 1;
-            overflow-y: auto;
-        }
+    /* Conversation list */
+    .conversation-list {
+    flex: 1;
+    overflow-y: auto;
+    }
 
-        .conversation-item {
-            display: flex;
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            text-decoration: none;
-            color: #333;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
+    .conversation-item {
+    display: flex;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    text-decoration: none;
+    color: #333;
+    align-items: center;
+    transition: all 0.3s ease;
+    }
 
-            .conversation-item:hover {
-                background-color: #e9f5ff;
-            }
+    .conversation-item:hover {
+    background-color: #e9f5ff;
+    }
 
-            .conversation-item.active {
-                background-color: #e9f5ff;
-                border-left: 4px solid #4e73df;
-            }
+    .conversation-item.active {
+    background-color: #e9f5ff;
+    border-left: 4px solid #4e73df;
+    }
 
+        /* Avatar styles */
         .avatar {
             width: 50px;
             height: 50px;
@@ -81,214 +82,298 @@
             margin-right: 15px;
             font-weight: bold;
             font-size: 1.2rem;
-        }
-
-        .info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .name {
-            font-weight: 600;
-            white-space: nowrap;
+            position: relative;
             overflow: hidden;
-            text-overflow: ellipsis;
-            margin-bottom: 3px;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
         }
 
-        .preview {
-            font-size: 0.9em;
-            color: #777;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            .avatar img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            /* Avatar status indicator */
+            .avatar::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background-color: #28a745;
+                border: 2px solid white;
+                display: none;
+            }
+
+            .avatar.online::after {
+                display: block;
+            }
+
+        /* Smaller avatar for messages */
+        .message .avatar {
+            width: 36px;
+            height: 36px;
+            font-size: 1rem;
+            margin-right: 10px;
+            flex-shrink: 0;
         }
 
-        .time {
-            font-size: 0.8em;
-            color: #999;
-            margin-left: 10px;
-            white-space: nowrap;
-        }
-
-        /* Main chat area */
-        .chat-main {
-            flex: 1;
+        /* Avatar placeholder when no image */
+        .avatar-placeholder {
+            width: 100%;
+            height: 100%;
             display: flex;
-            flex-direction: column;
-            background: #f5f7fb;
-        }
-
-        .chat-main-header {
-            padding: 15px 20px;
-            background: white;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            align-items: center;
-        }
-
-            .chat-main-header .avatar {
-                width: 40px;
-                height: 40px;
-                margin-right: 10px;
-            }
-
-        .message-container {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background: #f5f7fb;
-            background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path fill="%23e5e5e5" fill-opacity="0.2" d="M30 10L10 30v40l20 20h40l20-20V30L70 10H30z"/></svg>');
-            background-size: 100px;
-        }
-
-        .message {
-            display: flex;
-            margin-bottom: 15px;
-            max-width: 70%;
-        }
-
-            .message.sent {
-                margin-left: auto;
-                justify-content: flex-end;
-            }
-
-            .message.received {
-                margin-right: auto;
-                justify-content: flex-start;
-            }
-
-            .message .content {
-                padding: 12px 15px;
-                border-radius: 18px;
-                position: relative;
-                word-wrap: break-word;
-            }
-
-            .message.sent .content {
-                background-color: #4e73df;
-                color: white;
-                border-radius: 18px 18px 0 18px;
-            }
-
-            .message.received .content {
-                background-color: white;
-                color: #333;
-                border-radius: 18px 18px 18px 0;
-                box-shadow: 0 1px 1px rgba(0,0,0,0.1);
-            }
-
-        .message-image {
-            max-width: 250px;
-            max-height: 250px;
-            border-radius: 12px;
-            margin-bottom: 5px;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-
-            .message-image:hover {
-                transform: scale(1.03);
-            }
-
-        .message .time {
-            font-size: 0.75em;
-            color: rgba(255,255,255,0.7);
-            margin-top: 5px;
-            text-align: right;
-        }
-
-        .message.received .time {
-            color: #999;
-        }
-
-        /* Chat input */
-        .chat-input {
-            padding: 15px;
-            background: white;
-            border-top: 1px solid #eee;
-        }
-
-        .input-group {
-            display: flex;
-            align-items: center;
-        }
-
-            .input-group input[type="text"] {
-                flex: 1;
-                padding: 12px 20px;
-                border: 1px solid #ddd;
-                border-radius: 30px;
-                margin-right: 10px;
-                font-size: 1rem;
-            }
-
-        .file-upload {
-            padding: 10px 12px;
-            cursor: pointer;
-            color: #4e73df;
-            font-size: 1.2rem;
-        }
-
-        .chat-input button {
-            background: #4e73df;
-            color: white;
-            border: none;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-            .chat-input button:hover {
-                background: #3a5bbf;
-                transform: scale(1.05);
-            }
-
-        /* Empty chat state */
-        .empty-chat {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: #777;
-            text-align: center;
-            padding: 40px;
+            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+            color: white;
+            font-weight: bold;
         }
 
-            .empty-chat .icon {
-                font-size: 4rem;
-                margin-bottom: 20px;
-                color: #ddd;
+    .info {
+    flex: 1;
+    min-width: 0;
+    }
+
+    .name {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 3px;
+    }
+
+    .preview {
+    font-size: 0.9em;
+    color: #777;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    }
+
+    .time {
+    font-size: 0.8em;
+    color: #999;
+    margin-left: 10px;
+    white-space: nowrap;
+    }
+
+    /* Main chat area */
+    .chat-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #f5f7fb;
+    }
+
+    .chat-main-header {
+    padding: 15px 20px;
+    background: white;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    }
+
+    .chat-main-header .avatar {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+    }
+
+    .message-container {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #f5f7fb;
+    background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path fill="%23e5e5e5" fill-opacity="0.2" d="M30 10L10 30v40l20 20h40l20-20V30L70 10H30z"/></svg>');
+    background-size: 100px;
+    }
+
+        .message-container {
+            overflow-y: auto; /* Cuộn nếu nội dung dài */
+            padding: 10px;
+        }
+    .message {
+    display: flex;
+    margin-bottom: 15px;
+    max-width: 70%;
+    }
+
+    .message.sent {
+    margin-left: auto;
+    justify-content: flex-end;
+    }
+
+    .message.received {
+    margin-right: auto;
+    justify-content: flex-start;
+    }
+
+    .message .content {
+    padding: 12px 15px;
+    border-radius: 18px;
+    position: relative;
+    word-wrap: break-word;
+    }
+
+    .message.sent .content {
+    background-color: #4e73df;
+    color: white;
+    border-radius: 18px 18px 0 18px;
+    }
+
+    .message.received .content {
+    background-color: white;
+    color: #333;
+    border-radius: 18px 18px 18px 0;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+    }
+
+    .message-image {
+    max-width: 250px;
+    max-height: 250px;
+    border-radius: 12px;
+    margin-bottom: 5px;
+    cursor: pointer;
+    transition: transform 0.3s;
+    }
+
+    .message-image:hover {
+    transform: scale(1.03);
+    }
+
+    .message .time {
+    font-size: 0.75em;
+    color: rgba(255,255,255,0.7);
+    margin-top: 5px;
+    text-align: right;
+    }
+
+    .message.received .time {
+    color: #999;
+    }
+
+    /* Chat input */
+    .chat-input {
+    padding: 15px;
+    background: white;
+    border-top: 1px solid #eee;
+    }
+
+    .input-group {
+    display: flex;
+    align-items: center;
+    }
+
+    .input-group input[type="text"] {
+    flex: 1;
+    padding: 12px 20px;
+    border: 1px solid #ddd;
+    border-radius: 30px;
+    margin-right: 10px;
+    font-size: 1rem;
+    }
+
+    .file-upload {
+    padding: 10px 12px;
+    cursor: pointer;
+    color: #4e73df;
+    font-size: 1.2rem;
+    }
+
+    .chat-input button {
+    background: #4e73df;
+    color: white;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s;
+    }
+
+    .chat-input button:hover {
+    background: #3a5bbf;
+    transform: scale(1.05);
+    }
+
+    /* Empty chat state */
+    .empty-chat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #777;
+    text-align: center;
+    padding: 40px;
+    }
+
+    .empty-chat .icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    color: #ddd;
+    }
+
+    .empty-chat p {
+    font-size: 1.1rem;
+    max-width: 300px;
+    }
+
+    /* Badge for admin */
+    .badge-admin {
+    background: #4e73df;
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 5px;
+    }
+
+    /* Unread count badge */
+    .unread-badge {
+    background: #e74a3b;
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 50%;
+    margin-left: auto;
+    }
+
+
+
+
+            .avatar:hover {
+                transform: scale(1.05);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.15);
             }
 
-            .empty-chat p {
-                font-size: 1.1rem;
-                max-width: 300px;
-            }
+        /* Pulse animation for online status */
+        @@keyframes pulse {
+            0%
 
-        /* Badge for admin */
-        .badge-admin {
-            background: #4e73df;
-            color: white;
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 10px;
-            margin-left: 5px;
+        {
+            transform: scale(1);
         }
 
-        /* Unread count badge */
-        .unread-badge {
-            background: #e74a3b;
-            color: white;
-            font-size: 0.7rem;
-            padding: 2px 6px;
-            border-radius: 50%;
-            margin-left: auto;
+        50% {
+            transform: scale(1.1);
         }
-    </style>
+
+        100% {
+            transform: scale(1);
+        }
+
+        }
+
+        .avatar.online::after {
+            animation: pulse 2s infinite;
+        }
+</style>
 }
 
 <div class="container-fluid px-4 py-4">
@@ -314,9 +399,18 @@
                     var unreadCount = hopThoai.TinNhans.Count(t => (t.IsRead==false)  && t.MaNguoiGui != User.FindFirstValue(ClaimTypes.NameIdentifier));
 
                     <a href="@Url.Action("Index", new { hopThoaiId = hopThoai.Id })"
-                       class="conversation-item @(Model.HopThoaiHienTai?.Id == hopThoai.Id ? "active" : "")">
-                        <div class="avatar">
-                            @otherUser?.UserName?.Substring(0, 1).ToUpper()
+                    class="conversation-item @(Model.HopThoaiHienTai?.Id == hopThoai.Id ? "active" : "")">
+                        <div class="avatar @(otherUser?.Active == true ? "online" : "")">
+                            @if (!string.IsNullOrEmpty(otherUser?.HinhAnh))
+                            {
+                                <img src="@Url.Content(otherUser.HinhAnh)" alt="@otherUser.UserName">
+                            }
+                            else
+                            {
+                                <div class="avatar-placeholder">
+                                    @otherUser?.UserName?.Substring(0, 1).ToUpper()
+                                </div>
+                            }
                         </div>
                         <div class="info">
                             <div class="name">
@@ -363,8 +457,17 @@
                 .FirstOrDefault(tv => tv.MaNguoiThamGia != User.FindFirstValue(ClaimTypes.NameIdentifier))?.ApplicationUser;
 
                 <div class="chat-main-header">
-                    <div class="avatar">
-                        @otherUser?.UserName?.Substring(0, 1).ToUpper()
+                    <div class="avatar @(otherUser?.Active == true ? "online" : "")">
+                        @if (!string.IsNullOrEmpty(otherUser?.HinhAnh))
+                        {
+                            <img src="@Url.Content(otherUser.HinhAnh)" alt="@otherUser.UserName">
+                        }
+                        else
+                        {
+                            <div class="avatar-placeholder">
+                                @otherUser?.UserName?.Substring(0, 1).ToUpper()
+                            </div>
+                        }
                     </div>
                     <div>
                         <h6 class="mb-0">@otherUser?.UserName</h6>
@@ -387,9 +490,19 @@
                         <div class="message @(tinNhan.MaNguoiGui == User.FindFirstValue(ClaimTypes.NameIdentifier) ? "sent" : "received")">
                             @if (tinNhan.MaNguoiGui != User.FindFirstValue(ClaimTypes.NameIdentifier))
                             {
-                                <div class="avatar">
-                                    @tinNhan.NguoiGuiTinNhan?.UserName?.Substring(0, 1).ToUpper()
+                                <div class="avatar @(tinNhan.NguoiGuiTinNhan?.Active == true ? "online" : "")">
+                                    @if (!string.IsNullOrEmpty(tinNhan.NguoiGuiTinNhan?.HinhAnh))
+                                    {
+                                        <img src="@Url.Content(otherUser.HinhAnh)" alt="@otherUser.UserName">
+                                    }
+                                    else
+                                    {
+                                        <div class="avatar-placeholder">
+                                            @tinNhan.NguoiGuiTinNhan?.UserName?.Substring(0, 1).ToUpper()
+                                        </div>
+                                    }
                                 </div>
+                                
                             }
 
                             <div class="content">

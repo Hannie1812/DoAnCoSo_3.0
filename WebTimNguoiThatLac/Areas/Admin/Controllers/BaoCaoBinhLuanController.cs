@@ -57,7 +57,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 .OrderByDescending(b => b.NgayBaoCao)
                 .ToPagedList(page, PageSize);
 
-            await ProcessReportedComments();
+            //await ProcessReportedComments();
 
             ViewBag.TiemKiem = TiemKiem;
             ViewBag.Status = status;
@@ -121,10 +121,13 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                             {
                                 NguoiDungId = applicationUser.Id,
                                 HanhDong = "Bình luận bị báo cáo nhiều lần",
-                                ThoiGian = DateTime.Now
+                                ThoiGian = DateTime.Now,
+                                IdLoiViPham = comment.Id,
+                                LoaiViPham = "Bình Luận",
 
                             };
                             _context.HanhViDangNgos.Add(hanhVi);
+                            await _context.SaveChangesAsync();
 
                             if (applicationUser.SoLanViPham >= 3)
                             {
@@ -236,6 +239,21 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     report.check = true;
                     _context.Update(report);
                 }
+                
+                if(comment.Active)
+                {
+                    // danh sách report liên quan bình luận
+                    var relatedReports = await _context.BaoCaoBinhLuans
+                        .Where(b => b.MaBinhLuan == commentId)
+                        .ToListAsync();
+                    foreach (var relatedReport in relatedReports)
+                    {
+                        relatedReport.check = true;
+
+                    }
+                    await _context.SaveChangesAsync();
+                }
+
 
                 await _context.SaveChangesAsync();
 
@@ -252,6 +270,8 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                         $"đã được {(comment.Active ? "hiển thị lại" : "ẩn bình luận")}."
                     );
                 }
+
+                
 
                 TempData["SuccessMessage"] = $"Đã {(comment.Active ? "Đã cho phép hiển thị bình luận" : "Đã ẩn bình luận")} bình luận thành công";
                 return RedirectToAction("Details", new { id = reportId });

@@ -695,7 +695,6 @@ namespace WebTimNguoiThatLac.Controllers
             }
         }
 
-
         public async Task<IActionResult> ChiTietBaiTimNguoi(int id, int idBinhLuan = 0)
         {
             if(User.Identity.IsAuthenticated == false)
@@ -748,6 +747,10 @@ namespace WebTimNguoiThatLac.Controllers
                         await db.SaveChangesAsync();
                     }
                 }
+                ViewBag.KhuVuc = y.KhuVuc;
+                ViewBag.QuanHuyen = y.QuanHuyen?.TenQuanHuyen; // null check nếu cần
+                ViewBag.TinhThanh = y.QuanHuyen?.TinhThanh?.TenTinhThanh; // null check nếu cần
+
                 ViewBag.DaTimThay = y.TimThayNguoiThatLacs != null;
                 ViewBag.DSBinhLuan = DSBinhLuan;
                 return View(y);

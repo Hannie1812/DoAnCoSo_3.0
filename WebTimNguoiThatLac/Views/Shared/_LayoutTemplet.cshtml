@@ -182,6 +182,9 @@
         </div>
     </footer>
 
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
 
 
     <!-- loader -->
@@ -418,6 +421,7 @@
           $('#compose-textarea').summernote()
         })
     </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

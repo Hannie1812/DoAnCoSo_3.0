@@ -37,7 +37,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             this.roleManager = roleManager;
             this._logger = logger;
         }
-        private static readonly IEnumerable<string> TinhThanhIEnumerable = new List<string>
+        /*private static readonly IEnumerable<string> TinhThanhIEnumerable = new List<string>
         {
             "Hà Nội",
             "Hồ Chí Minh",
@@ -102,7 +102,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             "Vĩnh Phúc",
             "Yên Bái",
             "Phú Yên"
-        };
+        };*/
 
         public async Task<IActionResult> Index(string TimKiem = "", int Page = 1)
         {

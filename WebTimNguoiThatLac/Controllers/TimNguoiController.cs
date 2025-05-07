@@ -492,7 +492,7 @@ namespace WebTimNguoiThatLac.Controllers
             ViewBag.TenFilter = ten;
 
             // XL KHU VỰC
-            //ViewBag.KhuVucFilter = khuVuc;
+            ViewBag.KhuVucFilter = khuVuc;
 
             ViewBag.TinhThanhList = await db.TinhThanhs.ToListAsync();
             ViewBag.QuanHuyenList = await db.QuanHuyens.ToListAsync();
@@ -509,8 +509,6 @@ namespace WebTimNguoiThatLac.Controllers
 
         public async Task<IActionResult> ThemNguoiCanTim()
         {
-
-
             // Kiểm tra xem email đã được xác thực chưa
             var verifiedEmail = TempData["VerifiedEmail"] as string;
             if (string.IsNullOrEmpty(verifiedEmail))
@@ -1735,6 +1733,17 @@ namespace WebTimNguoiThatLac.Controllers
                 return Json(new { success = false, message = "Đã xảy ra lỗi khi xóa bài viết" });
             }
         }
+        [HttpGet]
+        public JsonResult GetQuanHuyenTheoTinh(int tinhThanhId)
+        {
+            var quanHuyens = db.QuanHuyens
+                .Where(q => q.IdTinhThanh == tinhThanhId)
+                .Select(q => new { q.Id, q.TenQuanHuyen })
+                .ToList();
+
+            return Json(quanHuyens);
+        }
+
     }
 
 }

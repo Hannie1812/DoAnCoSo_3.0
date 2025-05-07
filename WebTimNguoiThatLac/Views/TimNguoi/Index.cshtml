@@ -514,24 +514,26 @@
 @section Scripts {
 
 	<script>
-        // Khu Vực
-        function loadQuanHuyen(tinhThanhId) {
-            const quanHuyenDropdown = document.getElementById("QuanHuyen");
-            quanHuyenDropdown.innerHTML = '<option value="">Tất cả quận</option>';
+        //Load quận huyện theo tỉnh thành
+           function loadQuanHuyen(tinhThanhId) {
+            $.ajax({
+                url: '/TimNguoi/GetQuanHuyenTheoTinh?tinhThanhId=' + tinhThanhId,
+                type: 'GET',
+                success: function (data) {
+                    let quanHuyenSelect = $('#QuanHuyen');
+                    quanHuyenSelect.empty(); // Clear existing options
+                    quanHuyenSelect.append('<option value="">Tất cả quận</option>');
 
-            if (!tinhThanhId) return;
-
-            fetch(`/TimNguoi/GetQuanHuyenByTinhThanh?tinhThanhId=${tinhThanhId}`)
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(huyen => {
-                        const option = document.createElement("option");
-                        option.value = huyen.id;
-                        option.textContent = huyen.tenQuanHuyen;
-                        quanHuyenDropdown.appendChild(option);
+                    data.forEach(function (item) {
+                        quanHuyenSelect.append(
+                            $('<option></option>').val(item.id).text(item.tenQuanHuyen)
+                        );
                     });
-                })
-                .catch(error => console.error("Error loading districts:", error));
+                },
+                error: function () {
+                    alert("Lỗi khi tải danh sách quận/huyện");
+                }
+            });
         }
 
         // Hiển thị thông báo từ TempData

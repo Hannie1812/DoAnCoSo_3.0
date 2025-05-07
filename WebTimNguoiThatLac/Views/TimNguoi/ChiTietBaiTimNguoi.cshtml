@@ -756,10 +756,10 @@
                             <div class="info-content">
                                 <div class="info-label">Địa chỉ</div>
                                 <div class="info-value">
-                                    @if (!string.IsNullOrEmpty(ViewBag.TinhThanh) || !string.IsNullOrEmpty(ViewBag.QuanHuyen) || !string.IsNullOrEmpty(Model.KhuVuc))
+                                    @if (!string.IsNullOrEmpty(Model.KhuVuc) || !string.IsNullOrEmpty(Model.QuanHuyen?.TenQuanHuyen) || !string.IsNullOrEmpty(Model.QuanHuyen?.TinhThanh?.TenTinhThanh))
                                     {
                                         <span>
-                                            @ViewBag.KhuVuc, @ViewBag.QuanHuyen, @ViewBag.TinhThanh
+                                            @(Model.KhuVuc ?? ""), @(Model.QuanHuyen?.TenQuanHuyen ?? ""), @(Model.QuanHuyen?.TinhThanh?.TenTinhThanh ?? "")
                                         </span>
                                     }
                                     else
@@ -767,6 +767,7 @@
                                         <span class="text-muted">Chưa xác định</span>
                                     }
                                 </div>
+
                             </div>
                         </div>
 

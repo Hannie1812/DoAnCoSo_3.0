@@ -492,7 +492,7 @@ namespace WebTimNguoiThatLac.Controllers
             ViewBag.TenFilter = ten;
 
             // XL KHU VỰC
-            //ViewBag.KhuVucFilter = khuVuc;
+            ViewBag.KhuVucFilter = khuVuc;
 
             ViewBag.TinhThanhList = await db.TinhThanhs.ToListAsync();
             ViewBag.QuanHuyenList = await db.QuanHuyens.ToListAsync();
@@ -509,8 +509,6 @@ namespace WebTimNguoiThatLac.Controllers
 
         public async Task<IActionResult> ThemNguoiCanTim()
         {
-
-
             // Kiểm tra xem email đã được xác thực chưa
             var verifiedEmail = TempData["VerifiedEmail"] as string;
             if (string.IsNullOrEmpty(verifiedEmail))
@@ -587,21 +585,17 @@ namespace WebTimNguoiThatLac.Controllers
                     return RedirectToAction("Index", "LoiViPham", new { area = "" });
                 }
             }
-
-            IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
-            IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
+            await LoadSelectListsAsync();
 
 
-            ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
-            ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
             if (ModelState.IsValid)
             {
 
                 if(DSHinhAnhCapNhat == null)
                 {
                     ModelState.AddModelError("Lỗi", "Chưa Có Hình Ảnh");
-                    ViewBag.DanhSachTinhThanh = await db.TinhThanhs.ToListAsync();
-                    ViewBag.DanhSachQuanHuyen = await db.QuanHuyens.ToListAsync();
+                    await LoadSelectListsAsync();
+
                     return View(timNguoi);
                 }
                 
@@ -611,9 +605,9 @@ namespace WebTimNguoiThatLac.Controllers
                 int d = 0;
                 if (DSHinhAnhCapNhat.Count == 0)
                 {
-                    ModelState.AddModelError("Lỗi", "Chưa Có Hình Ảnh");
-                    ViewBag.DanhSachTinhThanh = await db.TinhThanhs.ToListAsync();
-                    ViewBag.DanhSachQuanHuyen = await db.QuanHuyens.ToListAsync();
+                    ModelState.AddModelError("Lỗi", "Chưa Có Hình Ảnh"); 
+                    await LoadSelectListsAsync();
+
                     return View(timNguoi);
                 }
                 foreach (IFormFile i in DSHinhAnhCapNhat)
@@ -639,9 +633,16 @@ namespace WebTimNguoiThatLac.Controllers
                 //return RedirectToAction("Index", "LoiViPham", new { area = "" });
 
             }
-            ViewBag.DanhSachTinhThanh = await db.TinhThanhs.ToListAsync();
-            ViewBag.DanhSachQuanHuyen = await db.QuanHuyens.ToListAsync();
+            await LoadSelectListsAsync();
+
             return View(timNguoi);
+        }
+        private async Task LoadSelectListsAsync()
+        {
+            var tinhThanhs = await db.TinhThanhs.ToListAsync();
+            var quanHuyens = await db.QuanHuyens.ToListAsync();
+            ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
+            ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
         }
 
         public async Task<string> SaveImage(IFormFile ImageURL, string subFolder)
@@ -695,7 +696,6 @@ namespace WebTimNguoiThatLac.Controllers
             }
         }
 
-
         public async Task<IActionResult> ChiTietBaiTimNguoi(int id, int idBinhLuan = 0)
         {
             if(User.Identity.IsAuthenticated == false)
@@ -748,6 +748,10 @@ namespace WebTimNguoiThatLac.Controllers
                         await db.SaveChangesAsync();
                     }
                 }
+                ViewBag.KhuVuc = y.KhuVuc;
+                ViewBag.QuanHuyen = y.QuanHuyen?.TenQuanHuyen; // null check nếu cần
+                ViewBag.TinhThanh = y.QuanHuyen?.TinhThanh?.TenTinhThanh; // null check nếu cần
+
                 ViewBag.DaTimThay = y.TimThayNguoiThatLacs != null;
                 ViewBag.DSBinhLuan = DSBinhLuan;
                 return View(y);
@@ -1735,6 +1739,17 @@ namespace WebTimNguoiThatLac.Controllers
                 return Json(new { success = false, message = "Đã xảy ra lỗi khi xóa bài viết" });
             }
         }
+        [HttpGet]
+        public JsonResult GetQuanHuyenTheoTinh(int tinhThanhId)
+        {
+            var quanHuyens = db.QuanHuyens
+                .Where(q => q.IdTinhThanh == tinhThanhId)
+                .Select(q => new { q.Id, q.TenQuanHuyen })
+                .ToList();
+
+            return Json(quanHuyens);
+        }
+
     }
 
 }

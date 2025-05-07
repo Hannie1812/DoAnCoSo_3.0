@@ -162,6 +162,7 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account.Manage
                 }
 
                 user.HinhAnh = "/uploads/avatars/" + uniqueFileName;
+                user.IsAvatarCustomized = true; // Đánh dấu avatar đã được tùy chỉnh
             }
 
             await _userManager.UpdateAsync(user);

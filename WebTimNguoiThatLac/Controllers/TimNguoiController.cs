@@ -585,21 +585,17 @@ namespace WebTimNguoiThatLac.Controllers
                     return RedirectToAction("Index", "LoiViPham", new { area = "" });
                 }
             }
-
-            IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
-            IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
+            await LoadSelectListsAsync();
 
 
-            ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
-            ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
             if (ModelState.IsValid)
             {
 
                 if(DSHinhAnhCapNhat == null)
                 {
                     ModelState.AddModelError("Lỗi", "Chưa Có Hình Ảnh");
-                    ViewBag.DanhSachTinhThanh = await db.TinhThanhs.ToListAsync();
-                    ViewBag.DanhSachQuanHuyen = await db.QuanHuyens.ToListAsync();
+                    await LoadSelectListsAsync();
+
                     return View(timNguoi);
                 }
                 
@@ -609,9 +605,9 @@ namespace WebTimNguoiThatLac.Controllers
                 int d = 0;
                 if (DSHinhAnhCapNhat.Count == 0)
                 {
-                    ModelState.AddModelError("Lỗi", "Chưa Có Hình Ảnh");
-                    ViewBag.DanhSachTinhThanh = await db.TinhThanhs.ToListAsync();
-                    ViewBag.DanhSachQuanHuyen = await db.QuanHuyens.ToListAsync();
+                    ModelState.AddModelError("Lỗi", "Chưa Có Hình Ảnh"); 
+                    await LoadSelectListsAsync();
+
                     return View(timNguoi);
                 }
                 foreach (IFormFile i in DSHinhAnhCapNhat)
@@ -637,9 +633,16 @@ namespace WebTimNguoiThatLac.Controllers
                 //return RedirectToAction("Index", "LoiViPham", new { area = "" });
 
             }
-            ViewBag.DanhSachTinhThanh = await db.TinhThanhs.ToListAsync();
-            ViewBag.DanhSachQuanHuyen = await db.QuanHuyens.ToListAsync();
+            await LoadSelectListsAsync();
+
             return View(timNguoi);
+        }
+        private async Task LoadSelectListsAsync()
+        {
+            var tinhThanhs = await db.TinhThanhs.ToListAsync();
+            var quanHuyens = await db.QuanHuyens.ToListAsync();
+            ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
+            ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
         }
 
         public async Task<string> SaveImage(IFormFile ImageURL, string subFolder)

@@ -494,8 +494,7 @@ namespace WebTimNguoiThatLac.Controllers
             // XL KHU VỰC
             ViewBag.KhuVucFilter = khuVuc;
 
-            ViewBag.TinhThanhList = await db.TinhThanhs.ToListAsync();
-            ViewBag.QuanHuyenList = await db.QuanHuyens.ToListAsync();
+            await LoadSelectListsAsync();
 
             ViewBag.SelectedTinhThanh = tinhThanhId;
             ViewBag.SelectedQuanHuyen = quanHuyenId;
@@ -555,12 +554,7 @@ namespace WebTimNguoiThatLac.Controllers
             }
             //ViewBag.DanhSachTinhThanh = TinhThanhIEnumerable;
 
-            IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
-            IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
-
-
-            ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
-            ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen") ;
+            await LoadSelectListsAsync();
 
             return View();
         }

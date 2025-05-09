@@ -146,19 +146,23 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             }
         }
 
-
+        private async Task LoadSelectListsAsync()
+        {
+            var tinhThanhs = await db.TinhThanhs.ToListAsync();
+            var quanHuyens = await db.QuanHuyens.ToListAsync();
+            ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
+            ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
+        }
         public async Task<IActionResult> Create()
         {
-            ViewBag.DanhSachTinhThanh = await db.TinhThanhs.ToListAsync();
-            ViewBag.DanhSachQuanHuyen = await db.QuanHuyens.ToListAsync();
+            await LoadSelectListsAsync();
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(TimNguoi x, List<IFormFile>? DanhSachHinhAnh, string EmailNguoiDung)
         {
-            ViewBag.DanhSachTinhThanh = await db.TinhThanhs.ToListAsync();
-            ViewBag.DanhSachQuanHuyen = await db.QuanHuyens.ToListAsync();
+            await LoadSelectListsAsync();
 
             if (ModelState.IsValid)
             {
@@ -273,9 +277,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             {
                 return RedirectToAction("Index");
             }
-
-            ViewBag.DanhSachTinhThanh = await db.TinhThanhs.ToListAsync();
-            ViewBag.DanhSachQuanHuyen = await db.QuanHuyens.ToListAsync();
+            await LoadSelectListsAsync();
             ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == id).ToList();
 
             return View(x);
@@ -296,8 +298,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     }
 
                     // Luôn thiết lập ViewBag trước khi trả về View
-                    ViewBag.DanhSachTinhThanh = await db.TinhThanhs.ToListAsync();
-                    ViewBag.DanhSachQuanHuyen = await db.QuanHuyens.ToListAsync();
+                    await LoadSelectListsAsync();
                     ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == x.Id).ToList();
 
                     if (!ModelState.IsValid)
@@ -375,9 +376,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     TempData["SuccessMessage"] = " Lưu Thay Đỗi Bài Viết Tành Công";
                     return RedirectToAction("Index");
                 }
-
-                ViewBag.DanhSachTinhThanh = await db.TinhThanhs.ToListAsync();
-                ViewBag.DanhSachQuanHuyen = await db.QuanHuyens.ToListAsync();
+                await LoadSelectListsAsync();
                 ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == x.Id).ToList();
                 ViewData["ErrorMessage"] = " Nhập Đầy Đủ Thông Tin";
                 return View(x);

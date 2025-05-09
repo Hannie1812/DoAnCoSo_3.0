@@ -310,8 +310,8 @@ namespace WebTimNguoiThatLac.Controllers
                             NguoiDungId = nguoiDungId,
                             HanhDong = "Tìm kiếm quá nhiều",
                             ThoiGian = DateTime.UtcNow,
-                            ChiTiet = $"Đã tìm kiếm {soLanTim} lần trong vòng 1 phút, Nghi ngờ bạn đang có ý định xâm hại hệ thống"
-                        });
+                            ChiTiet = $"Đã tìm kiếm {soLanTimTrong1Phut} lần trong vòng 1 phút, Nghi ngờ bạn đang có ý định xâm hại hệ thống"
+                        };
                         await db.SaveChangesAsync();
 
                         // 👉 Tăng số lần vi phạm của người dùng

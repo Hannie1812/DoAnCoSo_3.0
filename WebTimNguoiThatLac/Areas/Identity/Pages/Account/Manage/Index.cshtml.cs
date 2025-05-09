@@ -144,7 +144,7 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account.Manage
                     Directory.CreateDirectory(uploadsFolder);
 
                 // Xóa ảnh avatar cũ nếu tồn tại và không phải là ảnh mặc định
-                if (!string.IsNullOrEmpty(user.HinhAnh) && !user.HinhAnh.EndsWith("default-avatar.svg"))
+                if (!string.IsNullOrEmpty(user.HinhAnh) && !user.HinhAnh.EndsWith("default-avatar.svg") && !user.HinhAnh.EndsWith("default-avatar.png"))
                 {
                     var oldAvatarPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", user.HinhAnh.TrimStart('/'));
                     if (System.IO.File.Exists(oldAvatarPath))
@@ -162,6 +162,7 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account.Manage
                 }
 
                 user.HinhAnh = "/uploads/avatars/" + uniqueFileName;
+                user.IsAvatarCustomized = true; // Đánh dấu avatar đã được tùy chỉnh
             }
 
             await _userManager.UpdateAsync(user);

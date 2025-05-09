@@ -33,7 +33,7 @@ builder.Services.AddAuthentication(options =>
                 var user = await context.HttpContext.RequestServices
                     .GetRequiredService<UserManager<ApplicationUser>>()
                     .FindByEmailAsync(context.Principal.FindFirstValue(ClaimTypes.Email));
-                if (user != null)
+                if (user != null && !user.IsAvatarCustomized)
                 {
                     user.HinhAnh = picture;
                     await context.HttpContext.RequestServices

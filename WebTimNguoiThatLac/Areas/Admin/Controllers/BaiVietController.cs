@@ -161,26 +161,23 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             }
         }
 
-        public async Task<IActionResult> Create()
+        private async Task LoadSelectListsAsync()
         {
-            IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
-            IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
-
-
+            var tinhThanhs = await db.TinhThanhs.ToListAsync();
+            var quanHuyens = await db.QuanHuyens.ToListAsync();
             ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
             ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
+        }
+        public async Task<IActionResult> Create()
+        {
+            await LoadSelectListsAsync();
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(TimNguoi x, List<IFormFile>? DanhSachHinhAnh, string EmailNguoiDung)
         {
-            IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
-            IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
-
-
-            ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
-            ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
+            await LoadSelectListsAsync();
 
             if (ModelState.IsValid)
             {
@@ -311,17 +308,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             {
                 return RedirectToAction("Index");
             }
-
-            //IEnumerable<string> DanhSachTinhThanh = TinhThanhIEnumerable;
-            //ViewBag.DanhSachTinhThanh = DanhSachTinhThanh;
-
-            IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
-            IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
-
-            ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
-            ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
-
-
+            await LoadSelectListsAsync();
             ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == id).ToList();
 
             return View(x);
@@ -426,12 +413,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     TempData["SuccessMessage"] = " Lưu Thay Đỗi Bài Viết Tành Công";
                     return RedirectToAction("Index");
                 }
-
-
-                //IEnumerable<string> DanhSachTinhThanh = TinhThanhIEnumerable;
-                //ViewBag.DanhSachTinhThanh = DanhSachTinhThanh;
                 await LoadSelectListsAsync();
-
                 ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == x.Id).ToList();
                 ViewData["ErrorMessage"] = " Nhập Đầy Đủ Thông Tin";
                 return View(x);

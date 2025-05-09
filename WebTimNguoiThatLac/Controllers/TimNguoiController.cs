@@ -494,7 +494,8 @@ namespace WebTimNguoiThatLac.Controllers
             // XL KHU VỰC
             ViewBag.KhuVucFilter = khuVuc;
 
-            await LoadSelectListsAsync();
+            ViewBag.TinhThanhList = await db.TinhThanhs.ToListAsync();
+            ViewBag.QuanHuyenList = await db.QuanHuyens.ToListAsync();
 
             ViewBag.SelectedTinhThanh = tinhThanhId;
             ViewBag.SelectedQuanHuyen = quanHuyenId;

@@ -70,7 +70,7 @@ namespace WebTimNguoiThatLac.Models
         public ICollection<NhanChung> NhanChungs { get; set; }
 
 
-
+    
 
 
     }

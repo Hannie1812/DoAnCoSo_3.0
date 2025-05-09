@@ -7,6 +7,7 @@ using WebTimNguoiThatLac.Middlewares;
 using WebTimNguoiThatLac.Models;
 using WebTimNguoiThatLac.Repositories;
 using WebTimNguoiThatLac.Services;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,26 @@ builder.Services.AddAuthentication(options =>
     {
         options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
         options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+        options.Scope.Add("profile");
+        options.Scope.Add("email");
+        options.Events.OnCreatingTicket = async context =>
+        {
+            var picture = context.User.GetProperty("picture").GetString() ?? 
+                         context.Principal.FindFirstValue("urn:google:picture");
+            if (!string.IsNullOrEmpty(picture))
+            {
+                var user = await context.HttpContext.RequestServices
+                    .GetRequiredService<UserManager<ApplicationUser>>()
+                    .FindByEmailAsync(context.Principal.FindFirstValue(ClaimTypes.Email));
+                if (user != null)
+                {
+                    user.HinhAnh = picture;
+                    await context.HttpContext.RequestServices
+                        .GetRequiredService<UserManager<ApplicationUser>>()
+                        .UpdateAsync(user);
+                }
+            }
+        };
     })
     .AddFacebook(options =>
     {

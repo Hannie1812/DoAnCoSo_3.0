@@ -313,13 +313,6 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
 
             return View(x);
         }
-        private async Task LoadSelectListsAsync()
-        {
-            var tinhThanhs = await db.TinhThanhs.ToListAsync();
-            var quanHuyens = await db.QuanHuyens.ToListAsync();
-            ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
-            ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
-        }
         [HttpPost]
         public async Task<IActionResult> Update(TimNguoi x, List<IFormFile>? DSHinhAnhCapNhat)
         {

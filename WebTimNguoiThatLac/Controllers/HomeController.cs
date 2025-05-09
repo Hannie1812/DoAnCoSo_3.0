@@ -19,15 +19,99 @@ namespace WebTimNguoiThatLac.Controllers
             this.db = db;
         }
 
-        public IActionResult Index()
+        /*public IActionResult Index(string? TimKiem, int? tinhThanhId, int? quanHuyenId)
         {
-           
-                int sl = db.TimNguois.ToList().Count;
-                ViewBag.TongBaiVietTrong = sl;
-                return View();
-            
+            ViewBag.TimKiem = TimKiem;
+            if (TimKiem.IsNullOrEmpty())
+            {
+                IEnumerable<TimNguoi> ds = db.TimNguois
+                                                .Include(u => u.ApplicationUser)
+                                                .Include(u2 => u2.AnhTimNguois)
+                                                .Where(i => i.active == true)
+                                                .ToList().OrderByDescending(x => x.Id);
+                return View(ds);
+            }
+            else
+            {
+                IEnumerable<TimNguoi> ds = db.TimNguois
+                                        .Include(u => u.ApplicationUser)
+                                        .Include(u2 => u2.AnhTimNguois)
+                                        .Where(i => i.active == true)
+                                        .ToList().OrderByDescending(x => x.Id);
+                List<TimNguoi> DSTimkiem = new List<TimNguoi>();
+                foreach (TimNguoi i in ds)
+                {
+                    TimKiem = WebTimNguoiThatLac.BoTro.Filter.ChuyenCoDauThanhKhongDau(TimKiem);
+                    string r1 = WebTimNguoiThatLac.BoTro.Filter.ChuyenCoDauThanhKhongDau(i.HoTen);
+                    if (r1.ToUpper().Contains(TimKiem.ToUpper()))
+                    {
+                        DSTimkiem.Add(i);
+                        continue;
+                    }
+                    string r2 = WebTimNguoiThatLac.BoTro.Filter.ChuyenCoDauThanhKhongDau(i.MoTa);
+                    if (r2.ToUpper().Contains(TimKiem.ToUpper()))
+                    {
+                        DSTimkiem.Add(i);
+                        continue;
+                    }
+                    string r3 = WebTimNguoiThatLac.BoTro.Filter.ChuyenCoDauThanhKhongDau(i.KhuVuc);
+                    if (r3.ToUpper().Contains(TimKiem.ToUpper()))
+                    {
+                        DSTimkiem.Add(i);
+                        continue;
+                    }
+                    string r4 = WebTimNguoiThatLac.BoTro.Filter.ChuyenCoDauThanhKhongDau(i.DaciemNhanDang);
+                    if (r4.ToUpper().Contains(TimKiem.ToUpper()))
+                    {
+                        DSTimkiem.Add(i);
+                        continue;
+                    }
+                }
+                return View(DSTimkiem);
+            }
 
+        }*/
+        public IActionResult Index(string? TimKiem, int? tinhThanhId, int? quanHuyenId)
+        {
+            ViewBag.TimKiem = TimKiem;
+            ViewBag.TinhThanhList = db.TinhThanhs.OrderBy(t => t.TenTinhThanh).ToList();
+            ViewBag.QuanHuyenList = db.QuanHuyens.OrderBy(q => q.TenQuanHuyen).ToList();
+
+            // Base query
+            var query = db.TimNguois
+                          .Include(u => u.ApplicationUser)
+                          .Include(u2 => u2.AnhTimNguois)
+                          .Include(q => q.QuanHuyen) // Nếu cần hiển thị tên quận huyện
+                          .Include(t => t.TinhThanh)  // Nếu cần hiển thị tên tỉnh thành
+                          .Where(i => i.active == true);
+
+            // Filter by Tỉnh Thành (sử dụng trực tiếp IdTinhThanh trong TimNguoi)
+            if (tinhThanhId.HasValue)
+            {
+                query = query.Where(x => x.IdTinhThanh == tinhThanhId.Value);
+            }
+
+            // Filter by Quận Huyện
+            if (quanHuyenId.HasValue)
+            {
+                query = query.Where(x => x.IdQuanHuyen == quanHuyenId.Value);
+            }
+
+            // Filter by TimKiem
+            if (!string.IsNullOrEmpty(TimKiem))
+            {
+                TimKiem = WebTimNguoiThatLac.BoTro.Filter.ChuyenCoDauThanhKhongDau(TimKiem);
+                query = query.Where(x =>
+                    WebTimNguoiThatLac.BoTro.Filter.ChuyenCoDauThanhKhongDau(x.HoTen).Contains(TimKiem) ||
+                    WebTimNguoiThatLac.BoTro.Filter.ChuyenCoDauThanhKhongDau(x.MoTa).Contains(TimKiem) ||
+                    WebTimNguoiThatLac.BoTro.Filter.ChuyenCoDauThanhKhongDau(x.DaciemNhanDang).Contains(TimKiem) ||
+                    WebTimNguoiThatLac.BoTro.Filter.ChuyenCoDauThanhKhongDau(x.KhuVuc).Contains(TimKiem));
+            }
+
+            var ds = query.OrderByDescending(x => x.Id).ToList();
+            return View(ds);
         }
+
 
         public IActionResult Privacy()
         {
@@ -53,6 +137,7 @@ namespace WebTimNguoiThatLac.Controllers
                     lh.NgayLienHe = DateTime.Now;
                     db.NguoiDungLienHes.Add(lh);
                     await db.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Thông tin liên hệ của bạn đã được gửi thành công.";
                     return RedirectToAction("Index");
                 }
                 else
@@ -60,14 +145,16 @@ namespace WebTimNguoiThatLac.Controllers
                     ModelState.AddModelError("", "Hãy Nhập Đủ Thông Tin");
                     TempData["ErrorMessage"] = "Vui Lòng Nhập Đủ Thông Tin";
                 }
-                return View(lh);
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "Có lỗi xảy ra, vui lòng thử lại sau"+ ex.Message);
-                return View(lh);
+                _logger.LogError(ex, "Lỗi khi gửi thông tin liên hệ.");
+                TempData["ErrorMessage"] = "Đã xảy ra lỗi, vui lòng thử lại sau.";
             }
+
+            return View(lh);
         }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 
@@ -79,5 +166,16 @@ namespace WebTimNguoiThatLac.Controllers
             };
             return View(errorModel);
         }
+        [HttpGet]
+        public async Task<IActionResult> GetQuanHuyenByTinhThanh(int tinhThanhId)
+        {
+            var quanHuyens = await db.QuanHuyens
+                .Where(q => q.IdTinhThanh == tinhThanhId)
+                .Select(q => new { id = q.Id, tenQuanHuyen = q.TenQuanHuyen })
+                .ToListAsync();
+
+            return Json(quanHuyens);
+        }
+
     }
 }

@@ -758,7 +758,7 @@
                             </div>
                         </div>
 
-                        <div class="info-item">
+                        @* <div class="info-item">
                             <div class="info-icon">
                                 <i class="fas fa-map-marker-alt"></i>
                             </div>
@@ -783,7 +783,29 @@
                                 <div class="info-value">@khuvuc</div>
                                 
                             </div>
+                        </div> *@
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Địa chỉ</div>
+                                <div class="info-value">
+                                    @if (!string.IsNullOrEmpty(Model.KhuVuc) || !string.IsNullOrEmpty(Model.QuanHuyen?.TenQuanHuyen) || !string.IsNullOrEmpty(Model.QuanHuyen?.TinhThanh?.TenTinhThanh))
+                                    {
+                                        <span>
+                                            @(Model.KhuVuc ?? ""), @(Model.QuanHuyen?.TenQuanHuyen ?? ""), @(Model.QuanHuyen?.TinhThanh?.TenTinhThanh ?? "")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Chưa xác định</span>
+                                    }
+                                </div>
+
+                            </div>
                         </div>
+
 
                         <div class="info-item">
                             <div class="info-icon">
@@ -1003,10 +1025,9 @@
         <!-- Identification Section -->
         <div class="description-section mt-4">
             <h5 class="section-title">
-                <div class="info-icon me-3">
-                    <i class="fas fa-id-card"></i>
-                </div> Đặc Điểm Nhận Dạng
+                <i class="fas fa-id-card me-2"></i> Đặc Điểm Nhận Dạng
             </h5>
+
             <div class="info-item">
                 <div class="info-content">
                     <div class="description-container">
@@ -1018,15 +1039,16 @@
 
         <!-- Detailed Description -->
         <div class="description-section">
-            <h5 class="section-title">
-                <div class="info-icon me-3">
-                    <i class="fas fa-info-circle text-primary"></i>
-                </div> Thông Tin Chi Tiết
+            <h5 class="section-title text-primary">
+                <i class="fas fa-info-circle me-2"></i> Thông Tin Chi Tiết
             </h5>
-            <div class="info-content">
-                <div class="description-container">
-                    <div class="info-value">
-                        @Html.Raw(Model.MoTa)
+
+            <div class="info-item">
+                <div class="info-content">
+                    <div class="description-container">
+                        <div class="info-value">
+                            @Html.Raw(Model.MoTa)
+                        </div>
                     </div>
                 </div>
             </div>

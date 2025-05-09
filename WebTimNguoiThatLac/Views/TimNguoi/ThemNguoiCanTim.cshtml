@@ -1,7 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @model WebTimNguoiThatLac.Models.TimNguoi
 @inject UserManager<ApplicationUser> UserManager
-
 @{
     ViewData["Title"] = "Thêm Người Cần Tìm";
     ApplicationUser us = await UserManager.GetUserAsync(User);
@@ -324,6 +323,23 @@
     <!-- Summernote -->
     <script src="~/clients/plugins/summernote/summernote-bs4.min.js"></script>
     <script>
+                   // Đảm bảo hàm này được định nghĩa trong global scope
+        window.loadQuanHuyen = function(tinhThanhId) {
+            const quanHuyenSelect = document.getElementById('QuanHuyen');
+            quanHuyenSelect.innerHTML = '<option value="">-- Chọn quận/huyện --</option>';
+
+            if (!tinhThanhId) return;
+
+            fetch(`/Home/GetQuanHuyenByTinhThanh?tinhThanhId=${tinhThanhId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(item => {
+                        const option = new Option(item.tenQuanHuyen, item.id);
+                        quanHuyenSelect.add(option);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
         $(function () {
             // Initialize Summernote
             $('#compose-textarea').summernote({

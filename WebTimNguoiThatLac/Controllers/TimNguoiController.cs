@@ -709,11 +709,7 @@ namespace WebTimNguoiThatLac.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 //ViewBag.DanhSachTinhThanh = TinhThanhIEnumerable;
-                IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
-                IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
-
-                ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
-                ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
+                await LoadSelectListsAsync();
 
                 var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 var nguoiDung = await _userManager.GetUserAsync(User);

@@ -326,7 +326,13 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
 
             return View(x);
         }
-
+        private async Task LoadSelectListsAsync()
+        {
+            var tinhThanhs = await db.TinhThanhs.ToListAsync();
+            var quanHuyens = await db.QuanHuyens.ToListAsync();
+            ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
+            ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
+        }
         [HttpPost]
         public async Task<IActionResult> Update(TimNguoi x, List<IFormFile>? DSHinhAnhCapNhat)
         {
@@ -342,7 +348,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     }
 
                     // Luôn thiết lập ViewBag trước khi trả về View
-                    ViewBag.DanhSachTinhThanh = TinhThanhIEnumerable;
+                    await LoadSelectListsAsync();
                     ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == x.Id).ToList();
 
                     if (!ModelState.IsValid)
@@ -424,12 +430,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
 
                 //IEnumerable<string> DanhSachTinhThanh = TinhThanhIEnumerable;
                 //ViewBag.DanhSachTinhThanh = DanhSachTinhThanh;
-
-                IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
-                IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
-
-                ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
-                ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
+                await LoadSelectListsAsync();
 
                 ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == x.Id).ToList();
                 ViewData["ErrorMessage"] = " Nhập Đầy Đủ Thông Tin";

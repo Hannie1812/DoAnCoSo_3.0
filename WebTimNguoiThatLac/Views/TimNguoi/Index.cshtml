@@ -9,283 +9,284 @@
 <style>
     /* Main container */
     .search-container {
-        background-color: #f8f9fa;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        padding: 25px;
-        margin-bottom: 30px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 25px;
+    margin-bottom: 30px;
     }
 
     /* Search form elements */
     .search-form .form-group {
-        margin-bottom: 1.2rem;
+    margin-bottom: 1.2rem;
     }
 
     .search-form label {
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
     }
 
     .search-form .form-control {
-        border-radius: 8px;
-        padding: 10px 15px;
-        border: 1px solid #ced4da;
-        transition: all 0.3s;
+    border-radius: 8px;
+    padding: 10px 15px;
+    border: 1px solid #ced4da;
+    transition: all 0.3s;
     }
 
-        .search-form .form-control:focus {
-            border-color: #80bdff;
-            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
-        }
+    .search-form .form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+    }
 
     /* Search buttons */
     .btn-search {
-        background-color: #28a745;
-        color: white;
-        border-radius: 8px;
-        padding: 10px 20px;
-        font-weight: 600;
-        transition: all 0.3s;
+    background-color: #28a745;
+    color: white;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 600;
+    transition: all 0.3s;
     }
 
-        .btn-search:hover {
-            background-color: #218838;
-            transform: translateY(-2px);
-        }
+    .btn-search:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    }
 
     .btn-reset {
-        background-color: #6c757d;
-        color: white;
-        border-radius: 8px;
-        padding: 10px 20px;
-        font-weight: 600;
-        transition: all 0.3s;
+    background-color: #6c757d;
+    color: white;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 600;
+    transition: all 0.3s;
     }
 
-        .btn-reset:hover {
-            background-color: #5a6268;
-            transform: translateY(-2px);
-        }
+    .btn-reset:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+    }
 
     /* Result cards */
     .person-card {
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-        margin-bottom: 25px;
-        border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    margin-bottom: 25px;
+    border: none;
     }
 
-        .person-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
-        }
+    .person-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+    }
 
-        .person-card .card-img-top {
-            height: 250px;
-            object-fit: cover;
-            width: 100%;
-        }
+    .person-card .card-img-top {
+    height: 250px;
+    object-fit: cover;
+    width: 100%;
+    }
 
-        .person-card .card-body {
-            padding: 20px;
-        }
+    .person-card .card-body {
+    padding: 20px;
+    }
 
-        .person-card .card-title {
-            font-weight: 700;
-            color: #343a40;
-            margin-bottom: 15px;
-        }
+    .person-card .card-title {
+    font-weight: 700;
+    color: #343a40;
+    margin-bottom: 15px;
+    }
 
-        .person-card .card-text {
-            color: #6c757d;
-            margin-bottom: 5px;
-        }
+    .person-card .card-text {
+    color: #6c757d;
+    margin-bottom: 5px;
+    }
 
-        .person-card .status-badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.8rem;
-        }
+    .person-card .status-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    }
 
     .status-searching {
-        background-color: #ffc107;
-        color: #212529;
+    background-color: #ffc107;
+    color: #212529;
     }
 
     .status-found {
-        background-color: #28a745;
-        color: white;
+    background-color: #28a745;
+    color: white;
     }
 
     /* Tags */
     .tag-container {
-        margin-top: 10px;
-        margin-bottom: 15px;
+    margin-top: 10px;
+    margin-bottom: 15px;
     }
 
     .tag {
-        display: inline-block;
-        background-color: #e9ecef;
-        color: #495057;
-        padding: 4px 10px;
-        margin: 0 5px 5px 0;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        transition: all 0.2s;
+    display: inline-block;
+    background-color: #e9ecef;
+    color: #495057;
+    padding: 4px 10px;
+    margin: 0 5px 5px 0;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    transition: all 0.2s;
     }
 
-        .tag:hover {
-            background-color: #dee2e6;
-            transform: translateY(-1px);
-        }
+    .tag:hover {
+    background-color: #dee2e6;
+    transform: translateY(-1px);
+    }
 
     .tag-highlight {
-        background-color: #fff3cd;
-        color: #856404;
-        font-weight: 600;
+    background-color: #fff3cd;
+    color: #856404;
+    font-weight: 600;
     }
 
     /* Pagination */
     .pagination-container {
-        margin-top: 30px;
+    margin-top: 30px;
     }
 
     .page-item .page-link {
-        border-radius: 8px !important;
-        margin: 0 3px;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid #dee2e6;
-        color: #495057;
-        font-weight: 600;
+    border-radius: 8px !important;
+    margin: 0 3px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #dee2e6;
+    color: #495057;
+    font-weight: 600;
     }
 
     .page-item.active .page-link {
-        background-color: #28a745;
-        border-color: #28a745;
-        color: white;
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
     }
 
     .page-item:not(.active) .page-link:hover {
-        background-color: #e9ecef;
-        color: #28a745;
+    background-color: #e9ecef;
+    color: #28a745;
     }
 
     /* Empty state */
     .empty-state {
-        text-align: center;
-        padding: 50px 20px;
+    text-align: center;
+    padding: 50px 20px;
     }
 
-        .empty-state i {
-            font-size: 4rem;
-            color: #6c757d;
-            margin-bottom: 20px;
-        }
+    .empty-state i {
+    font-size: 4rem;
+    color: #6c757d;
+    margin-bottom: 20px;
+    }
 
-        .empty-state h4 {
-            color: #343a40;
-            margin-bottom: 15px;
-        }
+    .empty-state h4 {
+    color: #343a40;
+    margin-bottom: 15px;
+    }
 
     /* Responsive */
     @@media (max-width: 768px) {
-        .search-form .form-group {
-            margin-bottom: 1rem;
-        }
+    .search-form .form-group {
+    margin-bottom: 1rem;
+    }
 
-        .person-card {
-            margin-bottom: 20px;
-        }
+    .person-card {
+    margin-bottom: 20px;
+    }
     }
 </style>
 
- <!-- Thêm vào phần đầu trang --> 
- <div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div> 
+<!-- Thêm vào phần đầu trang -->
+<div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
 
- <style> 
-     .notification { 
-         padding: 15px 20px; 
-         margin-bottom: 10px; 
-         border-radius: 5px; 
-         color: white; 
-         box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
-         animation: slideIn 0.3s, fadeOut 0.5s 4.5s; 
-         transition: all 0.3s; 
-     } 
+<style>
 
-         .notification.success { 
-             background-color: #28a745; 
-         } 
+    .notification {
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    animation: slideIn 0.3s, fadeOut 0.5s 4.5s;
+    transition: all 0.3s;
+    }
 
-         .notification.error { 
-             background-color: #dc3545; 
-         } 
+    .notification.success {
+    background-color: #28a745;
+    }
 
-         .notification.warning { 
-             background-color: #ffc107; 
-             color: #212529; 
-         } 
+    .notification.error {
+    background-color: #dc3545;
+    }
 
-         .notification.info { 
-             background-color: #17a2b8; 
-         } 
+    .notification.warning {
+    background-color: #ffc107;
+    color: #212529;
+    }
 
-     @@keyframes slideIn { 
-         from { 
-             transform: translateX(100%); 
-         } 
+    .notification.info {
+    background-color: #17a2b8;
+    }
 
-         to { 
-             transform: translateX(0); 
-         } 
-     } 
+    @@keyframes slideIn {
+    from {
+    transform: translateX(100%);
+    }
 
-     @@keyframes fadeOut { 
-         from { 
-             opacity: 1; 
-         } 
+    to {
+    transform: translateX(0);
+    }
+    }
 
-         to { 
-             opacity: 0;
-         } 
-     } 
- </style>
+    @@keyframes fadeOut {
+    from {
+    opacity: 1;
+    }
+
+    to {
+    opacity: 0;
+    }
+    }
+</style>
 
 <style>
     .search-form .form-floating label {
-        padding-left: 2.5rem;
+    padding-left: 2.5rem;
     }
 
     .search-form .form-floating > .form-control ~ label::after,
     .search-form .form-floating > .form-select ~ label::after {
-        background-color: transparent !important;
+    background-color: transparent !important;
     }
 
     .search-form .form-floating > .form-control:not(:placeholder-shown) ~ label,
     .search-form .form-floating > .form-select ~ label {
-        opacity: 1;
-        transform: scale(0.85) translateY(-1.2rem) translateX(0.5rem);
+    opacity: 1;
+    transform: scale(0.85) translateY(-1.2rem) translateX(0.5rem);
     }
 
     .search-form .form-text {
-        margin-top: 0.25rem;
-        margin-left: 0.5rem;
+    margin-top: 0.25rem;
+    margin-left: 0.5rem;
     }
 
     .card-header i.fs-4 {
-        width: 24px;
-        text-align: center;
+    width: 24px;
+    text-align: center;
     }
 </style>
 
@@ -325,46 +326,34 @@
                     @*     </div> *@
                     @* </div> *@
 
-                    <!-- Tỉnh Thành -->
-                    <div class=" col-md-6">
-                        <label class="form-label text-muted small mb-1">Tỉnh/Thành</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-white border-end-0">
-                                <i class="fas fa-map-marker-alt text-primary"></i>
-                            </span>
-                            <select id="TinhThanh" name="tinhThanhId" class="form-select border-start-0 ps-0" onchange="loadQuanHuyen(this.value)">
-                                <option value="">Tất cả tỉnh</option>
-                                @foreach (var tinh in ViewBag.TinhThanhList as List<WebTimNguoiThatLac.Models.TinhThanh>)
-                                {
-                                    <option value="@tinh.Id" selected="@(ViewBag.SelectedTinhThanh == tinh.Id ? "selected" : null)">
-                                        @tinh.TenTinhThanh
-                                    </option>
-                                }
-                            </select>
-                        </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Tỉnh/Thành</label>
+                        <select id="TinhThanh" name="tinhThanhId" class="form-select" onchange="loadQuanHuyen(this.value)">
+                            <option value="">Tất cả tỉnh</option>
+                            @foreach (var tinh in ViewBag.TinhThanhList as List<WebTimNguoiThatLac.Models.TinhThanh>)
+                            {
+                                <option value="@tinh.Id" selected="@(ViewBag.SelectedTinhThanh == tinh.Id ? "selected" : null)">
+                                    @tinh.TenTinhThanh
+                                </option>
+                            }
+                        </select>
                     </div>
 
-                    <!-- Quận Huyện -->
-                    <div class=" col-md-6">
-                        <label class="form-label text-muted small mb-1">Quận/Huyện</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-white border-end-0">
-                                <i class="fas fa-map-pin text-primary"></i>
-                            </span>
-                            <select id="QuanHuyen" name="quanHuyenId" class="form-select border-start-0 ps-0">
-                                <option value="">Tất cả quận</option>
-                                @if (ViewBag.SelectedTinhThanh != null)
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Quận/Huyện</label>
+                        <select id="QuanHuyen" name="quanHuyenId" class="form-select">
+                            <option value="">Tất cả quận</option>
+                            @if (ViewBag.QuanHuyenList != null && ViewBag.SelectedTinhThanh != null)
+                            {
+                                foreach (var huyen in ((List<WebTimNguoiThatLac.Models.QuanHuyen>)ViewBag.QuanHuyenList)
+                                .Where(q => q.IdTinhThanh == ViewBag.SelectedTinhThanh))
                                 {
-                                    var quanHuyenList = ViewBag.QuanHuyenList as List<WebTimNguoiThatLac.Models.QuanHuyen>;
-                                    foreach (var huyen in quanHuyenList.Where(q => q.IdTinhThanh == ViewBag.SelectedTinhThanh))
-                                    {
-                                        <option value="@huyen.Id" selected="@(ViewBag.SelectedQuanHuyen == huyen.Id ? "selected" : null)">
-                                            @huyen.TenQuanHuyen
-                                        </option>
-                                    }
+                                    <option value="@huyen.Id" selected="@(ViewBag.SelectedQuanHuyen == huyen.Id ? "selected" : null)">
+                                        @huyen.TenQuanHuyen
+                                    </option>
                                 }
-                            </select>
-                        </div>
+                            }
+                        </select>
                     </div>
 
                     <!-- Đặc điểm nhận dạng -->
@@ -394,20 +383,26 @@
                                 </div>
                             </div>
 
-                            <!-- Nút tìm kiếm -->
-                            <div class="col-lg-2 col-md-12">
-                                <div class="d-grid gap-2 d-md-flex">
-                                    <button type="submit" class="btn btn-primary px-4 flex-grow-1">
-                                        <i class="fas fa-search me-2"></i>Tìm
-                                    </button>
-                                    <a asp-action="Index" class="btn btn-outline-secondary px-3" title="Làm mới">
-                                        <i class="fas fa-sync-alt"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </form>
+                <!-- Action Buttons -->
+                <div class="row mt-4">
+                    <div class="col-12 d-flex justify-content-end gap-2">
+                        <button type="submit" class="btn btn-primary px-4 py-2">
+                            <i class="fas fa-search me-2"></i> Tìm kiếm
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4 py-2">
+                            <i class="fas fa-undo me-2"></i> Đặt lại
+                        </a>
+                        <a asp-action="TimKiemNangCao" class="btn btn-outline-primary px-4 py-2">
+                            <i class="fas fa-sliders-h me-2"></i> Nâng cao
+                        </a>
+                        <a asp-action="TimKiemBangHinhAnh" class="btn btn-outline-primary px-4 py-2">
+                            <i class="fas fa-sliders-h me-2"></i> hình ảnh
+                        </a>
                     </div>
                 </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 
@@ -429,13 +424,18 @@
                     <div class="card person-card h-100">
                         @if (mainImage != null)
                         {
-                            <img src="@mainImage.HinhAnh" class="card-img-top" alt="@item.HoTen">
+                            <a href="/TimNguoi/ChiTietBaiTimNguoi/@item.Id">
+                                <img src="@mainImage.HinhAnh" class="card-img-top" alt="@item.HoTen">
+                            </a>
+
                         }
                         else
                         {
-                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:250px;">
-                                <i class="fas fa-user-slash fa-4x text-secondary"></i>
-                            </div>
+                            <a href="/TimNguoi/ChiTietBaiTimNguoi/@item.Id">
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:250px;">
+                                    <i class="fas fa-user-slash fa-4x text-secondary"></i>
+                                </div>
+                            </a>
                         }
 
                         <div class="card-body">
@@ -445,7 +445,22 @@
 
                             <h5 class="card-title">@item.TieuDe</h5>
                             <p class="card-text"><strong>Họ tên:</strong> @item.HoTen</p>
-                            <p class="card-text"><strong>Khu vực:</strong> @item.KhuVuc</p>
+                            @{
+                                string khuvuc = "";
+                                if (item.IdTinhThanh != null)
+                                {
+                                    khuvuc = khuvuc + item.TinhThanh.TenTinhThanh + ", ";
+                                }
+                                if (item.IdQuanHuyen != null)
+                                {
+                                    khuvuc = khuvuc + item.QuanHuyen.TenQuanHuyen + ", ";
+                                }
+                                if (item.KhuVuc != null)
+                                {
+                                    khuvuc = khuvuc + item.KhuVuc;
+                                }
+                            }
+                            <p class="card-text"><strong>Khu vực:</strong>   @khuvuc</p>
                             <p class="card-text"><strong>Ngày đăng:</strong> @item.NgayDang.ToString("dd/MM/yyyy")</p>
 
                             @if (dacDiemItems != null && dacDiemItems.Any())
@@ -483,8 +498,7 @@
                     {
                         page,
                         ten = ViewBag.TenFilter,
-                        tinhThanhId = ViewBag.SelectedTinhThanh,
-                        quanHuyenId = ViewBag.SelectedQuanHuyen,
+                        khuVuc = ViewBag.KhuVucFilter,
                         dacDiem = ViewBag.DacDiemFilter
                     }), new PagedListRenderOptions
        {
@@ -513,37 +527,34 @@
 
 @section Scripts {
 
-	<script>
-        //Load quận huyện theo tỉnh thành
-           function loadQuanHuyen(tinhThanhId) {
-            $.ajax({
-                url: '/TimNguoi/GetQuanHuyenTheoTinh?tinhThanhId=' + tinhThanhId,
-                type: 'GET',
-                success: function (data) {
-                    let quanHuyenSelect = $('#QuanHuyen');
-                    quanHuyenSelect.empty(); // Clear existing options
-                    quanHuyenSelect.append('<option value="">Tất cả quận</option>');
+    <script>
+        function loadQuanHuyen(tinhThanhId) {
+            const quanHuyenDropdown = $("#QuanHuyen");
+            quanHuyenDropdown.empty().append('<option value="">Tất cả quận</option>');
 
-                    data.forEach(function (item) {
-                        quanHuyenSelect.append(
-                            $('<option></option>').val(item.id).text(item.tenQuanHuyen)
-                        );
-                    });
-                },
-                error: function () {
-                    alert("Lỗi khi tải danh sách quận/huyện");
-                }
+            if (!tinhThanhId) return;
+
+            $.getJSON(`/TimNguoi/GetQuanHuyenByTinhThanh?tinhThanhId=${tinhThanhId}`, function(data) {
+                $.each(data, function(index, item) {
+                    quanHuyenDropdown.append($('<option></option>').val(item.id).text(item.tenQuanHuyen));
+                });
+
+                // Giữ lại giá trị đã chọn nếu có
+        @if (ViewBag.SelectedQuanHuyen != null)
+        {
+            @:quanHuyenDropdown.val('@ViewBag.SelectedQuanHuyen');
+        }
+            }).fail(function() {
+                console.error("Lỗi khi tải danh sách quận huyện");
             });
         }
 
-        // Hiển thị thông báo từ TempData
-        document.addEventListener('DOMContentLoaded', function() {
-        @if (ViewData["Warning"] != null)
-        {
-            <text>
-                                showNotification('warning', '@Html.Raw(ViewData["Warning"])');
-            </text>
-        }
+        // Khởi tạo khi trang được tải
+        $(document).ready(function() {
+            const tinhThanhId = $("#TinhThanh").val();
+            if (tinhThanhId) {
+                loadQuanHuyen(tinhThanhId);
+            }
         });
     </script>
 
@@ -559,7 +570,7 @@
         @if (ViewData["Warning"] != null)
         {
             <text>
-                        showNotification('warning', '@Html.Raw(ViewData["Warning"])');
+                            showNotification('warning', '@Html.Raw(ViewData["Warning"])');
             </text>
         }
         });

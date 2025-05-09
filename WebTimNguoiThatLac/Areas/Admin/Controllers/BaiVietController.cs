@@ -38,82 +38,82 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             this._logger = logger;
         }
         private static readonly IEnumerable<string> TinhThanhIEnumerable = new List<string>
-        {
-            "Hà Nội",
-            "Hồ Chí Minh",
-            "Đà Nẵng",
-            "Hải Phòng",
-            "Cần Thơ",
-            "An Giang",
-            "Bà Rịa - Vũng Tàu",
-            "Bắc Giang",
-            "Bắc Kạn",
-            "Bạc Liêu",
-            "Bắc Ninh",
-            "Bến Tre",
-            "Bình Định",
-            "Bình Dương",
-            "Bình Phước",
-            "Bình Thuận",
-            "Cà Mau",
-            "Cao Bằng",
-            "Đắk Lắk",
-            "Đắk Nông",
-            "Điện Biên",
-            "Đồng Nai",
-            "Đồng Tháp",
-            "Gia Lai",
-            "Hà Giang",
-            "Hà Nam",
-            "Hà Tĩnh",
-            "Hải Dương",
-            "Hậu Giang",
-            "Hòa Bình",
-            "Hưng Yên",
-            "Khánh Hòa",
-            "Kiên Giang",
-            "Kon Tum",
-            "Lai Châu",
-            "Lâm Đồng",
-            "Lạng Sơn",
-            "Lào Cai",
-            "Long An",
-            "Nam Định",
-            "Nghệ An",
-            "Ninh Bình",
-            "Ninh Thuận",
-            "Phú Thọ",
-            "Quảng Bình",
-            "Quảng Nam",
-            "Quảng Ngãi",
-            "Quảng Ninh",
-            "Quảng Trị",
-            "Sóc Trăng",
-            "Sơn La",
-            "Tây Ninh",
-            "Thái Bình",
-            "Thái Nguyên",
-            "Thanh Hóa",
-            "Thừa Thiên Huế",
-            "Tiền Giang",
-            "Trà Vinh",
-            "Tuyên Quang",
-            "Vĩnh Long",
-            "Vĩnh Phúc",
-            "Yên Bái",
-            "Phú Yên"
-        };
+    {
+        "Hà Nội",
+        "Hồ Chí Minh",
+        "Đà Nẵng",
+        "Hải Phòng",
+        "Cần Thơ",
+        "An Giang",
+        "Bà Rịa - Vũng Tàu",
+        "Bắc Giang",
+        "Bắc Kạn",
+        "Bạc Liêu",
+        "Bắc Ninh",
+        "Bến Tre",
+        "Bình Định",
+        "Bình Dương",
+        "Bình Phước",
+        "Bình Thuận",
+        "Cà Mau",
+        "Cao Bằng",
+        "Đắk Lắk",
+        "Đắk Nông",
+        "Điện Biên",
+        "Đồng Nai",
+        "Đồng Tháp",
+        "Gia Lai",
+        "Hà Giang",
+        "Hà Nam",
+        "Hà Tĩnh",
+        "Hải Dương",
+        "Hậu Giang",
+        "Hòa Bình",
+        "Hưng Yên",
+        "Khánh Hòa",
+        "Kiên Giang",
+        "Kon Tum",
+        "Lai Châu",
+        "Lâm Đồng",
+        "Lạng Sơn",
+        "Lào Cai",
+        "Long An",
+        "Nam Định",
+        "Nghệ An",
+        "Ninh Bình",
+        "Ninh Thuận",
+        "Phú Thọ",
+        "Quảng Bình",
+        "Quảng Nam",
+        "Quảng Ngãi",
+        "Quảng Ninh",
+        "Quảng Trị",
+        "Sóc Trăng",
+        "Sơn La",
+        "Tây Ninh",
+        "Thái Bình",
+        "Thái Nguyên",
+        "Thanh Hóa",
+        "Thừa Thiên Huế",
+        "Tiền Giang",
+        "Trà Vinh",
+        "Tuyên Quang",
+        "Vĩnh Long",
+        "Vĩnh Phúc",
+        "Yên Bái",
+        "Phú Yên"
+    };
 
         public async Task<IActionResult> Index(string TimKiem = "", int Page = 1)
         {
-            IEnumerable<TimNguoi> ds = await db.TimNguois.Include(u => u.ApplicationUser)
-                                                         .OrderByDescending(m => m.NgayDang)
-                                                         .ToListAsync();
-
+            IEnumerable<TimNguoi> ds = await db.TimNguois
+                                                            .Include(u => u.ApplicationUser)
+                                                            .OrderByDescending(m => m.NgayDang)
+                                                            .ToListAsync();
             ViewBag.TimKiem = TimKiem;
             int sodongtren1trang = 5;
 
-            if (string.IsNullOrEmpty(TimKiem))
+            if (TimKiem.IsNullOrEmpty())
             {
                 var dsTrang = ds.ToPagedList(Page, sodongtren1trang);
                 return View(dsTrang);
@@ -121,49 +121,71 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             else
             {
                 TimKiem = WebTimNguoiThatLac.BoTro.Filter.ChuyenCoDauThanhKhongDau(TimKiem);
-
-                // Filter data by TimKiem (case-insensitive)
-                var dsTimKiem = ds.Where(i =>
-                                           WebTimNguoiThatLac.BoTro.Filter.ChuyenCoDauThanhKhongDau(i.HoTen).Contains(TimKiem, StringComparison.OrdinalIgnoreCase) ||
-                                           WebTimNguoiThatLac.BoTro.Filter.ChuyenCoDauThanhKhongDau(i.TieuDe).Contains(TimKiem, StringComparison.OrdinalIgnoreCase) ||
-                                           (i.DaciemNhanDang != null && i.DaciemNhanDang.Contains(TimKiem, StringComparison.OrdinalIgnoreCase)) ||
-                                           (i.KhuVuc != null && i.KhuVuc.Contains(TimKiem, StringComparison.OrdinalIgnoreCase)))
-                                      .ToList();
-
-                // Assuming y is the first result or a specific logic to fetch region data
-                var y = dsTimKiem.FirstOrDefault(); // Adjust this if necessary
-
-                // Pass KhuVuc, TinhThanh, QuanHuyen to the view if y is not null
-                if (y != null)
+                List<TimNguoi> dsTimKiem = new List<TimNguoi>();
+                foreach (TimNguoi i in ds)
                 {
-                    ViewBag.Khuvuc = y.KhuVuc;
-                    ViewBag.TinhThanh = y.QuanHuyen?.TinhThanh?.TenTinhThanh;
-                    ViewBag.QuanHuyen = y.QuanHuyen?.TenQuanHuyen;
-                }
+                    string r1 = WebTimNguoiThatLac.BoTro.Filter.ChuyenCoDauThanhKhongDau(i.HoTen);
+                    if (r1.ToUpper().Contains(TimKiem.ToUpper()))
+                    {
+                        dsTimKiem.Add(i);
+                        continue;
+                    }
+                    string r2 = WebTimNguoiThatLac.BoTro.Filter.ChuyenCoDauThanhKhongDau(i.TieuDe);
+                    if (r2.ToUpper().Contains(TimKiem.ToUpper()))
+                    {
+                        dsTimKiem.Add(i);
+                        continue;
+                    }
+                    if (i.DaciemNhanDang != null)
+                    {
+                        string r3 = i.DaciemNhanDang;
+                        if (r3.ToUpper().Contains(TimKiem.ToUpper()))
+                        {
+                            dsTimKiem.Add(i);
+                            continue;
+                        }
+                    }
+                    if (i.KhuVuc != null)
+                    {
+                        string r4 = i.KhuVuc;
+                        if (r4.ToUpper().Contains(TimKiem.ToUpper()))
+                        {
+                            dsTimKiem.Add(i);
+                            continue;
+                        }
+                    }
 
+                }
                 var dsTrang = dsTimKiem.ToPagedList(Page, sodongtren1trang);
                 return View(dsTrang);
             }
         }
 
-
         public async Task<IActionResult> Create()
         {
-            ViewBag.DanhSachTinhThanh = await db.TinhThanhs.ToListAsync();
-            ViewBag.DanhSachQuanHuyen = await db.QuanHuyens.ToListAsync();
+            IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
+            IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
+
+
+            ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
+            ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(TimNguoi x, List<IFormFile>? DanhSachHinhAnh, string EmailNguoiDung)
         {
-            ViewBag.DanhSachTinhThanh = await db.TinhThanhs.ToListAsync();
-            ViewBag.DanhSachQuanHuyen = await db.QuanHuyens.ToListAsync();
+            IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
+            IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
+
+
+            ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
+            ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
 
             if (ModelState.IsValid)
             {
                 ApplicationUser us = await userManager.FindByEmailAsync(EmailNguoiDung);
-                if(us == null)
+                if (us == null)
                 {
                     ModelState.AddModelError("", "Lỗi email chưa đăng kí tài khoản ");
                     return View(x);
@@ -173,6 +195,8 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 x.IdNguoiDung = us.Id;
                 x.NgayDang = DateTime.Now;
                 x.active = false;
+                x.NguoiDangBaiXoa = false;
+
 
                 db.Add(x);
                 await db.SaveChangesAsync();
@@ -180,12 +204,12 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 if (DanhSachHinhAnh != null)
                 {
                     int d = 0;
-                    foreach(IFormFile i in DanhSachHinhAnh)
+                    foreach (IFormFile i in DanhSachHinhAnh)
                     {
 
-                        AnhTimNguoi z = new AnhTimNguoi(); 
-                        z.HinhAnh  = await SaveImage(i, "AnhNguoiCanTim");
-                        if(d==0)
+                        AnhTimNguoi z = new AnhTimNguoi();
+                        z.HinhAnh = await SaveImage(i, "AnhNguoiCanTim");
+                        if (d == 0)
                         {
                             z.TrangThai = 1;
                             d++;
@@ -198,7 +222,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                         z.IdNguoiCanTim = x.Id;
 
                         db.AnhTimNguois.Add(z);
-                        
+
                     }
                 }
 
@@ -261,21 +285,43 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             }
         }
 
-       
+
+        [HttpGet]
+        public async Task<IActionResult> GetQuanHuyenByTinhThanh(int tinhThanhId)
+        {
+            var quanHuyenList = await db.QuanHuyens
+                .Where(q => q.IdTinhThanh == tinhThanhId)
+                .OrderBy(q => q.TenQuanHuyen)
+                .Select(q => new {
+                    id = q.Id,
+                    tenQuanHuyen = q.TenQuanHuyen
+                })
+                .ToListAsync();
+
+
+            return Json(quanHuyenList);
+        }
         public async Task<IActionResult> Update(int id)
         {
-            TimNguoi x = await db.TimNguois.Include(u => u.ApplicationUser)
-                                            .Include(u => u.BinhLuans)
-                                            .Include(u => u.QuanHuyen)
-                                            .ThenInclude(q => q.TinhThanh)
-                                            .FirstOrDefaultAsync(i => i.Id == id);
+            TimNguoi x = await db.TimNguois
+                                             .Include(u => u.ApplicationUser)
+                                             .Include(u => u.BinhLuans)
+                                             .FirstOrDefaultAsync(i => i.Id == id);
             if (x == null)
             {
                 return RedirectToAction("Index");
             }
 
-            ViewBag.DanhSachTinhThanh = await db.TinhThanhs.ToListAsync();
-            ViewBag.DanhSachQuanHuyen = await db.QuanHuyens.ToListAsync();
+            //IEnumerable<string> DanhSachTinhThanh = TinhThanhIEnumerable;
+            //ViewBag.DanhSachTinhThanh = DanhSachTinhThanh;
+
+            IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
+            IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
+
+            ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
+            ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
+
+
             ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == id).ToList();
 
             return View(x);
@@ -296,8 +342,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     }
 
                     // Luôn thiết lập ViewBag trước khi trả về View
-                    ViewBag.DanhSachTinhThanh = await db.TinhThanhs.ToListAsync();
-                    ViewBag.DanhSachQuanHuyen = await db.QuanHuyens.ToListAsync();
+                    ViewBag.DanhSachTinhThanh = TinhThanhIEnumerable;
                     ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == x.Id).ToList();
 
                     if (!ModelState.IsValid)
@@ -313,12 +358,12 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     y.GioiTinh = x.GioiTinh;
                     y.TrangThai = x.TrangThai;
                     y.KhuVuc = x.KhuVuc;
-                    y.IdTinhThanh = x.IdTinhThanh;
-                    y.IdQuanHuyen = x.IdQuanHuyen;
                     y.NgaySinh = x.NgaySinh;
                     y.NgayMatTich = x.NgayMatTich;
                     y.HoTen = x.HoTen;
                     y.MoiQuanHe = x.MoiQuanHe;
+                    y.IdTinhThanh = x.IdTinhThanh;
+                    y.IdQuanHuyen = x.IdQuanHuyen;
 
                     await db.SaveChangesAsync();
 
@@ -376,17 +421,25 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     return RedirectToAction("Index");
                 }
 
-                ViewBag.DanhSachTinhThanh = await db.TinhThanhs.ToListAsync();
-                ViewBag.DanhSachQuanHuyen = await db.QuanHuyens.ToListAsync();
+
+                //IEnumerable<string> DanhSachTinhThanh = TinhThanhIEnumerable;
+                //ViewBag.DanhSachTinhThanh = DanhSachTinhThanh;
+
+                IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
+                IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
+
+                ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
+                ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
+
                 ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == x.Id).ToList();
                 ViewData["ErrorMessage"] = " Nhập Đầy Đủ Thông Tin";
                 return View(x);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return View(x);
             }
-           
+
 
         }
 
@@ -402,12 +455,12 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 {
                     return Json(new { success = false, message = "Ko Có Id Cần chỉnh sửa" });
                 }
-                if(y.active == false)
+                if (y.active == false)
                 {
                     y.NguoiDangBaiXoa = false;
                 }
                 y.active = !y.active;
-                
+
                 await db.SaveChangesAsync();
                 return Json(new { success = true, message = "Thành Công" });
             }
@@ -430,7 +483,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     .Include(u => u.BinhLuans)
                         .ThenInclude(v => v.ApplicationUser)
                         .ThenInclude(v => v.BaoCaoBinhLuans)
-                    .Include(u=>u.BaoCaoBaiViets)
+                    .Include(u => u.BaoCaoBaiViets)
                         .ThenInclude(v => v.ApplicationUser)
                     .FirstOrDefault(i => i.Id == id);
 
@@ -440,10 +493,10 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     .Include(u => u.BaoCaoBinhLuans)
                     .Where(i => i.IdBaiViet == tn.Id).ToList();
                 // xóa các báo cáo bình luận trong dsBinhLuan
-                foreach(BinhLuan i in dsBinhLuan)
+                foreach (BinhLuan i in dsBinhLuan)
                 {
                     List<BaoCaoBinhLuan> bc = db.BaoCaoBinhLuans.Where(m => m.MaBinhLuan == i.Id).ToList();
-                    if(bc.Count() > 0)
+                    if (bc.Count() > 0)
                     {
                         db.BaoCaoBinhLuans.RemoveRange(bc);
                     }
@@ -456,7 +509,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     .Include(u => u.ApplicationUser)
                     .Where(i => i.TimNguoiId == tn.Id).ToList();
 
-                if(dsThayThayLac.Count() > 0)
+                if (dsThayThayLac.Count() > 0)
                 {
                     db.TimThayNguoiThatLacs.RemoveRange(dsThayThayLac);
                 }
@@ -465,11 +518,11 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 List<AnhTimNguoi> dsAnhTimNguoi = db.AnhTimNguois
                    .Where(i => i.IdNguoiCanTim == tn.Id).ToList();
 
-               foreach(AnhTimNguoi i in dsAnhTimNguoi)
-               {
+                foreach (AnhTimNguoi i in dsAnhTimNguoi)
+                {
                     DeleteImage(i.HinhAnh, "AnhNguoiCanTim");
                     db.AnhTimNguois.Remove(i);
-               }
+                }
 
 
                 // báo cáo bài viết
@@ -479,7 +532,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     .Where(i => i.MaBaiViet == tn.Id).ToList();
 
 
-                foreach(BaoCaoBaiViet i in dsBaoCaoBaiViet)
+                foreach (BaoCaoBaiViet i in dsBaoCaoBaiViet)
                 {
                     DeleteImage(i.HinhAnh, "AnhMinhTrungBaoCaoBaiViet");
                     db.BaoCaoBaiViets.Remove(i);

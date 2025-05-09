@@ -57,13 +57,7 @@ namespace WebTimNguoiThatLac.Models
         public ICollection<NhanChung> NhanChungs { get; set; }
 
 
-        public int? IdTinhThanh { get; set; }
-        [ForeignKey("IdTinhThanh")]
-        public TinhThanh? TinhThanh { get; set; }
-
-        public int? IdQuanHuyen { get; set; }
-        [ForeignKey("IdQuanHuyen")]
-        public QuanHuyen? QuanHuyen { get; set; }
+    
 
 
     }

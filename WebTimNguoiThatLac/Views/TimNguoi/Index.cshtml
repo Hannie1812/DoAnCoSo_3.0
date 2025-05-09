@@ -9,204 +9,204 @@
 <style>
     /* Main container */
     .search-container {
-    background-color: #f8f9fa;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    padding: 25px;
-    margin-bottom: 30px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        padding: 25px;
+        margin-bottom: 30px;
     }
 
     /* Search form elements */
     .search-form .form-group {
-    margin-bottom: 1.2rem;
+        margin-bottom: 1.2rem;
     }
 
     .search-form label {
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
     }
 
     .search-form .form-control {
-    border-radius: 8px;
-    padding: 10px 15px;
-    border: 1px solid #ced4da;
-    transition: all 0.3s;
+        border-radius: 8px;
+        padding: 10px 15px;
+        border: 1px solid #ced4da;
+        transition: all 0.3s;
     }
 
-    .search-form .form-control:focus {
-    border-color: #80bdff;
-    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
-    }
+        .search-form .form-control:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+        }
 
     /* Search buttons */
     .btn-search {
-    background-color: #28a745;
-    color: white;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-weight: 600;
-    transition: all 0.3s;
+        background-color: #28a745;
+        color: white;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 600;
+        transition: all 0.3s;
     }
 
-    .btn-search:hover {
-    background-color: #218838;
-    transform: translateY(-2px);
-    }
+        .btn-search:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
 
     .btn-reset {
-    background-color: #6c757d;
-    color: white;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-weight: 600;
-    transition: all 0.3s;
+        background-color: #6c757d;
+        color: white;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 600;
+        transition: all 0.3s;
     }
 
-    .btn-reset:hover {
-    background-color: #5a6268;
-    transform: translateY(-2px);
-    }
+        .btn-reset:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+        }
 
     /* Result cards */
     .person-card {
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-    margin-bottom: 25px;
-    border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        margin-bottom: 25px;
+        border: none;
     }
 
-    .person-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 20px rgba(0,0,0,0.15);
-    }
+        .person-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+        }
 
-    .person-card .card-img-top {
-    height: 250px;
-    object-fit: cover;
-    width: 100%;
-    }
+        .person-card .card-img-top {
+            height: 250px;
+            object-fit: cover;
+            width: 100%;
+        }
 
-    .person-card .card-body {
-    padding: 20px;
-    }
+        .person-card .card-body {
+            padding: 20px;
+        }
 
-    .person-card .card-title {
-    font-weight: 700;
-    color: #343a40;
-    margin-bottom: 15px;
-    }
+        .person-card .card-title {
+            font-weight: 700;
+            color: #343a40;
+            margin-bottom: 15px;
+        }
 
-    .person-card .card-text {
-    color: #6c757d;
-    margin-bottom: 5px;
-    }
+        .person-card .card-text {
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
 
-    .person-card .status-badge {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 0.8rem;
-    }
+        .person-card .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
 
     .status-searching {
-    background-color: #ffc107;
-    color: #212529;
+        background-color: #ffc107;
+        color: #212529;
     }
 
     .status-found {
-    background-color: #28a745;
-    color: white;
+        background-color: #28a745;
+        color: white;
     }
 
     /* Tags */
     .tag-container {
-    margin-top: 10px;
-    margin-bottom: 15px;
+        margin-top: 10px;
+        margin-bottom: 15px;
     }
 
     .tag {
-    display: inline-block;
-    background-color: #e9ecef;
-    color: #495057;
-    padding: 4px 10px;
-    margin: 0 5px 5px 0;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    transition: all 0.2s;
+        display: inline-block;
+        background-color: #e9ecef;
+        color: #495057;
+        padding: 4px 10px;
+        margin: 0 5px 5px 0;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        transition: all 0.2s;
     }
 
-    .tag:hover {
-    background-color: #dee2e6;
-    transform: translateY(-1px);
-    }
+        .tag:hover {
+            background-color: #dee2e6;
+            transform: translateY(-1px);
+        }
 
     .tag-highlight {
-    background-color: #fff3cd;
-    color: #856404;
-    font-weight: 600;
+        background-color: #fff3cd;
+        color: #856404;
+        font-weight: 600;
     }
 
     /* Pagination */
     .pagination-container {
-    margin-top: 30px;
+        margin-top: 30px;
     }
 
     .page-item .page-link {
-    border-radius: 8px !important;
-    margin: 0 3px;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #dee2e6;
-    color: #495057;
-    font-weight: 600;
+        border-radius: 8px !important;
+        margin: 0 3px;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #dee2e6;
+        color: #495057;
+        font-weight: 600;
     }
 
     .page-item.active .page-link {
-    background-color: #28a745;
-    border-color: #28a745;
-    color: white;
+        background-color: #28a745;
+        border-color: #28a745;
+        color: white;
     }
 
     .page-item:not(.active) .page-link:hover {
-    background-color: #e9ecef;
-    color: #28a745;
+        background-color: #e9ecef;
+        color: #28a745;
     }
 
     /* Empty state */
     .empty-state {
-    text-align: center;
-    padding: 50px 20px;
+        text-align: center;
+        padding: 50px 20px;
     }
 
-    .empty-state i {
-    font-size: 4rem;
-    color: #6c757d;
-    margin-bottom: 20px;
-    }
+        .empty-state i {
+            font-size: 4rem;
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
 
-    .empty-state h4 {
-    color: #343a40;
-    margin-bottom: 15px;
-    }
+        .empty-state h4 {
+            color: #343a40;
+            margin-bottom: 15px;
+        }
 
     /* Responsive */
     @@media (max-width: 768px) {
-    .search-form .form-group {
-    margin-bottom: 1rem;
-    }
+        .search-form .form-group {
+            margin-bottom: 1rem;
+        }
 
-    .person-card {
-    margin-bottom: 20px;
-    }
+        .person-card {
+            margin-bottom: 20px;
+        }
     }
 </style>
 
@@ -216,77 +216,77 @@
 <style>
 
     .notification {
-    padding: 15px 20px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    color: white;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    animation: slideIn 0.3s, fadeOut 0.5s 4.5s;
-    transition: all 0.3s;
+        padding: 15px 20px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        color: white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        animation: slideIn 0.3s, fadeOut 0.5s 4.5s;
+        transition: all 0.3s;
     }
 
-    .notification.success {
-    background-color: #28a745;
-    }
+        .notification.success {
+            background-color: #28a745;
+        }
 
-    .notification.error {
-    background-color: #dc3545;
-    }
+        .notification.error {
+            background-color: #dc3545;
+        }
 
-    .notification.warning {
-    background-color: #ffc107;
-    color: #212529;
-    }
+        .notification.warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
 
-    .notification.info {
-    background-color: #17a2b8;
-    }
+        .notification.info {
+            background-color: #17a2b8;
+        }
 
     @@keyframes slideIn {
-    from {
-    transform: translateX(100%);
-    }
+        from {
+            transform: translateX(100%);
+        }
 
-    to {
-    transform: translateX(0);
-    }
+        to {
+            transform: translateX(0);
+        }
     }
 
     @@keyframes fadeOut {
-    from {
-    opacity: 1;
-    }
+        from {
+            opacity: 1;
+        }
 
-    to {
-    opacity: 0;
-    }
+        to {
+            opacity: 0;
+        }
     }
 </style>
 
 <style>
     .search-form .form-floating label {
-    padding-left: 2.5rem;
+        padding-left: 2.5rem;
     }
 
     .search-form .form-floating > .form-control ~ label::after,
     .search-form .form-floating > .form-select ~ label::after {
-    background-color: transparent !important;
+        background-color: transparent !important;
     }
 
     .search-form .form-floating > .form-control:not(:placeholder-shown) ~ label,
     .search-form .form-floating > .form-select ~ label {
-    opacity: 1;
-    transform: scale(0.85) translateY(-1.2rem) translateX(0.5rem);
+        opacity: 1;
+        transform: scale(0.85) translateY(-1.2rem) translateX(0.5rem);
     }
 
     .search-form .form-text {
-    margin-top: 0.25rem;
-    margin-left: 0.5rem;
+        margin-top: 0.25rem;
+        margin-left: 0.5rem;
     }
 
     .card-header i.fs-4 {
-    width: 24px;
-    text-align: center;
+        width: 24px;
+        text-align: center;
     }
 </style>
 
@@ -369,19 +369,9 @@
                             <div class="form-text ps-4">
                                 <small><i class="fas fa-info-circle me-1 text-primary"></i>Nhập các đặc điểm cách nhau bằng dấu phẩy</small>
                             </div>
-
-
-                            <!-- Đặc điểm -->
-                            <div class="col-lg-3 col-md-6">
-                                <label class="form-label text-muted small mb-1">Đặc điểm</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-white border-end-0">
-                                        <i class="fas fa-search text-primary"></i>
-                                    </span>
-                                    <input type="text" name="dacDiem" class="form-control border-start-0 ps-0"
-                                           placeholder="Nhập đặc điểm nhận dạng..." value="@ViewBag.DacDiemFilter">
-                                </div>
-                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Action Buttons -->
                 <div class="row mt-4">
@@ -570,7 +560,7 @@
         @if (ViewData["Warning"] != null)
         {
             <text>
-                            showNotification('warning', '@Html.Raw(ViewData["Warning"])');
+                                showNotification('warning', '@Html.Raw(ViewData["Warning"])');
             </text>
         }
         });

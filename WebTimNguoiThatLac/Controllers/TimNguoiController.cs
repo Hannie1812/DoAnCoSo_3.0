@@ -184,139 +184,21 @@ namespace WebTimNguoiThatLac.Controllers
         }
 
 
-
-        //public async Task<IActionResult> Index(string ten, string khuVuc, string dacDiem, int page = 1)
-        //{
-        //    int pageSize = 6; // Số bài viết mỗi trang
-
-        //    var query = db.TimNguois
-        //        .Include(u => u.ApplicationUser)
-        //        .Include(u => u.AnhTimNguois)
-        //        .Where(i => i.active == true);
-
-        //    int d = 0;
-        //    // Áp dụng bộ lọc tên
-        //    if (!string.IsNullOrEmpty(ten))
-        //    {
-        //        query = query.Where(x => x.HoTen.Contains(ten) || x.TieuDe.Contains(ten));
-        //        d++;
-        //    }
-
-        //    // Áp dụng bộ lọc khu vực
-        //    if (!string.IsNullOrEmpty(khuVuc))
-        //    {
-        //        query = query.Where(x => x.KhuVuc.Contains(khuVuc));
-        //        d ++;
-        //    }
-
-        //    // Áp dụng bộ lọc đặc điểm nhận dạng
-        //    if (!string.IsNullOrEmpty(dacDiem))
-        //    {
-        //        query = query.Where(x => x.DaciemNhanDang.Contains(dacDiem));
-        //        d++;
-        //    }
-
-        //    if(d>0)
-        //    {
-        //        // Lưu lịch sử tìm kiếm
-        //        string nguoiDungId = null;
-
-        //        var diaChiIP = HttpContext.Connection.RemoteIpAddress?.ToString();
-
-        //        if(User.Identity.IsAuthenticated)
-        //        {
-        //            var nguoiDung = await _userManager.GetUserAsync(User);
-        //            nguoiDungId = nguoiDung.Id;
-
-        //            if(nguoiDung.Active == false)
-        //            {
-
-        //                // Ghi log
-        //                _logger.LogWarning($"Tài khoản {nguoiDung.Email} đã bị vô hiệu hóa do vi phạm quy định.");
-        //                TempData["Warning"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
-        //                return Redirect("/Identity/Account/Login");
-        //            }
-
-        //            // Ghi lịch sử tìm kiếm
-        //            LichSuTimKiem lichSu = new LichSuTimKiem
-        //            {
-        //                IdNguoiDung = nguoiDungId,
-        //                TuKhoa = ten + khuVuc + dacDiem,
-        //                ThoiGianTimKiem = DateTime.UtcNow,
-        //                DiaChiIP = diaChiIP
-        //            };
-        //            db.LichSuTimKiems.Add(lichSu);
-        //            await db.SaveChangesAsync();
-
-        //            // Kiểm tra hành vi đáng ngờ
-        //            var soLanTimTrong1Phut = db.LichSuTimKiems
-        //                .Where(x => x.IdNguoiDung == nguoiDungId && x.ThoiGianTimKiem > DateTime.UtcNow.AddMinutes(-1))
-        //                .Count();
-
-        //            if (soLanTimTrong1Phut > 10)
-        //            {
-        //                var hanhVi = new HanhViDangNgo
-        //                {
-        //                    NguoiDungId = nguoiDungId,
-        //                    HanhDong = "Tìm kiếm quá nhiều",
-        //                    ThoiGian = DateTime.UtcNow,
-        //                    ChiTiet = $"Đã tìm kiếm {soLanTimTrong1Phut} lần trong vòng 1 phút, Nghi ngờ bạn đang có ý định xâm hại hệ thống"
-        //                };
-        //                db.HanhViDangNgos.Add(hanhVi);
-        //                await db.SaveChangesAsync();
-
-        //                // 👉 Tăng số lần vi phạm của người dùng
-        //                ApplicationUser nguoiDungViPham = await db.Users.FirstOrDefaultAsync(u => u.Id == nguoiDungId);
-        //                if (nguoiDungViPham != null)
-        //                {
-        //                    nguoiDungViPham.SoLanViPham++;
-        //                    await db.SaveChangesAsync();
-
-        //                    if (nguoiDungViPham.SoLanViPham >= 5)
-        //                    {
-        //                        nguoiDungViPham.Active = false;
-        //                        await db.SaveChangesAsync();
-
-        //                        // 👉 Gửi email thông báo
-        //                        await _emailService.SendEmailAsync(nguoiDungViPham.Email, "Tài khoản của bạn đã bị vô hiệu hóa", "Tài khoản của bạn đã bị vô hiệu hóa do vi phạm quy định của hệ thống. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.");
-
-        //                        // 👉 Ghi log
-        //                        _logger.LogWarning($"Tài khoản {nguoiDungViPham.Email} đã bị vô hiệu hóa do vi phạm quy định.");
+        [HttpGet]
+        public async Task<IActionResult> GetQuanHuyenByTinhThanh(int tinhThanhId)
+        {
+            var quanHuyenList = await db.QuanHuyens
+                .Where(q => q.IdTinhThanh == tinhThanhId)
+                .OrderBy(q => q.TenQuanHuyen)
+                .Select(q => new {
+                    id = q.Id,
+                    tenQuanHuyen = q.TenQuanHuyen
+                })
+                .ToListAsync();
 
 
-        //                        //return Redirect("/Identity/Account/Login");
-        //                        TempData["WarningMessage"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
-        //                        return RedirectToAction("Index", "LoiViPham", new { area = "" });
-
-        //                    }
-        //                    else
-        //                    {
-        //                        ViewData["Warning"] = "Bạn đang bị nghi ngờ phá hoại hệ thống. Cần Đăng Nhập Lại";
-        //                    }
-
-        //                }
-        //                // 👉 đăng nhập lại
-        //                //return Redirect("/Identity/Account/Login");
-
-
-        //            }
-        //        }
-
-        //    }
-
-        //    // Lưu các giá trị filter vào ViewBag
-        //    ViewBag.TenFilter = ten;
-        //    ViewBag.KhuVucFilter = khuVuc;
-        //    ViewBag.DacDiemFilter = dacDiem;
-        //    ViewBag.TinhThanhList = new SelectList(TinhThanhIEnumerable);
-
-        //    // Sắp xếp và phân trang
-        //    var pagedList = query.OrderByDescending(x => x.Id)
-        //                        .ToPagedList(page, pageSize);
-
-        //    return View(pagedList);
-        //}
-
+            return Json(quanHuyenList);
+        }
 
         public async Task<IActionResult> Index(string ten, int? tinhThanhId, int? quanHuyenId, string khuVuc, string dacDiem, int page = 1)
         {
@@ -325,6 +207,8 @@ namespace WebTimNguoiThatLac.Controllers
             var query = db.TimNguois
                 .Include(u => u.ApplicationUser)
                 .Include(u => u.AnhTimNguois)
+                .Include(u => u.TinhThanh)
+                .Include(u => u.QuanHuyen)
                 .Where(i => i.active == true);
 
             int d = 0;
@@ -334,13 +218,6 @@ namespace WebTimNguoiThatLac.Controllers
                 query = query.Where(x => x.HoTen.Contains(ten) || x.TieuDe.Contains(ten));
                 d++;
             }
-
-            // //Áp dụng bộ lọc khu vực
-            //if (!string.IsNullOrEmpty(khuVuc))
-            //{
-            //    query = query.Where(x => x.KhuVuc.Contains(khuVuc));
-            //    d++;
-            //}
 
             if (tinhThanhId.HasValue)
             {
@@ -483,7 +360,17 @@ namespace WebTimNguoiThatLac.Controllers
             //ViewBag.KhuVucFilter = khuVuc;
 
             ViewBag.TinhThanhList = await db.TinhThanhs.ToListAsync();
-            ViewBag.QuanHuyenList = await db.QuanHuyens.ToListAsync();
+            if (tinhThanhId.HasValue)
+            {
+                ViewBag.QuanHuyenList = await db.QuanHuyens
+                    .Where(q => q.IdTinhThanh == tinhThanhId.Value)
+                    .OrderBy(q => q.TenQuanHuyen)
+                    .ToListAsync();
+            }
+            else
+            {
+                ViewBag.QuanHuyenList = new List<QuanHuyen>();
+            }
 
             ViewBag.SelectedTinhThanh = tinhThanhId;
             ViewBag.SelectedQuanHuyen = quanHuyenId;
@@ -669,7 +556,7 @@ namespace WebTimNguoiThatLac.Controllers
         {
             if (string.IsNullOrEmpty(ImageURL))
             {
-                throw new ArgumentException("Đường dẫn ảnh không hợp lệ!");
+                return;
             }
 
             // Lấy đường dẫn tuyệt đối của ảnh trong thư mục wwwroot/uploads/
@@ -709,6 +596,8 @@ namespace WebTimNguoiThatLac.Controllers
                 TimNguoi y = db.TimNguois
                     .Include(u => u.AnhTimNguois)
                     .Include(u => u.TimThayNguoiThatLacs)
+                    .Include(u => u.QuanHuyen)
+                    .Include(u => u.TinhThanh)
                     .FirstOrDefault(i => i.Id == id);
                 ApplicationUser us = await _userManager.FindByIdAsync(y.IdNguoiDung);
                 ViewBag.NguoiTim = us;
@@ -726,6 +615,9 @@ namespace WebTimNguoiThatLac.Controllers
                                                         .Where(i => i.IdBaiViet ==  id && i.Active == true && i.NguoiDangBaiXoa==false)
                                                         .OrderByDescending(z => z.NgayBinhLuan)
                                                         .ToList();
+                List<NhanChung> DSHANC = db.NhanChungs
+                                                        .Where(i => i.TimNguoiId == id )
+                                                        .ToList();
                 if (idBinhLuan != 0)
                 {
                     BinhLuan xBinhLuan = db.BinhLuans.FirstOrDefault(i => i.Id == idBinhLuan);
@@ -737,6 +629,7 @@ namespace WebTimNguoiThatLac.Controllers
                 }
                 ViewBag.DaTimThay = y.TimThayNguoiThatLacs != null;
                 ViewBag.DSBinhLuan = DSBinhLuan;
+                ViewBag.DSHANhanChung = DSHANC;
                 return View(y);
             }
             return RedirectToAction("ThongTinCaNhan", "NguoiDung");
@@ -809,8 +702,16 @@ namespace WebTimNguoiThatLac.Controllers
 
         public async Task<IActionResult> CapNhatBaiViet(int id)
         {
+
             if(User.Identity.IsAuthenticated)
             {
+                //ViewBag.DanhSachTinhThanh = TinhThanhIEnumerable;
+                IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
+                IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
+
+                ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
+                ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
+
                 var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 var nguoiDung = await _userManager.GetUserAsync(User);
                 if (nguoiDung == null || nguoiDung.Active == false)
@@ -829,7 +730,6 @@ namespace WebTimNguoiThatLac.Controllers
 
                 if (x.IdNguoiDung == userid || check == true)
                 {
-                    ViewBag.DanhSachTinhThanh = TinhThanhIEnumerable;
                     ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == id).ToList();
                     return View(x);
                 }
@@ -839,13 +739,13 @@ namespace WebTimNguoiThatLac.Controllers
                     return Redirect("/Identity/Account/login");
                 }
             }
-            ViewBag.DanhSachTinhThanh = TinhThanhIEnumerable;
-            ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == id).ToList();
-            return View();
+
+            TempData["WarningMessage"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
+            return Redirect("/Identity/Account/login");
+
         }
 
         [HttpPost]
-        
         public async Task<IActionResult> CapNhatBaiViet(TimNguoi x, List<IFormFile>? DSHinhAnhCapNhat)
         {
             if (!User.Identity.IsAuthenticated)
@@ -859,6 +759,8 @@ namespace WebTimNguoiThatLac.Controllers
                                 .Include(u => u.ApplicationUser)
                                 .Include(u => u.AnhTimNguois)
                                 .Include(u => u.BinhLuans)
+                                .Include(u => u.TinhThanh)
+                                .Include(u => u.QuanHuyen)
                                 .FirstOrDefault(i => i.Id == x.Id);
 
             var roles = await _userManager.GetRolesAsync(nguoiDung);
@@ -872,7 +774,13 @@ namespace WebTimNguoiThatLac.Controllers
             }
 
             // Luôn thiết lập ViewBag trước khi trả về View
-            ViewBag.DanhSachTinhThanh = TinhThanhIEnumerable;
+            //ViewBag.DanhSachTinhThanh = TinhThanhIEnumerable;
+            IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
+            IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
+
+
+            ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
+            ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
             ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == x.Id).ToList();
 
             if (!ModelState.IsValid)
@@ -891,6 +799,8 @@ namespace WebTimNguoiThatLac.Controllers
             y.NgayMatTich = x.NgayMatTich;
             y.HoTen = x.HoTen;
             y.MoiQuanHe = x.MoiQuanHe;
+            y.IdQuanHuyen = x.IdQuanHuyen;
+            y.IdTinhThanh = x.IdTinhThanh;
 
             await db.SaveChangesAsync();
 
@@ -1710,6 +1620,72 @@ namespace WebTimNguoiThatLac.Controllers
             {
 
                 return Json(new { success = false, message = "Đã xảy ra lỗi khi xóa bài viết" });
+            }
+        }
+
+        public async Task<IActionResult> TimKiemBangHinhAnh()
+        {
+            return View();
+        }
+        [HttpPost]
+        [RequestSizeLimit(5 * 1024 * 1024)] // Giới hạn 5MB
+        public async Task<IActionResult> TimKiemBangHinhAnh(IFormFile file)
+        {
+            try
+            {
+                // 1. Validate file
+                if (file == null || file.Length == 0)
+                {
+                    Console.WriteLine("❌ File null!");
+                    return BadRequest("File null rồi bạn ơi!");
+                }
+
+                if (file.Length > 5 * 1024 * 1024) // 5MB
+                    return BadRequest("Kích thước ảnh không được vượt quá 5MB");
+
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+                var fileExtension = Path.GetExtension(file.FileName).ToLower();
+                if (!allowedExtensions.Contains(fileExtension))
+                    return BadRequest("Chỉ chấp nhận file ảnh (jpg, jpeg, png)");
+
+                // 2. Lưu ảnh tạm
+                var tempImagePath = await SaveImage(file, "TempImages");
+                if (string.IsNullOrEmpty(tempImagePath))
+                    return StatusCode(500, "Lỗi khi lưu ảnh tạm");
+
+                var tempImageUrl = $"{Request.Scheme}://{Request.Host}{tempImagePath}";
+
+                // 3. Lấy dữ liệu bài viết (tối ưu chỉ lấy trường cần thiết)
+                var allPosts = await db.TimNguois
+                    .AsNoTracking() // Tăng performance
+                    .Where(t => t.active)
+                    .Include(t => t.AnhTimNguois)
+                    .Select(t => new {
+                        t.Id,
+                        t.HoTen,
+                        t.TieuDe,
+                        t.MoTa,
+                        DacDiem = t.DaciemNhanDang,
+                        t.NgayDang,
+                        Images = t.AnhTimNguois.Select(a => new {
+                            Url = a.HinhAnh,
+                            IsMain = a.TrangThai == 1
+                        }).ToList()
+                    })
+                    .ToListAsync();
+
+                // 4. Trả về kết quả
+                return Json(new
+                {
+                    success = true,
+                    tempImageUrl,
+                    posts = allPosts
+                });
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi ở đây (sử dụng ILogger)
+                return StatusCode(500, $"Đã xảy ra lỗi: {ex.Message}");
             }
         }
     }

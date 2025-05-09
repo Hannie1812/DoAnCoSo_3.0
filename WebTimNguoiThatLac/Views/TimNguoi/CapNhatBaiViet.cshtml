@@ -73,13 +73,7 @@
                             <div class="col-md-6">
                                 <h4 class="mb-3 text-primary"><i class="fas fa-info-circle mr-2"></i>Thông tin bổ sung</h4>
 
-                                @* <div class="form-group"> *@
-                                @*     <label asp-for="DaciemNhanDang" class="font-weight-bold">Đặc điểm nhận dạng</label> *@
-                                @*     <textarea asp-for="DaciemNhanDang" class="form-control" rows="3" placeholder="Mô tả đặc điểm nhận dạng" required></textarea> *@
-                                @*     <span asp-validation-for="DaciemNhanDang" class="text-danger small"></span> *@
-                                @* </div> *@
-
-                                @* dặc đeir nhận dạng *@
+                                @* đặc đeir nhận dạng *@
                                 <div class="form-group">
                                     <label asp-for="DaciemNhanDang" class="font-weight-bold">Đặc điểm nhận dạng</label>
 
@@ -138,14 +132,22 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label asp-for="KhuVuc" class="font-weight-bold">Khu vực</label>
-                                    <select asp-for="KhuVuc" class="form-control" required>
-                                        @foreach (string i in ViewBag.DanhSachTinhThanh)
-                                        {
-                                            <option value="@i" selected="@(i == Model.KhuVuc)">@i</option>
-                                        }
+                                    <label class="font-weight-bold">Tỉnh Thành</label>
+                                    <select id="TinhThanh" asp-for="IdTinhThanh" asp-items="@ViewBag.DanhSachTinhThanh" class="form-control" onchange="loadQuanHuyen(this.value)">
+                                        <option value="">-- Chọn tỉnh/thành phố --</option>
                                     </select>
-                                    <span asp-validation-for="KhuVuc" class="text-danger small"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="font-weight-bold">Quận Huyện</label>
+                                    <select id="QuanHuyen" asp-for="IdQuanHuyen" asp-items="@ViewBag.DanhSachQuanHuyen" class="form-control">
+                                        <option value="">-- Chọn quận/huyện --</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="KhuVuc" class="font-weight-bold">Khu Vực </label>
+                                    <input asp-for="KhuVuc" class="form-control" placeholder="Nhập tên đường, quận huyện" />
                                 </div>
                             </div>
                         </div>
@@ -284,12 +286,10 @@
             border-bottom-left-radius: 0;
         }
     </style>
+    @* end so sánh với dữ liệu  *@
 }
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
 
     <!-- Summernote -->
     <script src="~/clients/plugins/summernote/summernote-bs4.min.js"></script>
@@ -297,6 +297,45 @@
     <!-- Bootstrap File Input -->
     <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js"></script>
 
+
+    @* khu vực *@
+    <script>
+        function loadQuanHuyen(tinhThanhId) {
+            const quanHuyenDropdown = $("#QuanHuyen");
+            quanHuyenDropdown.empty().append('<option value="">Tất cả quận</option>');
+
+            if (!tinhThanhId) return;
+
+            $.getJSON(`/TimNguoi/GetQuanHuyenByTinhThanh?tinhThanhId=${tinhThanhId}`, function(data) {
+                $.each(data, function(index, item) {
+                    quanHuyenDropdown.append($('<option></option>').val(item.id).text(item.tenQuanHuyen));
+                });
+
+                // Giữ lại giá trị đã chọn nếu có
+        @if (ViewBag.SelectedQuanHuyen != null)
+        {
+            @:quanHuyenDropdown.val('@ViewBag.SelectedQuanHuyen');
+        }
+            }).fail(function() {
+                console.error("Lỗi khi tải danh sách quận huyện");
+            });
+        }
+
+        // Khởi tạo khi trang được tải
+        $(document).ready(function() {
+            const tinhThanhId = $("#TinhThanh").val();
+            if (tinhThanhId) {
+                loadQuanHuyen(tinhThanhId);
+            }
+        });
+    </script>
+    @* end khu vực *@
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+   
     @* so sánh với cơ sửo dl *@
     <script>
         $(document).ready(function() {
@@ -352,6 +391,8 @@
         });
     </script>
     @* end so sánh với cơ sửo dl *@
+
+
     <script>
         $(function () {
             // Khởi tạo Summernote

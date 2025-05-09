@@ -514,83 +514,83 @@
     }
     /* Custom colors */
     .btn-orange {
-        background-color: #FF4500;
-        color: white;
-        border: none;
+    background-color: #FF4500;
+    color: white;
+    border: none;
     }
 
-        .btn-orange:hover {
-            background-color: #e03d00;
-            color: white;
-        }
+    .btn-orange:hover {
+    background-color: #e03d00;
+    color: white;
+    }
 
     .btn-warning {
-        background-color: #ffc107;
-        color: #212529;
-        border: none;
+    background-color: #ffc107;
+    color: #212529;
+    border: none;
     }
 
-        .btn-warning:hover {
-            background-color: #e0a800;
-            color: #212529;
-        }
+    .btn-warning:hover {
+    background-color: #e0a800;
+    color: #212529;
+    }
 
     /* Modal enhancements */
     .modal-content {
-        border-radius: 12px;
-        overflow: hidden;
+    border-radius: 12px;
+    overflow: hidden;
     }
 
     .modal-header {
-        border-bottom: none;
-        padding: 1.25rem 1.5rem;
+    border-bottom: none;
+    padding: 1.25rem 1.5rem;
     }
 
     .modal-body {
-        padding: 1.5rem;
+    padding: 1.5rem;
     }
 
     .modal-footer {
-        padding: 1rem 1.5rem;
-        background-color: #f8f9fa;
+    padding: 1rem 1.5rem;
+    background-color: #f8f9fa;
     }
 
     /* Tooltip styles */
     .tooltip-inner {
-        background-color: var(--primary-color);
-        border-radius: 6px;
-        padding: 5px 10px;
-        font-size: 0.8rem;
+    background-color: var(--primary-color);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 0.8rem;
     }
 
     .bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before,
     .bs-tooltip-top .tooltip-arrow::before {
-        border-top-color: var(--primary-color);
+    border-top-color: var(--primary-color);
     }
 
     /* Button hover effects */
     .btn {
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-        }
+    .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
 
     /* Responsive adjustments for buttons */
     @@media (max-width: 768px) {
-        .action-buttons
+    .action-buttons
 
     {
-        flex-direction: column;
-        gap: 0.5rem;
+    flex-direction: column;
+    gap: 0.5rem;
     }
 
     .btn {
-        width: 100%;
-        justify-content: center;
+    width: 100%;
+    justify-content: center;
     }
 
     }
@@ -709,6 +709,24 @@
                                         </div>
                                     }
                                 }
+                                @if(ViewBag.DSHANhanChung.Any())
+                                {
+                                    @foreach (WebTimNguoiThatLac.Models.NhanChung img in ViewBag.DSHANhanChung)
+                                    {
+                                        if (img.FileDinhKem != null)
+                                        {
+                                            <div class="gallery-item">
+                                                <div class="position-relative">
+                                                    <img src="@img.FileDinhKem"
+                                                    class="gallery-thumbnail"
+                                                    onclick="changeMainImage('@img.FileDinhKem')"
+                                                    alt="Ảnh liên quan"
+                                                    loading="lazy">
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                }
                             </div>
                         </div>
                     }
@@ -746,7 +764,24 @@
                             </div>
                             <div class="info-content">
                                 <div class="info-label">Khu vực</div>
-                                <div class="info-value">@Model.KhuVuc</div>
+                                @{
+                                    string khuvuc = "";
+                                    if (Model.IdTinhThanh != null)
+                                    {
+                                        khuvuc = khuvuc + Model.TinhThanh.TenTinhThanh + ", ";
+                                    }
+                                    if (Model.IdQuanHuyen != null)
+                                    {
+                                        khuvuc = khuvuc + Model.QuanHuyen.TenQuanHuyen + ", ";
+                                    }
+                                    if (Model.KhuVuc != null)
+                                    {
+                                        khuvuc = khuvuc + Model.KhuVuc;
+                                    }
+                                }
+
+                                <div class="info-value">@khuvuc</div>
+                                
                             </div>
                         </div>
 

@@ -19,56 +19,13 @@ namespace WebTimNguoiThatLac.Controllers
             this.db = db;
         }
 
-        public IActionResult Index(string? TimKiem, string? KhuVuc)
+        public IActionResult Index()
         {
-            ViewBag.TimKiem = TimKiem;
-            if (TimKiem.IsNullOrEmpty())
-            {
-                IEnumerable<TimNguoi> ds = db.TimNguois
-                                                .Include(u => u.ApplicationUser)
-                                                .Include(u2 => u2.AnhTimNguois)
-                                                .Where(i => i.active == true)
-                                                .ToList().OrderByDescending(x => x.Id);
-                return View(ds);
-            }
-            else
-            {
-                IEnumerable<TimNguoi> ds = db.TimNguois
-                                        .Include(u => u.ApplicationUser)
-                                        .Include(u2 => u2.AnhTimNguois)
-                                        .Where(i => i.active == true)
-                                        .ToList().OrderByDescending(x => x.Id);
-                List<TimNguoi> DSTimkiem = new List<TimNguoi>();
-                foreach (TimNguoi i in ds)
-                {
-                    TimKiem = WebTimNguoiThatLac.BoTro.Filter.ChuyenCoDauThanhKhongDau(TimKiem);
-                    string r1 = WebTimNguoiThatLac.BoTro.Filter.ChuyenCoDauThanhKhongDau(i.HoTen);
-                    if (r1.ToUpper().Contains(TimKiem.ToUpper()))
-                    {
-                        DSTimkiem.Add(i);
-                        continue;
-                    }
-                    string r2 = WebTimNguoiThatLac.BoTro.Filter.ChuyenCoDauThanhKhongDau(i.MoTa);
-                    if (r2.ToUpper().Contains(TimKiem.ToUpper()))
-                    {
-                        DSTimkiem.Add(i);
-                        continue;
-                    }
-                    string r3 = WebTimNguoiThatLac.BoTro.Filter.ChuyenCoDauThanhKhongDau(i.KhuVuc);
-                    if (r3.ToUpper().Contains(TimKiem.ToUpper()))
-                    {
-                        DSTimkiem.Add(i);
-                        continue;
-                    }
-                    string r4 = WebTimNguoiThatLac.BoTro.Filter.ChuyenCoDauThanhKhongDau(i.DaciemNhanDang);
-                    if (r4.ToUpper().Contains(TimKiem.ToUpper()))
-                    {
-                        DSTimkiem.Add(i);
-                        continue;
-                    }
-                }
-                return View(DSTimkiem);
-            }
+           
+                int sl = db.TimNguois.ToList().Count;
+                ViewBag.TongBaiVietTrong = sl;
+                return View();
+            
 
         }
 

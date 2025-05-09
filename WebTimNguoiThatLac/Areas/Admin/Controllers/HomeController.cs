@@ -27,7 +27,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             _us = us;
         }
 
-        public async Task<IActionResult> Index(int? year, int? month, int? day, string khuVuc, string trangThai, int? tuan)
+        public async Task<IActionResult> Index(int? year, int? month, int? day, int? tinhThanhId, string trangThai, int? tuan)
         {
 
             ApplicationUser user = _us.GetUserAsync(User).Result;
@@ -62,17 +62,25 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             ViewBag.DemLienHeNguoiDung = await _context.NguoiDungLienHes
                 .Where(b => b.isRead == false).CountAsync();
 
+
+
+
+
             // Lấy dữ liệu từ database
-            var query = _context.TimNguois.AsQueryable();
+            // Lấy dữ liệu từ database với include TinhThanh
+            var query = _context.TimNguois
+                .Include(x => x.TinhThanh)
+                .Include(x => x.QuanHuyen)
+                .AsQueryable();
 
             // Áp dụng các bộ lọc
             if (year.HasValue) query = query.Where(x => x.NgayDang.Year == year.Value);
             if (month.HasValue) query = query.Where(x => x.NgayDang.Month == month.Value);
             if (day.HasValue) query = query.Where(x => x.NgayDang.Day == day.Value);
-            if (!string.IsNullOrEmpty(khuVuc)) query = query.Where(x => x.KhuVuc == khuVuc);
+            if (tinhThanhId.HasValue) query = query.Where(x => x.IdTinhThanh == tinhThanhId);
             if (!string.IsNullOrEmpty(trangThai)) query = query.Where(x => x.TrangThai == trangThai);
 
-            var baiViets = query.ToList();
+            var baiViets = await query.ToListAsync();
 
             // Xử lý dữ liệu thống kê
             var now = DateTime.Now;
@@ -89,12 +97,18 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 .Select(ngay => baiViets.Count(x => x.NgayDang.Date == ngay))
                 .ToList();
 
-            // Tạo dữ liệu thống kê với kiểu rõ ràng
-            var khuVucStats = baiViets
-                .GroupBy(x => x.KhuVuc)
-                .Select(g => new { KhuVuc = g.Key ?? "Không xác định", Count = g.Count() })
-                .OrderBy(x => x.KhuVuc)
-                .ToList();
+            // Thống kê theo Tỉnh Thành (thay cho Khu Vực)
+            var tinhThanhStats = await _context.TinhThanhs
+                    .Select(t => new
+                    {
+                        Id = t.Id,
+                        TenTinhThanh = t.TenTinhThanh,
+                        Count = _context.TimNguois.Count(b => b.IdTinhThanh == t.Id)
+                    })
+                    .Where(t => t.Count > 0)
+                    .OrderByDescending(t => t.Count)
+                    .ThenBy(t => t.TenTinhThanh)
+                    .ToListAsync();
 
             var trangThaiStats = baiViets
                 .GroupBy(x => x.TrangThai)
@@ -106,29 +120,30 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             {
                 Labels = new List<string> { "Nam", "Nữ", "Khác" },
                 Counts = new List<int>
-                {
-                    baiViets.Count(x => x.GioiTinh == 1),
-                    baiViets.Count(x => x.GioiTinh == 2),
-                    baiViets.Count(x => x.GioiTinh != 1 && x.GioiTinh != 2)
-                }
+            {
+                baiViets.Count(x => x.GioiTinh == 1),
+                baiViets.Count(x => x.GioiTinh == 2),
+                baiViets.Count(x => x.GioiTinh != 1 && x.GioiTinh != 2)
+            }
             };
 
             // Lấy danh sách các giá trị distinct cho dropdown
-            var allKhuVuc = _context.TimNguois.Select(x => x.KhuVuc).Distinct().ToList();
-            var allTrangThai = _context.TimNguois.Select(x => x.TrangThai).Distinct().ToList();
+
+            var allTrangThai = await _context.TimNguois
+                .Select(x => x.TrangThai)
+                .Distinct()
+                .ToListAsync();
 
             // Truyền dữ liệu sang view
-            ViewBag.AllKhuVuc = allKhuVuc;
             ViewBag.AllTrangThai = allTrangThai;
             ViewBag.Year = year;
             ViewBag.Month = month;
             ViewBag.Day = day;
-            ViewBag.KhuVuc = khuVuc;
+            ViewBag.TinhThanhId = tinhThanhId;
             ViewBag.TrangThai = trangThai;
             ViewBag.Tuan = tuan;
             ViewBag.NgayLabels = ngayLabels;
             ViewBag.BaiVietTheoNgay = baiVietTheoNgay;
-            ViewBag.KhuVucStats = khuVucStats;
             ViewBag.TrangThaiStats = trangThaiStats;
             ViewBag.GioiTinhStats = gioiTinhStats;
 
@@ -137,8 +152,8 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             {
                 return Json(new
                 {
-                    khuVucs = khuVucStats.Select(x => x.KhuVuc).ToList(),
-                    soLuongsKhuVuc = khuVucStats.Select(x => x.Count).ToList(),
+                    tinhThanhs = tinhThanhStats.Select(x => x.TenTinhThanh).ToList(),
+                    soLuongsTinhThanh = tinhThanhStats.Select(x => x.Count).ToList(),
                     trangThais = trangThaiStats.Select(x => x.TrangThai).ToList(),
                     soLuongsTrangThai = trangThaiStats.Select(x => x.Count).ToList(),
                     soLuongsGioiTinh = gioiTinhStats.Counts,
@@ -147,6 +162,15 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     label = GetTimeLabel(year, month, day, tuan)
                 });
             }
+
+
+            ViewBag.TinhThanhStats = tinhThanhStats;
+            //ViewBag.AllTinhThanh = await _context.TinhThanhs.OrderBy(x => x.TenTinhThanh).ToListAsync();
+            ViewBag.AllTinhThanh = await _context.TinhThanhs
+                                 .Include(u => u.TimNguois)
+                                 .Where(t => _context.TimNguois.Any(b => b.IdTinhThanh == t.Id))
+                                 .OrderBy(t => t.TenTinhThanh)
+                                 .ToListAsync();
 
             return View(baiViets);
         }

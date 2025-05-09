@@ -54,6 +54,7 @@ namespace WebTimNguoiThatLac.Models
         [ForeignKey("IdQuanHuyen")]
         public QuanHuyen? QuanHuyen { get; set; }
 
+       public FaceDescriptor? FaceDescriptor { get; set; }
 
     }
 }

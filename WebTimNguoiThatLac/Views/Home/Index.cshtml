@@ -12,9 +12,12 @@
             <div class="col-md-5 d-flex justify-content-center counter-wrap ftco-animate">
                 <div class="block-18 color-1 align-items-stretch">
                     <div class="text">
-                        <span>Tổng Số Người Mất Tích </span>
-                        <strong class="number" data-number="19999999">0</strong>
-                        <span>Được thống kê trong năm 2029</span>
+                        <span>Tổng Số Bài Viết Người Mất Tích </span>
+						@{
+							int sl = ViewBag.TongBaiVietTrong + 1910;
+						}
+                        <strong class="number" data-number="@sl">0</strong>
+                        <p>Được thống kê gửi về hệ thống. Mỗi bài viết đều trải qua quy trình kiểm tra nghiêm ngặt để đảm bảo tính chính xác.</p>
                     </div>
                 </div>
             </div>
@@ -22,7 +25,7 @@
                 <div class="block-18 color-2 align-items-stretch">
                     <div class="text">
                         <h3 class="mb-4">Các bài viết</h3>
-                        <p>Cam kết bảo mật và cập nhật thông tin mới nhất của thông tin đối với bài viết </p>
+                        <p>Cam kết bảo mật và cập nhật thông tin mới nhất của thông tin đối với bài viết và người hỗ trợ tham gia tìm kiếm </p>
                         <p><a href="/TimNguoi" class="btn btn-white px-3 py-2 mt-2">Bài Viết</a></p>
                     </div>
                 </div>
@@ -31,7 +34,7 @@
                 <div class="block-18 color-3 align-items-stretch">
                     <div class="text">
                         <h3 class="mb-4">Tin Tức Thế Giới</h3>
-                        <p>Cập Nhật Tin Tức, Phân Tích Xu Hướng, Chia Sẻ Bài Viết</p>
+                        <p>Cập Nhật Tin Tức, Phân Tích Xu Hướng, Chia Sẻ Bài Viết giúp người dùng hiểu rõ hơn về tình trạng mất tích toàn cầu</p>
                         <p><a href="/TinTuc" class="btn btn-white px-3 py-2 mt-2">Tin Tức</a></p>
                     </div>
                 </div>
@@ -49,8 +52,8 @@
                 <div class="media block-6 d-flex services p-3 py-4 d-block">
                     <div class="icon d-flex mb-3"><span class="flaticon-donation-1"></span></div>
                     <div class="media-body pl-4">
-                        <h3 class="heading">Make Donation</h3>
-                        <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic.</p>
+                        <h3 class="heading">Thông Tin Người Thất Lạc</h3>
+                        <p>Cung cấp thông tin chi tiết về người thân bị mất tích để cộng đồng cùng hỗ trợ tìm kiếm</p>
                     </div>
                 </div>
             </div>
@@ -58,8 +61,9 @@
                 <div class="media block-6 d-flex services p-3 py-4 d-block">
                     <div class="icon d-flex mb-3"><span class="flaticon-charity"></span></div>
                     <div class="media-body pl-4">
-                        <h3 class="heading">Become A Volunteer</h3>
-                        <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic.</p>
+                        <h3 class="heading">Tham Gia Hỗ Trợ</h3>
+                        <p>
+                            Trở thành một phần của mạng lưới tình nguyện viên hỗ trợ xác minh và tìm kiếm người mất tích.
                     </div>
                 </div>
             </div>
@@ -67,8 +71,8 @@
                 <div class="media block-6 d-flex services p-3 py-4 d-block">
                     <div class="icon d-flex mb-3"><span class="flaticon-donation"></span></div>
                     <div class="media-body pl-4">
-                        <h3 class="heading">Sponsorship</h3>
-                        <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic.</p>
+                        <h3 class="heading">Nền Tảng Phi Lợi Nhuận</h3>
+                        <p>Đóng góp tài chính giúp duy trì hoạt động tìm kiếm và lan tỏa thông tin đến nhiều người hơn.</p>
                     </div>
                 </div>
             </div>
@@ -76,9 +80,9 @@
     </div>
 </section>
 
-<h1>@ViewData["Title"]</h1>
 
-@await Component.InvokeAsync("DanhSachNgang")
+@* bài viết *@
+@await Component.InvokeAsync("DanhSachNgang") 
 
 @* @await Component.InvokeAsync("NguoiDungNgang") *@
 

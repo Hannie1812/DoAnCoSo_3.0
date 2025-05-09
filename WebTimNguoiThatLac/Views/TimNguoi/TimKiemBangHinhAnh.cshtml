@@ -1,0 +1,390 @@
+﻿@{
+    ViewData["Title"] = "Tìm kiếm bằng hình ảnh";
+}
+
+<style>
+    #loadingIndicator {
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    .result-item {
+        background-color: #f8f9fa;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 5px;
+    }
+
+    .similarity-badge {
+        font-size: 0.9em;
+        padding: 3px 8px;
+        border-radius: 10px;
+        background-color: #28a745;
+        color: white;
+    }
+
+    .card {
+        transition: transform 0.3s;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+    .badge {
+        font-size: 0.8em;
+        padding: 5px 10px;
+    }
+
+    .progress {
+        height: 30px;
+        border-radius: 15px;
+    }
+
+    .progress-bar {
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: width 0.3s ease;
+    }
+
+    .best-match {
+        border: 2px solid rgba(13, 110, 253, 0.3);
+        box-shadow: 0 0 15px rgba(13, 110, 253, 0.1);
+    }
+
+        .best-match .card-header {
+            font-weight: bold;
+        }
+
+    .no-image {
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #6c757d;
+        border: 1px dashed #dee2e6;
+        border-radius: 4px;
+    }
+
+        .no-image.small {
+            width: 80px;
+            height: 80px;
+            font-size: 12px;
+        }
+
+    #cancelButton {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    @@media (max-width: 768px) {
+        .best-match .row {
+            flex-direction: column;
+        }
+
+        .best-match .col-md-3 {
+            margin-bottom: 15px;
+        }
+    }
+
+    #loadingIndicator {
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    .result-item {
+        background-color: #f8f9fa;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 5px;
+    }
+</style>
+
+<div class="container">
+    <h2 class="my-4">Tìm kiếm bài viết bằng hình ảnh</h2>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="mb-3">
+                <label for="searchImage" class="form-label">Chọn hình ảnh cần tìm kiếm</label>
+                <input type="file" id="searchImage" class="form-control" accept="image/*">
+                <div class="form-text">Chọn ảnh có khuôn mặt rõ ràng (jpg, png, max 5MB)</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loadingIndicator" class="text-center py-4" style="display: none;">
+        <div class="progress mb-3">
+            <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated"
+                 role="progressbar" style="width: 0%">
+                <span id="progressText">0%</span>
+            </div>
+        </div>
+        <p id="progressMessage" class="text-muted">Đang khởi tạo...</p>
+    </div>
+
+    <div id="searchResults"></div>
+</div>
+
+@section Scripts {
+    <!-- Sử dụng CDN đáng tin cậy từ jsDelivr -->
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
+    <script>
+        // Biến toàn cục
+        let faceMatcher;
+        let abortController = null;
+        let isModelsLoaded = false;
+
+        // URL model đáng tin cậy
+        const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights';
+
+        // Khởi tạo face-api.js với xử lý lỗi chi tiết
+        async function initFaceRecognition() {
+            try {
+                showLoading(true, 0, 'Đang tải mô hình nhận diện...');
+
+                // Kiểm tra kết nối trước
+                if (!await checkModelAvailability()) {
+                    throw new Error('Không thể kết nối đến server model');
+                }
+
+                // Tải các model
+                await Promise.all([
+                    faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+                    faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+                    faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+                ]);
+
+                console.log('Các model nhận diện đã sẵn sàng');
+                isModelsLoaded = true;
+                showLoading(false);
+                return true;
+            } catch (error) {
+                console.error('Lỗi khi tải mô hình:', error);
+                showLoading(false);
+
+                // Hiển thị thông báo thân thiện
+                const errorMessage = error.message.includes('404')
+                    ? 'Không tìm thấy tài nguyên model. Vui lòng thử lại sau.'
+                    : error.message;
+
+                document.getElementById('searchResults').innerHTML = `
+                    <div class="alert alert-danger">
+                        <strong>Lỗi khởi tạo:</strong> ${errorMessage}
+                    </div>
+                `;
+                return false;
+            }
+        }
+
+        // Kiểm tra model có sẵn sàng không
+        async function checkModelAvailability() {
+            try {
+                const testUrl = `${MODEL_URL}/face_landmark_68_model-weights_manifest.json`;
+                const response = await fetch(testUrl, { method: 'HEAD' });
+                return response.ok;
+            } catch {
+                return false;
+            }
+        }
+
+        // Xử lý upload ảnh với xử lý lỗi chi tiết
+        async function handleImageUpload(event) {
+            if (!isModelsLoaded) {
+                alert('Vui lòng đợi hệ thống khởi tạo xong');
+                return;
+            }
+
+            const file = event.target.files[0];
+            if (!file) return;
+
+            abortController = new AbortController();
+
+            try {
+                showLoading(true, 10, 'Đang xử lý ảnh...');
+                document.getElementById('searchResults').innerHTML = '';
+
+                // Validate ảnh
+                if (!file.type.match('image.*')) {
+                    throw new Error('File không phải là ảnh');
+                }
+                if (file.size > 5 * 1024 * 1024) {
+                    throw new Error('Ảnh quá lớn (>5MB)');
+                }
+
+                // Tạo URL tạm
+                const imageUrl = URL.createObjectURL(file);
+                const image = await faceapi.fetchImage(imageUrl);
+
+                // Phát hiện khuôn mặt
+                showLoading(true, 30, 'Đang phát hiện khuôn mặt...');
+                const detections = await faceapi.detectAllFaces(image)
+                    .withFaceLandmarks()
+                    .withFaceDescriptors();
+
+                if (detections.length === 0) {
+                    throw new Error('Không tìm thấy khuôn mặt trong ảnh');
+                }
+
+                // Gửi ảnh lên server để lấy danh sách bài viết
+                showLoading(true, 50, 'Đang tải dữ liệu...');
+                const formData = new FormData();
+                formData.append("file", file);
+
+                const response = await fetch('/TimNguoi/TimKiemBangHinhAnh', {
+                    method: 'POST',
+                    body: formData,
+                    signal: abortController.signal
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Lỗi server: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (!Array.isArray(data.posts)) {
+                    throw new Error('Dữ liệu trả về không hợp lệ hoặc không có bài viết.');
+                }
+
+                const posts = data.posts;
+
+                // So khớp khuôn mặt với dữ liệu bài viết
+                showLoading(true, 70, 'Đang phân tích...');
+                const results = await matchFaces(detections, posts);
+
+                // Hiển thị kết quả
+                showLoading(true, 100, 'Hoàn thành!');
+                setTimeout(() => {
+                    displayResults(results);
+                    showLoading(false);
+                    URL.revokeObjectURL(imageUrl); // Giải phóng bộ nhớ
+                }, 500);
+
+            } catch (error) {
+                if (error.name === 'AbortError') return;
+
+                console.error('Lỗi xử lý ảnh:', error);
+                showLoading(false);
+
+                document.getElementById('searchResults').innerHTML = `
+                    <div class="alert alert-danger">
+                        <strong>Lỗi:</strong> ${error.message}
+                        <button class="btn btn-sm btn-outline-primary mt-2" onclick="location.reload()">
+                            Thử lại
+                        </button>
+                    </div>
+                `;
+            } finally {
+                abortController = null;
+            }
+        }
+
+
+        // Các hàm phụ trợ (showLoading, displayResults, matchFaces...) giữ nguyên
+
+        // Khởi tạo khi trang tải xong
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Khởi tạo FaceAPI
+            await initFaceRecognition();
+
+            // Thiết lập sự kiện upload
+            document.getElementById('searchImage')?.addEventListener('change', handleImageUpload);
+        });
+
+        // Hàm hiển thị loading
+        function showLoading(show, progress = 0, message = '') {
+            const loadingElement = document.getElementById('loadingIndicator');
+            if (loadingElement) {
+                loadingElement.style.display = show ? 'block' : 'none';
+                document.getElementById('progressBar').style.width = `${progress}%`;
+                document.getElementById('progressText').textContent = `${progress}%`;
+                document.getElementById('progressMessage').textContent = message;
+            }
+        }
+
+        async function matchFaces(detections, posts) {
+            const queryDescriptors = detections.map(det => det.descriptor);
+
+            const results = [];
+
+            // Giả định: mỗi bài viết từ server có { id, title, imageUrl, descriptor (mảng 128 số) }
+            for (const post of posts) {
+                if (!post.descriptor) continue;
+
+                const referenceDescriptor = new Float32Array(post.descriptor);
+                const bestMatch = queryDescriptors.map(desc => faceapi.euclideanDistance(desc, referenceDescriptor));
+                const similarity = 1 - Math.min(...bestMatch); // 1 là giống hệt
+
+                results.push({
+                    ...post,
+                    similarity: similarity
+                });
+            }
+
+            // Sắp xếp theo độ giống giảm dần
+            results.sort((a, b) => b.similarity - a.similarity);
+
+            return results;
+        }
+
+         function displayResults(results) {
+            const container = document.getElementById('searchResults');
+            if (!results || results.length === 0) {
+                container.innerHTML = `
+                    <div class="alert alert-warning">Không tìm thấy bài viết trùng khớp.</div>
+                `;
+                return;
+            }
+
+            const topMatch = results[0];
+            container.innerHTML = `
+                <div class="card best-match mb-4">
+                    <div class="card-header bg-primary text-white">
+                        Kết quả giống nhất (${(topMatch.similarity * 100).toFixed(2)}%)
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img src="${topMatch.imageUrl}" class="img-fluid rounded" alt="Top match">
+                            </div>
+                            <div class="col-md-9">
+                                <h5>${topMatch.title}</h5>
+                                <a href="/Post/Details/${topMatch.id}" class="btn btn-outline-primary btn-sm mt-2">Xem chi tiết</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            if (results.length > 1) {
+                container.innerHTML += '<h5 class="mt-4">Các kết quả khác:</h5>';
+                for (let i = 1; i < results.length; i++) {
+                    const r = results[i];
+                    container.innerHTML += `
+                        <div class="result-item card">
+                            <div class="card-body d-flex align-items-center">
+                                <img src="${r.imageUrl}" class="rounded me-3" style="width:80px; height:80px; object-fit:cover;" alt="Match">
+                                <div>
+                                    <h6>${r.title}</h6>
+                                    <span class="badge bg-success similarity-badge">${(r.similarity * 100).toFixed(2)}%</span>
+                                    <a href="/Post/Details/${r.id}" class="btn btn-sm btn-link">Chi tiết</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+
+    </script>
+}

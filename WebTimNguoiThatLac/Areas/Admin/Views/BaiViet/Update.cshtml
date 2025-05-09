@@ -87,9 +87,9 @@
 
 <div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
 
-<div class="container py-5">
+<div class=" py-1">
     <div class="row justify-content-center">
-        <div class="col-lg-10">
+        <div class="col-lg-12">
             <div class="card shadow-lg">
                 <div class="card-header bg-primary text-white">
                     <h2 class="card-title mb-0"><i class="fas fa-edit mr-2"></i>@ViewData["Title"]</h2>
@@ -146,6 +146,28 @@
                                     <input asp-for="MoiQuanHe" class="form-control" placeholder="Mối quan hệ của bạn với người mất tích" required />
                                     <span asp-validation-for="MoiQuanHe" class="text-danger small"></span>
                                 </div>
+
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label asp-for="TrangThai" class="font-weight-bold">Trạng thái</label>
+                                        <select asp-for="TrangThai" class="form-control" required>
+                                            <option value="Đã Tìm Thấy">Đã Tìm Thấy</option>
+                                            <option value="Đang Tìm Kiếm">Đang Tìm Kiếm</option>
+                                            <option value="Cần hỗ trợ từ cộng đồng">Cần hỗ trợ từ cộng đồng</option>
+                                        </select>
+                                        <span asp-validation-for="TrangThai" class="text-danger small"></span>
+                                    </div>
+
+                                    <div class="form-group col-md-6">
+                                        <label asp-for="GioiTinh" class="font-weight-bold">Giới tính</label>
+                                        <select asp-for="GioiTinh" class="form-control" required>
+                                            <option value="1">Nam</option>
+                                            <option value="2">Nữ</option>
+                                            <option value="3">Khác</option>
+                                        </select>
+                                        <span asp-validation-for="GioiTinh" class="text-danger small"></span>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Thông tin bổ sung -->
@@ -194,36 +216,35 @@
                                     <textarea asp-for="DaciemNhanDang" id="featuresData" class="form-control" style="display:none;"></textarea>
                                 </div>
 
-                                <div class="form-row">
-                                    <div class="form-group col-md-6">
-                                        <label asp-for="TrangThai" class="font-weight-bold">Trạng thái</label>
-                                        <select asp-for="TrangThai" class="form-control" required>
-                                            <option value="Đã Tìm Thấy">Đã Tìm Thấy</option>
-                                            <option value="Đang Tìm Kiếm">Đang Tìm Kiếm</option>
-                                            <option value="Cần hỗ trợ từ cộng đồng">Cần hỗ trợ từ cộng đồng</option>
-                                        </select>
-                                        <span asp-validation-for="TrangThai" class="text-danger small"></span>
-                                    </div>
+                                
 
-                                    <div class="form-group col-md-6">
-                                        <label asp-for="GioiTinh" class="font-weight-bold">Giới tính</label>
-                                        <select asp-for="GioiTinh" class="form-control" required>
-                                            <option value="1">Nam</option>
-                                            <option value="2">Nữ</option>
-                                        </select>
-                                        <span asp-validation-for="GioiTinh" class="text-danger small"></span>
-                                    </div>
+                                @* <div class="form-group"> *@
+                                @*     <label asp-for="KhuVuc" class="font-weight-bold">Khu vực</label> *@
+                                @*     <select asp-for="KhuVuc" class="form-control" required> *@
+                                @*         @foreach (string i in ViewBag.DanhSachTinhThanh) *@
+                                @*         { *@
+                                @*             <option value="@i" selected="@(i == Model.KhuVuc)">@i</option> *@
+                                @*         } *@
+                                @*     </select> *@
+                                @*     <span asp-validation-for="KhuVuc" class="text-danger small"></span> *@
+                                @* </div> *@
+                                <div class="form-group">
+                                    <label class="font-weight-bold">Tỉnh Thành</label>
+                                    <select id="TinhThanh" asp-for="IdTinhThanh" asp-items="@ViewBag.DanhSachTinhThanh" class="form-control" onchange="loadQuanHuyen(this.value)">
+                                        <option value="">-- Chọn tỉnh/thành phố --</option>
+                                    </select>
                                 </div>
 
                                 <div class="form-group">
-                                    <label asp-for="KhuVuc" class="font-weight-bold">Khu vực</label>
-                                    <select asp-for="KhuVuc" class="form-control" required>
-                                        @foreach (string i in ViewBag.DanhSachTinhThanh)
-                                        {
-                                            <option value="@i" selected="@(i == Model.KhuVuc)">@i</option>
-                                        }
+                                    <label class="font-weight-bold">Quận Huyện</label>
+                                    <select id="QuanHuyen" asp-for="IdQuanHuyen" asp-items="@ViewBag.DanhSachQuanHuyen" class="form-control">
+                                        <option value="">-- Chọn quận/huyện --</option>
                                     </select>
-                                    <span asp-validation-for="KhuVuc" class="text-danger small"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="KhuVuc" class="font-weight-bold">Khu Vực </label>
+                                    <input asp-for="KhuVuc" class="form-control" placeholder="Nhập tên đường, quận huyện" />
                                 </div>
                             </div>
                         </div>
@@ -310,6 +331,39 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    @* khu vực *@
+    <script>
+        function loadQuanHuyen(tinhThanhId) {
+            const quanHuyenDropdown = $("#QuanHuyen");
+            quanHuyenDropdown.empty().append('<option value="">Tất cả quận</option>');
+
+            if (!tinhThanhId) return;
+
+            $.getJSON(`/Admin/BaiViet/GetQuanHuyenByTinhThanh?tinhThanhId=${tinhThanhId}`, function(data) {
+                $.each(data, function(index, item) {
+                    quanHuyenDropdown.append($('<option></option>').val(item.id).text(item.tenQuanHuyen));
+                });
+
+                // Giữ lại giá trị đã chọn nếu có
+        @if (ViewBag.SelectedQuanHuyen != null)
+        {
+            @:quanHuyenDropdown.val('@ViewBag.SelectedQuanHuyen');
+        }
+            }).fail(function() {
+                console.error("Lỗi khi tải danh sách quận huyện");
+            });
+        }
+
+        // Khởi tạo khi trang được tải
+        $(document).ready(function() {
+            const tinhThanhId = $("#TinhThanh").val();
+            if (tinhThanhId) {
+                loadQuanHuyen(tinhThanhId);
+            }
+        });
+    </script>
+    @* end khu vực *@
 
     <!-- Summernote -->
     <script src="~/clients/plugins/summernote/summernote-bs4.min.js"></script>

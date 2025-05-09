@@ -163,16 +163,24 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
 
         public async Task<IActionResult> Create()
         {
-            IEnumerable<string> DanhSachTinhThanh = TinhThanhIEnumerable;
-            ViewBag.DanhSachTinhThanh = DanhSachTinhThanh;
+            IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
+            IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
+
+
+            ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
+            ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(TimNguoi x, List<IFormFile>? DanhSachHinhAnh, string EmailNguoiDung)
         {
-            IEnumerable<string> DanhSachTinhThanh = TinhThanhIEnumerable;
-            ViewBag.DanhSachTinhThanh = DanhSachTinhThanh;
+            IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
+            IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
+
+
+            ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
+            ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
 
             if (ModelState.IsValid)
             {
@@ -187,6 +195,8 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 x.IdNguoiDung = us.Id;
                 x.NgayDang = DateTime.Now;
                 x.active = false;
+                x.NguoiDangBaiXoa = false;
+                
 
                 db.Add(x);
                 await db.SaveChangesAsync();
@@ -275,7 +285,22 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             }
         }
 
-       
+
+        [HttpGet]
+        public async Task<IActionResult> GetQuanHuyenByTinhThanh(int tinhThanhId)
+        {
+            var quanHuyenList = await db.QuanHuyens
+                .Where(q => q.IdTinhThanh == tinhThanhId)
+                .OrderBy(q => q.TenQuanHuyen)
+                .Select(q => new {
+                    id = q.Id,
+                    tenQuanHuyen = q.TenQuanHuyen
+                })
+                .ToListAsync();
+
+
+            return Json(quanHuyenList);
+        }
         public async Task<IActionResult> Update(int id)
         {
             TimNguoi x = await db.TimNguois
@@ -287,8 +312,16 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 return RedirectToAction("Index");
             }
 
-            IEnumerable<string> DanhSachTinhThanh = TinhThanhIEnumerable;
-            ViewBag.DanhSachTinhThanh = DanhSachTinhThanh;
+            //IEnumerable<string> DanhSachTinhThanh = TinhThanhIEnumerable;
+            //ViewBag.DanhSachTinhThanh = DanhSachTinhThanh;
+
+            IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
+            IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
+
+            ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
+            ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
+
+
             ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == id).ToList();
 
             return View(x);
@@ -329,6 +362,8 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     y.NgayMatTich = x.NgayMatTich;
                     y.HoTen = x.HoTen;
                     y.MoiQuanHe = x.MoiQuanHe;
+                    y.IdTinhThanh = x.IdTinhThanh;
+                    y.IdQuanHuyen = x.IdQuanHuyen;
 
                     await db.SaveChangesAsync();
 
@@ -387,8 +422,15 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 }
 
 
-                IEnumerable<string> DanhSachTinhThanh = TinhThanhIEnumerable;
-                ViewBag.DanhSachTinhThanh = DanhSachTinhThanh;
+                //IEnumerable<string> DanhSachTinhThanh = TinhThanhIEnumerable;
+                //ViewBag.DanhSachTinhThanh = DanhSachTinhThanh;
+
+                IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
+                IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
+
+                ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
+                ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
+
                 ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == x.Id).ToList();
                 ViewData["ErrorMessage"] = " Nhập Đầy Đủ Thông Tin";
                 return View(x);

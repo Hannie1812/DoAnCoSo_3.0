@@ -57,84 +57,6 @@
     <ul class="navbar-nav ml-auto">
         <!-- new -->
         <!-- Messages Dropdown Menu -->
-        @* <li class="nav-item dropdown"> *@
-        @*     <a class="nav-link" data-toggle="dropdown" href="#"> *@
-        @*         <i class="far fa-comments"></i> *@
-        @*         @if (ViewBag.DSTinNhanMoi?.Count > 0) *@
-        @*         { *@
-        @*             <span class="badge badge-warning navbar-badge">@ViewBag.DSTinNhanMoi.Count</span> *@
-        @*         } *@
-        @*     </a> *@
-        @*     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right"> *@
-        @*         <span class="dropdown-header">Bạn có @(ViewBag.DSTinNhanMoi?.Count ?? 0) tin nhắn mới</span> *@
-
-        @*         @if (ViewBag.DSTinNhanMoi != null) *@
-        @*         { *@
-        @*             <div class="dropdown-divider"></div> *@
-
-        @*             @foreach (var hopThoai in ViewBag.DSTinNhanMoi as List<HopThoaiTinNhan> ?? new List<HopThoaiTinNhan>()) *@
-        @*             { *@
-        @*                 var user = await UserManager.GetUserAsync(User); *@
-        @*                 var lastMessage = hopThoai.TinNhans?.FirstOrDefault(); *@
-        @*                 var otherUser = hopThoai.NguoiThamGias? *@
-        @*                 .FirstOrDefault(tv => tv.MaNguoiThamGia != user.Id)? *@
-        @*                 .ApplicationUser; *@
-
-        @*                 <a asp-action="Index" asp-area="" asp-controller="Chat" asp-route-hopThoaiId="@hopThoai.Id" class="dropdown-item"> *@
-        @*                     <div class="media align-items-center"> *@
-        @*                         <!-- Avatar --> *@
-        @*                         @if (!string.IsNullOrEmpty(otherUser?.HinhAnh)) *@
-        @*                         { *@
-        @*                             <img src="@otherUser.HinhAnh" class="img-size-50 img-circle mr-3" alt="User Avatar"> *@
-        @*                         } *@
-        @*                         else *@
-        @*                         { *@
-        @*                             <div class="img-size-50 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mr-3"> *@
-        @*                                 @otherUser?.UserName?.Substring(0, 1).ToUpper() *@
-        @*                             </div> *@
-        @*                         } *@
-
-        @*                         <!-- Nội dung tin nhắn --> *@
-        @*                         <div class="media-body overflow-hidden"> *@
-        @*                             <div class="d-flex justify-content-between"> *@
-        @*                                 <h6 class="dropdown-item-title text-truncate mb-0" style="max-width: 150px;"> *@
-        @*                                     @otherUser?.UserName *@
-        @*                                 </h6> *@
-        @*                                 <small class="text-muted"> *@
-        @*                                     @if (lastMessage != null) *@
-        @*                                     { *@
-        @*                                         @FormatTime(lastMessage.NgayGui) *@
-        @*                                     } *@
-        @*                                 </small> *@
-        @*                             </div> *@
-
-        @*                             @if (lastMessage != null) *@
-        @*                             { *@
-        @*                                 <p class="text-sm text-truncate mb-0" style="max-width: 200px;"> *@
-        @*                                     @if (!string.IsNullOrEmpty(lastMessage.HinhAnh)) *@
-        @*                                     { *@
-        @*                                         <i class="fas fa-image mr-1"></i> *@
-        @*                                         <span>Hình ảnh</span> *@
-        @*                                     } *@
-        @*                                     else *@
-        @*                                     { *@
-        @*                                         @lastMessage.NoiDung *@
-        @*                                     } *@
-        @*                                 </p> *@
-        @*                             } *@
-        @*                         </div> *@
-        @*                     </div> *@
-        @*                 </a> *@
-        @*                 <div class="dropdown-divider"></div> *@
-        @*             } *@
-        @*         } *@
-
-        @*         <!-- Xem tất cả tin nhắn --> *@
-        @*         <a asp-action="Index" asp-area="" asp-controller="Chat" class="dropdown-item dropdown-footer text-center"> *@
-        @*             <i class="fas fa-envelope mr-1"></i> Xem tất cả tin nhắn *@
-        @*         </a> *@
-        @*     </div> *@
-        @* </li> *@
         <li class="nav-item dropdown">
             <a class="nav-link position-relative" data-toggle="dropdown" href="#" aria-expanded="false">
                 <i class="far fa-comments fs-5"></i>
@@ -239,38 +161,7 @@
             </div>
         </li>
         <!-- Notifications Dropdown Menu -->
-        @* <li class="nav-item dropdown"> *@
-        @*     <a class="nav-link" data-toggle="dropdown" href="#"> *@
-        @*         <i class="far fa-bell"></i> *@
-        @*     @{int TongThongBao = ViewBag.DemBaoCaoBinhLuan + ViewBag.DemBaoCaoBaiViet + ViewBag.DemLienHeNguoiDung;} *@
-        @*         <span class="badge badge-warning navbar-badge"> *@
-        @*             @TongThongBao *@
-        @*         </span> *@
-                
-        @*     </a> *@
-        @*     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right"> *@
-        @*         <span class="dropdown-item dropdown-header"> @TongThongBao Thông Báo Mới</span> *@
-        @*         <div class="dropdown-divider"></div> *@
-        @*         <a asp-area="Admin" asp-action="Index" asp-controller="NguoiDungLienHe"  *@
-        @*             class="dropdown-item"> *@
-        @*             <i class="fas fa-envelope mr-2"></i>  Người Dùng Liên Hệ *@
-        @*             <span class="float-right text-muted text-sm">@ViewBag.DemLienHeNguoiDung</span> *@
-        @*         </a> *@
-        @*         <div class="dropdown-divider"></div> *@
-        @*         <a asp-area="Admin" asp-action="Index" asp-controller="BaoCaoBaiViet"  *@
-        @*             class="dropdown-item"> *@
-        @*             <i class="fas fa-users mr-2"></i> Báo Cáo Bài Viết *@
-        @*             <span class="float-right text-muted text-sm">@ViewBag.DemBaoCaoBaiViet</span> *@
-        @*         </a> *@
-        @*         <div class="dropdown-divider"></div> *@
-        @*         <a asp-area="Admin" asp-action="Index" asp-controller="BaoCaoBinhLuan"  *@
-        @*             class="dropdown-item"> *@
-        @*             <i class="fas fa-file mr-2"></i> Báo Cáo Bình Luận *@
-        @*             <span class="float-right text-muted text-sm">@ViewBag.DemBaoCaoBinhLuan</span> *@
-        @*         </a> *@
-        @*         <div class="dropdown-divider"></div> *@
-        @*     </div> *@
-        @* </li> *@
+
         <li class="nav-item dropdown">
             <a class="nav-link position-relative" data-toggle="dropdown" href="#" aria-expanded="false">
                 <i class="far fa-bell"></i>
@@ -378,14 +269,14 @@
     ViewData["Title"] = "Thống Kê Bài Viết Tìm Người Thất Lạc";
 
     // Xử lý dữ liệu cho biểu đồ
-    var khuVucs = ViewBag.KhuVucStats as List<dynamic> ?? new List<dynamic>();
+    var tinhThanhStats = ViewBag.TinhThanhStats as List<dynamic> ?? new List<dynamic>(); // tỉnh thành
     var trangThais = ViewBag.TrangThaiStats as List<dynamic> ?? new List<dynamic>();
     var gioiTinhData = ViewBag.GioiTinhStats as dynamic;
 
     // Lấy dữ liệu từ ViewBag
     var ngayLabels = ViewBag.NgayLabels as List<string> ?? new List<string>();
     var baiVietTheoNgay = ViewBag.BaiVietTheoNgay as List<int> ?? new List<int>();
-    var allKhuVuc = ViewBag.AllKhuVuc as List<string> ?? new List<string>();
+    var allTinhThanh = ViewBag.AllTinhThanh as List<TinhThanh> ?? new List<TinhThanh>(); // tỉnh thành
     var allTrangThai = ViewBag.AllTrangThai as List<string> ?? new List<string>();
 
     string label = "Tất cả";
@@ -467,12 +358,12 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label><i class="fas fa-map-marker-alt"></i> Khu vực</label>
-                            <select name="khuVuc" class="form-control select2">
-                                <option value="">Tất cả khu vực</option>
-                                @foreach (var kv in allKhuVuc)
+                            <label><i class="fas fa-map-marker-alt"></i> Tỉnh thành</label>
+                            <select name="tinhThanhId" class="form-control select2">
+                                <option value="">Tất cả tỉnh thành</option>
+                                @foreach (var tt in allTinhThanh)
                                 {
-                                    <option value="@kv" selected="@(ViewBag.KhuVuc == kv)">@kv</option>
+                                    <option value="@tt.Id" selected="@(ViewBag.TinhThanhId == tt.Id)">@tt.TenTinhThanh</option>
                                 }
                             </select>
                         </div>
@@ -523,7 +414,7 @@
             <div class="card card-success card-outline">
                 <div class="card-header">
                     <h3 class="card-title">
-                        <i class="fas fa-map-marked-alt"></i> Biểu đồ theo khu vực (@label)
+                        <i class="fas fa-map-marked-alt"></i> Biểu đồ theo tỉnh thành (@label)
                     </h3>
                     <div class="card-tools">
                         <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -535,10 +426,10 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <canvas id="khuVucChart" style="min-height: 250px; height: 250px; max-height: 500px;"></canvas>
+                    <canvas id="tinhThanhChart" style="min-height: 250px; height: 250px; max-height: 500px;"></canvas>
                 </div>
                 <div class="card-footer">
-                    <p class="text-muted">Thống kê số lượng bài viết theo từng khu vực</p>
+                    <p class="text-muted">Thống kê số lượng bài viết theo từng tỉnh thành</p>
                 </div>
             </div>
         </div>
@@ -627,7 +518,7 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         // Biến lưu trữ các biểu đồ
-        let khuVucChart, trangThaiChart, gioiTinhChart, thoiGianChart;
+        let tinhThanhChart, trangThaiChart, gioiTinhChart, thoiGianChart;
 
         // Hàm tạo màu ngẫu nhiên
         function generateRandomColors(count, opacity = 1) {
@@ -646,7 +537,7 @@
                 width: '100%'
             });
 
-            // Khởi tạo biểu đồ
+            // Khởi tạo biểu đồ tỉnh thành
             initCharts();
 
             // Xử lý sự kiện lọc
@@ -668,43 +559,51 @@
         });
 
         function initCharts() {
-    // Biểu đồ khu vực
-    khuVucChart = new Chart($('#khuVucChart'), {
-        type: 'bar',
-        data: {
-            labels: @Html.Raw(Json.Serialize(khuVucs.Select(x => x.KhuVuc))) || [],
-            datasets: [{
-                label: 'Số bài viết',
-                data: @Html.Raw(Json.Serialize(khuVucs.Select(x => x.Count))) || [],
-                backgroundColor: generateRandomColors(@khuVucs.Count, 0.7),
-                borderColor: generateRandomColors(@khuVucs.Count, 1),
-                borderWidth: 1,
-                borderRadius: 5
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `${context.dataset.label}: ${context.raw}`;
+            // Biểu đồ tỉnh thành
+            tinhThanhChart = new Chart($('#tinhThanhChart'), {
+                type: 'bar',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(tinhThanhStats.Select(x => x.TenTinhThanh))) || [],
+                    datasets: [{
+                        label: 'Số bài viết',
+                        data: @Html.Raw(Json.Serialize(tinhThanhStats.Select(x => x.Count))) || [],
+                        backgroundColor: generateRandomColors(@tinhThanhStats.Count, 0.7),
+                        borderColor: generateRandomColors(@tinhThanhStats.Count, 1),
+                        borderWidth: 1,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { drawBorder: false },
+                            ticks: { precision: 0 }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                autoSkip: false,
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
                         }
                     }
                 }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: { drawBorder: false },
-                    ticks: { precision: 0 }
-                },
-                x: { grid: { display: false } }
-            }
-        }
-    });
+            });
+
 
             // Biểu đồ trạng thái
             trangThaiChart = new Chart($('#trangThaiChart'), {
@@ -866,12 +765,12 @@
         }
 
         function updateCharts(data) {
-            // Cập nhật biểu đồ khu vực
-            khuVucChart.data.labels = data.khuVucs || [];
-            khuVucChart.data.datasets[0].data = data.soLuongsKhuVuc || [];
-            khuVucChart.data.datasets[0].backgroundColor = generateRandomColors(data.khuVucs?.length || 1, 0.7);
-            khuVucChart.data.datasets[0].borderColor = generateRandomColors(data.khuVucs?.length || 1, 1);
-            khuVucChart.update();
+            // Cập nhật biểu đồ tỉnh thành
+            tinhThanhChart.data.labels = data.tinhThanhs || [];
+            tinhThanhChart.data.datasets[0].data = data.soLuongsTinhThanh || [];
+            tinhThanhChart.data.datasets[0].backgroundColor = generateRandomColors(data.tinhThanhs?.length || 1, 0.7);
+            tinhThanhChart.data.datasets[0].borderColor = generateRandomColors(data.tinhThanhs?.length || 1, 1);
+            tinhThanhChart.update();
 
             // Cập nhật biểu đồ trạng thái
             trangThaiChart.data.labels = data.trangThais || [];

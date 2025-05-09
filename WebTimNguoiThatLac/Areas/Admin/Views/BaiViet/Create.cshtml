@@ -70,30 +70,40 @@
                             <label asp-for="NgaySinh" class="font-weight-bold">Ngày sinh (nếu biết)</label>
                             <input asp-for="NgaySinh" type="date" class="form-control" />
                         </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label asp-for="KhuVuc" class="font-weight-bold">Khu vực lần cuối nhìn thấy</label>
-                            <select asp-for="KhuVuc" class="form-control">
-                                <option value="" selected>-- Chọn khu vực --</option>
-                                @foreach (string i in ViewBag.DanhSachTinhThanh)
-                                {
-                                    <option value="@i">@i</option>
-                                }
-                            </select>
-                        </div>
-
                         <div class="form-group">
                             <label asp-for="NgayMatTich" class="font-weight-bold">Ngày mất tích</label>
                             <input asp-for="NgayMatTich" type="date" class="form-control" />
                         </div>
+                    </div>
+
+                    <div class="col-md-6">
 
                         <div class="form-group">
                             <label asp-for="MoiQuanHe" class="font-weight-bold">Mối quan hệ với người mất tích</label>
                             <input asp-for="MoiQuanHe" class="form-control" placeholder="Ví dụ: Cha, Mẹ, Anh trai..." />
                         </div>
+
+                        <div class="form-group">
+                            <label class="font-weight-bold">Tỉnh Thành</label>
+                            <select id="TinhThanh" asp-for="IdTinhThanh" asp-items="@ViewBag.DanhSachTinhThanh" class="form-control" onchange="loadQuanHuyen(this.value)">
+                                <option value="">-- Chọn tỉnh/thành phố --</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="font-weight-bold">Quận Huyện</label>
+                            <select id="QuanHuyen" asp-for="IdQuanHuyen" asp-items="@ViewBag.DanhSachQuanHuyen" class="form-control">
+                                <option value="">-- Chọn quận/huyện --</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="KhuVuc" class="font-weight-bold">Khu Vực </label>
+                            <input asp-for="KhuVuc" class="form-control" placeholder="Nhập tên đường, quận huyện" />
+                        </div>
                     </div>
+
+
                 </div>
 
                 <!-- Post Details -->
@@ -169,6 +179,41 @@
 
 @section Scripts {
     <script src="~/clients/plugins/summernote/summernote-bs4.min.js"></script>
+
+    @* khu vực *@
+    <script>
+        function loadQuanHuyen(tinhThanhId) {
+            const quanHuyenDropdown = $("#QuanHuyen");
+            quanHuyenDropdown.empty().append('<option value="">Tất cả quận</option>');
+
+            if (!tinhThanhId) return;
+
+            $.getJSON(`/Admin/BaiViet/GetQuanHuyenByTinhThanh?tinhThanhId=${tinhThanhId}`, function(data) {
+                $.each(data, function(index, item) {
+                    quanHuyenDropdown.append($('<option></option>').val(item.id).text(item.tenQuanHuyen));
+                });
+
+                // Giữ lại giá trị đã chọn nếu có
+        @if (ViewBag.SelectedQuanHuyen != null)
+        {
+            @:quanHuyenDropdown.val('@ViewBag.SelectedQuanHuyen');
+        }
+            }).fail(function() {
+                console.error("Lỗi khi tải danh sách quận huyện");
+            });
+        }
+
+        // Khởi tạo khi trang được tải
+        $(document).ready(function() {
+            const tinhThanhId = $("#TinhThanh").val();
+            if (tinhThanhId) {
+                loadQuanHuyen(tinhThanhId);
+            }
+        });
+    </script>
+    @* end khu vực *@
+
+
     <script>
         $(document).ready(function() {
             // Thêm đặc điểm mới

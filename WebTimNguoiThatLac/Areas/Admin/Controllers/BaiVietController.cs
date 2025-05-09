@@ -109,6 +109,8 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             IEnumerable<TimNguoi> ds = await db.TimNguois
                                                             .Include(u => u.ApplicationUser)
                                                             .OrderByDescending(m => m.NgayDang)
+                                                            .Include(u => u.TinhThanh)
+                                                            .Include(u => u.QuanHuyen)
                                                             .ToListAsync();
             ViewBag.TimKiem = TimKiem;
             int sodongtren1trang = 5;

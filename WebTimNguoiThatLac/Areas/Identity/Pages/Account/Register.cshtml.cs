@@ -209,11 +209,11 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
             // Nếu là xác thực khuôn mặt thì chỉ kiểm tra ảnh
             if (action == "verify")
             {
-                if (CccdImage == null || string.IsNullOrEmpty(CapturedImageBase64))
+                /*if (CccdImage == null || string.IsNullOrEmpty(CapturedImageBase64))
                 {
                     ModelState.AddModelError(string.Empty, "Vui lòng tải ảnh CCCD và chụp ảnh khuôn mặt.");
                     return Page();
-                }
+                }*/
 
                 var isVerified = await VerifyFaceAsync(CccdImage, CapturedImageBase64);
                 if (isVerified)

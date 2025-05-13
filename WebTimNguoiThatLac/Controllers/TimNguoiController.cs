@@ -449,6 +449,13 @@ namespace WebTimNguoiThatLac.Controllers
             return View();
         }
 
+        private async Task LoadSelectListsAsync()
+        {
+            var tinhThanhs = await db.TinhThanhs.ToListAsync();
+            var quanHuyens = await db.QuanHuyens.ToListAsync();
+            ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
+            ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ThemNguoiCanTim(

@@ -14,55 +14,85 @@
                 <div class="card-body">
                     <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
                         <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+                        <!-- Email Input -->
                         <div class="form-floating mb-3">
-                            <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                            <input asp-for="Input.Email" class="form-control" autocomplete="username" required placeholder="name@example.com" />
                             <label asp-for="Input.Email">Email</label>
                             <span asp-validation-for="Input.Email" class="text-danger"></span>
                         </div>
+
+                        <!-- Full Name Input -->
                         <div class="form-floating mb-3">
-                            <input asp-for="Input.FullName" class="form-control" autocomplete="FullName" aria-required="true" placeholder="name@example.com" />
-                            <label asp-for="Input.FullName">FullName</label>
+                            <input asp-for="Input.FullName" class="form-control" required placeholder="Họ và tên" />
+                            <label asp-for="Input.FullName">Họ và tên</label>
                             <span asp-validation-for="Input.FullName" class="text-danger"></span>
                         </div>
-                        <div class="form-group mb-3">
-                            <label for="imageUpload"><i class="fas fa-id-card"></i> Tải ảnh CCCD</label>
-                            <input type="file" id="imageUpload" class="form-control" accept="image/*">
-                            <button type="button" id="extractCCCD" class="btn btn-primary mt-2">
-                                <i class="fas fa-extract"></i> Trích xuất CCCD
-                            </button>
+
+                        <!-- CCCD Image Upload -->
+                        <div class="form-group">
+                            <label for="CccdImage">Ảnh CCCD</label>
+                            <input asp-for="CccdImage" type="file" class="form-control" accept="image/*" required />
                         </div>
 
+                        <!-- Face Capture -->
+                        <div class="form-group">
+                            <label>Chụp ảnh khuôn mặt</label><br />
+                            <video id="video" width="300" height="225" autoplay></video><br />
+                            <button type="button" id="snap" class="btn btn-secondary mt-2">Chụp ảnh</button>
+                            <canvas id="canvas" width="300" height="225" style="display: none;"></canvas>
+                            <input type="hidden" asp-for="CapturedImageBase64" />
+                            <img id="preview" src="#" style="display:none;" />
+                        </div>
+                        <!-- Thêm trường ẩn -->
+                        <input type="hidden" asp-for="IsFaceVerified" id="IsFaceVerified" />
+                        <!-- Nút xác thực khuôn mặt -->
+                        <button type="submit" class="btn btn-warning" name="action" value="verify">
+                            Xác thực khuôn mặt
+                        </button>
+                        <!-- CCCD Number Input -->
                         <div class="form-group mb-3">
                             <label asp-for="Input.CCCD"><i class="fas fa-id-card"></i> Số CCCD</label>
-                            <input asp-for="Input.CCCD" id="cccdInput"  class="form-control" required />
+                            <input asp-for="Input.CCCD" id="cccdInput" class="form-control" required />
                             <span asp-validation-for="Input.CCCD" class="text-danger"></span>
                         </div>
+
+                        <!-- Address Input -->
                         <div class="form-floating mb-3">
-                            <input asp-for="Input.Address" class="form-control" autocomplete="FullName" aria-required="true" placeholder="name@example.com" />
-                            <label asp-for="Input.Address">Address</label>
+                            <input asp-for="Input.Address" class="form-control" required placeholder="Địa chỉ" />
+                            <label asp-for="Input.Address">Địa chỉ</label>
                             <span asp-validation-for="Input.Address" class="text-danger"></span>
                         </div>
+
+                        <!-- Password Inputs -->
                         <div class="form-floating mb-3">
-                            <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                            <label asp-for="Input.Password">Password</label>
+                            <input asp-for="Input.Password" class="form-control" required placeholder="Mật khẩu" type="password" />
+                            <label asp-for="Input.Password">Mật khẩu</label>
                             <span asp-validation-for="Input.Password" class="text-danger"></span>
                         </div>
                         <div class="form-floating mb-3">
-                            <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                            <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+                            <input asp-for="Input.ConfirmPassword" class="form-control" required placeholder="Xác nhận mật khẩu" type="password" />
+                            <label asp-for="Input.ConfirmPassword">Xác nhận mật khẩu</label>
                             <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
                         </div>
+
+                        <!-- Role Selection -->
                         <div class="form-floating mb-3">
                             <select asp-for="Input.Role" asp-items="@Model.Input.RoleList" class="form-control">
-                                <option disabled selected> --- Hãy Chon Role ---</option>
+                                <option disabled selected> --- Hãy Chọn Role ---</option>
                             </select>
                         </div>
-                        <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Đăng ký</button>
+
+                        <!-- Nút đăng ký -->
+                        <button type="submit" class="btn btn-primary" name="action" value="register">
+                            Đăng ký
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
-        <div class="col-md-8 mt-4"></div>
+
+        <!-- External Login Section -->
         <div class="col-md-8 mt-4">
             <section>
                 <div class="card shadow">
@@ -70,45 +100,40 @@
                         <h3 class="mb-0 text-white">Đăng ký bằng dịch vụ khác</h3>
                     </div>
                     <div class="card-body">
-                        @{
-                            if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                            {
-                                <div>
-                                    <p>
-                                        There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                                            about setting up this ASP.NET application to support logging in via external services</a>.
-                                    </p>
-                                </div>
-                            }
-                            else
-                            {
-                                <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                                    <div class="d-grid gap-3">
-                                        @foreach (var provider in Model.ExternalLogins)
+                        @if ((Model.ExternalLogins?.Count ?? 0) == 0)
+                        {
+                            <div>
+                                <p>
+                                    Không có dịch vụ xác thực bên ngoài nào được cấu hình. Xem bài viết này <a href="https://go.microsoft.com/fwlink/?LinkID=532715">về cách thiết lập ứng dụng ASP.NET này để hỗ trợ đăng nhập qua các dịch vụ bên ngoài</a>.
+                                </p>
+                            </div>
+                        }
+                        else
+                        {
+                            <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                                <div class="d-grid gap-3">
+                                    @foreach (var provider in Model.ExternalLogins)
+                                    {
+                                        var btnClass = provider.Name switch
                                         {
-                                            var btnClass = provider.Name switch
+                                            "Google" => "btn-danger",
+                                            "Facebook" => "btn-facebook",
+                                            _ => "btn-secondary"
+                                        };
+                                        <button type="submit" class="btn @btnClass w-100 py-2" name="provider" value="@provider.Name" title="Đăng nhập bằng @provider.DisplayName">
+                                            @if (provider.Name == "Google")
                                             {
-                                                "Google" => "btn-danger",
-                                                "Facebook" => "btn-facebook",
-                                                _ => "btn-secondary"
-                                            };
-
-
-                                            <button type="submit" class="btn @btnClass w-100 py-2" name="provider" value="@provider.Name" title="Đăng nhập bằng @provider.DisplayName">
-                                                @if (provider.Name == "Google")
-                                                {
-                                                    <i class="fab fa-google me-2"></i>
-                                                }
-                                                else if (provider.Name == "Facebook")
-                                                {
-                                                    <i class="fab fa-facebook-f me-2"></i>
-                                                }
-                                                Đăng nhập bằng @provider.DisplayName
-                                            </button>
-                                        }
-                                    </div>
-                                </form>
-                            }
+                                                <i class="fab fa-google me-2"></i>
+                                            }
+                                            else if (provider.Name == "Facebook")
+                                            {
+                                                <i class="fab fa-facebook-f me-2"></i>
+                                            }
+                                            Đăng nhập bằng @provider.DisplayName
+                                        </button>
+                                    }
+                                </div>
+                            </form>
                         }
                     </div>
                 </div>
@@ -116,42 +141,34 @@
         </div>
     </div>
 </div>
-
+@if (ViewData["FaceVerifyMessage"] != null)
+{
+    <div class="alert alert-success">@ViewData["FaceVerifyMessage"]</div>
+}
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-        $(document).ready(function () {
-            $("#extractCCCD").click(function () {
-                var fileInput = $("#imageUpload")[0].files[0];
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const snap = document.getElementById('snap');
+        const preview = document.getElementById('preview');
+        const hiddenInput = document.getElementById('CapturedImageBase64');
 
-                if (!fileInput) {
-                    alert("Vui lòng chọn một ảnh CCCD.");
-                    return;
-                }
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => { video.srcObject = stream; })
+            .catch(err => { console.error("Không thể truy cập camera:", err); });
 
-                var formData = new FormData();
-                formData.append("imageFile", fileInput);
-
-                $.ajax({
-                    url: "/OCR/ExtractCCCD",
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        $("#cccdInput").val(response.cccd);
-                        $("#fullNameInput").val(response.hoTen);
-                        alert("Trích xuất thành công!");
-                    },
-                    error: function (xhr) {
-                        alert("Lỗi OCR: " + xhr.responseText);
-                    }
-                });
-            });
+        snap.addEventListener('click', () => {
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL('image/jpeg');
+            preview.src = dataUrl;
+            preview.style.display = 'block';
+            hiddenInput.value = dataUrl;
         });
     </script>
 }
+
 <style>
     .btn-facebook {
         background-color: #1877F2;

@@ -52,6 +52,13 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
             _logger = logger;
             _emailSender = emailSender;
         }
+        [BindProperty]
+        public IFormFile CccdImage { get; set; }
+
+        [BindProperty]
+        public string CapturedImageBase64 { get; set; }
+        [BindProperty]
+        public bool IsFaceVerified { get; set; }
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -164,67 +171,141 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
+        private async Task<bool> VerifyFaceAsync(IFormFile cccdImage, string capturedImageBase64)
+        {
+            var apiUrl = "https://api.fpt.ai/vision/face/verifications";
+            var apiKey = "S6X5dLj4vaMzn52cEWshCUrXLgkb7lJi";
 
-        public async Task<IActionResult> OnPostAsync(string returnUrl = null)
+            byte[] cccdBytes;
+            using (var ms = new MemoryStream())
+            {
+                await cccdImage.CopyToAsync(ms);
+                cccdBytes = ms.ToArray();
+            }
+
+            var faceBytes = Convert.FromBase64String(capturedImageBase64.Replace("data:image/jpeg;base64,", ""));
+
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("api-key", apiKey);
+
+            using var content = new MultipartFormDataContent();
+            content.Add(new ByteArrayContent(cccdBytes), "image1", "cccd.jpg");
+            content.Add(new ByteArrayContent(faceBytes), "image2", "face.jpg");
+
+            var response = await client.PostAsync(apiUrl, content);
+            var json = await response.Content.ReadAsStringAsync();
+
+            dynamic result = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+            double similarity = result?.data?.similarity ?? 0;
+
+            return similarity >= 0.75;
+        }
+
+        public async Task<IActionResult> OnPostAsync(string action, string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            if (ModelState.IsValid)
+            
+            // Nếu là xác thực khuôn mặt thì chỉ kiểm tra ảnh
+            if (action == "verify")
             {
-                var user = CreateUser();
-                 
-                user.FullName = Input.FullName;
-                user.CCCD = Input.CCCD;
-                user.Address = Input.Address;
-                user.HinhAnh = "/uploads/avatars/default-avatar.png";
-
-                if (!String.IsNullOrEmpty(Input.Role) && Input.Role == SD.Role_Admin )
+                if (CccdImage == null || string.IsNullOrEmpty(CapturedImageBase64))
                 {
-                    user.IsAdmin = true;
+                    ModelState.AddModelError(string.Empty, "Vui lòng tải ảnh CCCD và chụp ảnh khuôn mặt.");
+                    return Page();
                 }
 
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-                var result = await _userManager.CreateAsync(user, Input.Password);
-
-                if (result.Succeeded)
+                var isVerified = await VerifyFaceAsync(CccdImage, CapturedImageBase64);
+                if (isVerified)
                 {
-                    _logger.LogInformation("User created a new account with password.");
-                    if (!String.IsNullOrEmpty(Input.Role))
-                    {
-
-                        await _userManager.AddToRoleAsync(user, Input.Role);
-                        
-                    }
-                    else
-                    {
-                        await _userManager.AddToRoleAsync(user, SD.Role_Customer);
-                    }
-                    var userId = await _userManager.GetUserIdAsync(user);
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-                        protocol: Request.Scheme);
-
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                    {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
-                    }
-                    else
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
-                    }
+                    IsFaceVerified = true;
+                    ViewData["FaceVerifyMessage"] = "Xác thực khuôn mặt thành công!";
                 }
-                foreach (var error in result.Errors)
+                else
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    IsFaceVerified = false;
+                    ModelState.AddModelError(string.Empty, "Xác thực khuôn mặt không thành công. Vui lòng thử lại.");
+                }
+                return Page();
+            }
+            // Nếu là đăng ký thì kiểm tra đầy đủ thông tin
+            if (action == "register")
+            {
+                if (!IsFaceVerified)
+                {
+                    ModelState.AddModelError(string.Empty, "Bạn cần xác thực khuôn mặt trước khi đăng ký.");
+                    return Page();
+                }
+                if (ModelState.IsValid)
+                {
+                    if (CccdImage == null || string.IsNullOrEmpty(CapturedImageBase64))
+                    {
+                        ModelState.AddModelError(string.Empty, "Vui lòng tải ảnh CCCD và chụp ảnh khuôn mặt.");
+                        return Page();
+                    }
+
+                    var isVerified = await VerifyFaceAsync(CccdImage, CapturedImageBase64);
+                    if (!isVerified)
+                    {
+                        ModelState.AddModelError(string.Empty, "Xác thực khuôn mặt không thành công. Vui lòng thử lại.");
+                        return Page();
+                    }
+
+                    var user = CreateUser();
+
+                    user.FullName = Input.FullName;
+                    user.CCCD = Input.CCCD;
+                    user.Address = Input.Address;
+                    user.HinhAnh = "/uploads/avatars/default-avatar.png";
+
+                    if (!String.IsNullOrEmpty(Input.Role) && Input.Role == SD.Role_Admin)
+                    {
+                        user.IsAdmin = true;
+                    }
+
+                    await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+                    await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                    var result = await _userManager.CreateAsync(user, Input.Password);
+
+                    if (result.Succeeded)
+                    {
+                        _logger.LogInformation("User created a new account with password.");
+                        if (!String.IsNullOrEmpty(Input.Role))
+                        {
+
+                            await _userManager.AddToRoleAsync(user, Input.Role);
+
+                        }
+                        else
+                        {
+                            await _userManager.AddToRoleAsync(user, SD.Role_Customer);
+                        }
+                        var userId = await _userManager.GetUserIdAsync(user);
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                        var callbackUrl = Url.Page(
+                            "/Account/ConfirmEmail",
+                            pageHandler: null,
+                            values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
+                            protocol: Request.Scheme);
+
+                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+                        if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                        {
+                            return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                        }
+                        else
+                        {
+                            await _signInManager.SignInAsync(user, isPersistent: false);
+                            return LocalRedirect(returnUrl);
+                        }
+                    }
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
                 }
             }
 

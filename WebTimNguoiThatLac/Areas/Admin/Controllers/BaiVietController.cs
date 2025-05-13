@@ -15,6 +15,7 @@ using X.PagedList.Extensions;
 using Microsoft.Build.Framework;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 using DocumentFormat.OpenXml.Office2010.Excel;
+using Newtonsoft.Json;
 
 namespace WebTimNguoiThatLac.Areas.Admin.Controllers
 {
@@ -173,7 +174,10 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(TimNguoi x, List<IFormFile>? DanhSachHinhAnh, string EmailNguoiDung)
+        public async Task<IActionResult> Create(TimNguoi x, 
+                                                List<IFormFile>? DSHinhAnhCapNhat, 
+                                                string EmailNguoiDung,
+                                                string faceDescriptorsJson)
         {
             IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
             IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
@@ -198,32 +202,64 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 x.NguoiDangBaiXoa = false;
 
 
-                db.Add(x);
-                await db.SaveChangesAsync();
 
-                if (DanhSachHinhAnh != null)
+                if (DSHinhAnhCapNhat == null || DSHinhAnhCapNhat.Count == 0)
                 {
-                    int d = 0;
-                    foreach (IFormFile i in DanhSachHinhAnh)
-                    {
+                    ModelState.AddModelError("Lỗi", "Chưa Có Hình Ảnh");
+                    return View(x);
+                }
 
-                        AnhTimNguoi z = new AnhTimNguoi();
-                        z.HinhAnh = await SaveImage(i, "AnhNguoiCanTim");
-                        if (d == 0)
+                // Xử lý descriptors từ client
+                FaceDescriptorData? descriptorData = null;
+                if (!string.IsNullOrEmpty(faceDescriptorsJson))
+                {
+                    try
+                    {
+                        descriptorData = JsonConvert.DeserializeObject<FaceDescriptorData>(faceDescriptorsJson);
+                        _logger.LogInformation("Parsed faceDescriptorsJson: DescriptorsCount={DescriptorsCount}, AverageDescriptorLength={AvgLength}",
+                            descriptorData?.Descriptors?.Count, descriptorData?.AverageDescriptor?.Length);
+
+                        if (descriptorData?.AverageDescriptor != null && descriptorData.AverageDescriptor.Length == 128)
                         {
-                            z.TrangThai = 1;
-                            d++;
+                            x.AverageDescriptor = descriptorData.AverageDescriptor;
+                            _logger.LogInformation("Đã gán AverageDescriptor cho bài viết ID {Id}", x.Id);
                         }
                         else
                         {
-                            z.TrangThai = 0;
-                            d++;
+                            _logger.LogWarning("AverageDescriptor không hợp lệ: {Length}", descriptorData?.AverageDescriptor?.Length);
                         }
-                        z.IdNguoiCanTim = x.Id;
-
-                        db.AnhTimNguois.Add(z);
-
                     }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Lỗi khi xử lý face descriptors: {Json}", faceDescriptorsJson);
+                    }
+                }
+                else
+                {
+                    _logger.LogWarning("faceDescriptorsJson rỗng hoặc null");
+                }
+
+                db.TimNguois.Add(x);
+                await db.SaveChangesAsync();
+
+                int primaryImageIndex = 0;
+                for (int i = 0; i < DSHinhAnhCapNhat.Count; i++)
+                {
+                    var file = DSHinhAnhCapNhat[i];
+                    var anhTimNguoi = new AnhTimNguoi
+                    {
+                        IdNguoiCanTim = x.Id,
+                        TrangThai = (i == primaryImageIndex) ? 1 : 0,
+                        HinhAnh = await SaveImage(file, "AnhNguoiCanTim")
+                    };
+
+                    if (descriptorData?.Descriptors != null && i < descriptorData.Descriptors.Count)
+                    {
+                        anhTimNguoi.FaceDescriptor = JsonConvert.SerializeObject(descriptorData.Descriptors[i]);
+                        _logger.LogInformation("Saved FaceDescriptor for image {Index}: Length = {Length}", i, descriptorData.Descriptors[i].Length);
+                    }
+
+                    db.AnhTimNguois.Add(anhTimNguoi);
                 }
 
                 await db.SaveChangesAsync();
@@ -233,7 +269,11 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
 
             return View();
         }
-
+        public class FaceDescriptorData
+        {
+            public List<float[]> Descriptors { get; set; }
+            public float[] AverageDescriptor { get; set; }
+        }
         public async Task<string> SaveImage(IFormFile ImageURL, string subFolder)
         {
             if (ImageURL == null || ImageURL.Length == 0)
@@ -328,7 +368,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update(TimNguoi x, List<IFormFile>? DSHinhAnhCapNhat)
+        public async Task<IActionResult> Update(TimNguoi x, List<IFormFile>? DSHinhAnhCapNhat, string? faceDescriptorsJson)
         {
             try
             {
@@ -386,19 +426,58 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                                     await db.SaveChangesAsync();
                                 }
 
-                                int d = 0;
-                                foreach (IFormFile i in DSHinhAnhCapNhat)
+                                // Xử lý descriptors từ client
+                                FaceDescriptorData? descriptorData = null;
+                                if (!string.IsNullOrEmpty(faceDescriptorsJson))
                                 {
-                                    var z = new AnhTimNguoi();
+                                    try
+                                    {
+                                        descriptorData = JsonConvert.DeserializeObject<FaceDescriptorData>(faceDescriptorsJson);
+                                        _logger.LogInformation("Parsed faceDescriptorsJson: DescriptorsCount={DescriptorsCount}, AverageDescriptorLength={AvgLength}",
+                                            descriptorData?.Descriptors?.Count, descriptorData?.AverageDescriptor?.Length);
 
-                                    z.IdNguoiCanTim = y.Id;
-                                    z.TrangThai = (d == 0) ? 1 : 0;
-                                    z.HinhAnh = await SaveImage(i, "AnhNguoiCanTim");
-
-                                    db.AnhTimNguois.Add(z);
-                                    await db.SaveChangesAsync();
-                                    d++;
+                                        if (descriptorData?.AverageDescriptor != null && descriptorData.AverageDescriptor.Length == 128)
+                                        {
+                                            y.AverageDescriptor = descriptorData.AverageDescriptor; // cập nhật
+                                            _logger.LogInformation("Đã gán AverageDescriptor cho bài viết ID {Id}", y.Id);
+                                        }
+                                        else
+                                        {
+                                            _logger.LogWarning("AverageDescriptor không hợp lệ: {Length}", descriptorData?.AverageDescriptor?.Length);
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        _logger.LogError(ex, "Lỗi khi xử lý face descriptors: {Json}", faceDescriptorsJson);
+                                    }
                                 }
+                                else
+                                {
+                                    _logger.LogWarning("faceDescriptorsJson rỗng hoặc null");
+                                }
+
+                                await db.SaveChangesAsync();
+
+                                int primaryImageIndex = 0;
+                                for (int i = 0; i < DSHinhAnhCapNhat.Count; i++)
+                                {
+                                    var file = DSHinhAnhCapNhat[i];
+                                    var anhTimNguoi = new AnhTimNguoi
+                                    {
+                                        IdNguoiCanTim = y.Id,
+                                        TrangThai = (i == primaryImageIndex) ? 1 : 0,
+                                        HinhAnh = await SaveImage(file, "AnhNguoiCanTim")
+                                    };
+
+                                    if (descriptorData?.Descriptors != null && i < descriptorData.Descriptors.Count)
+                                    {
+                                        anhTimNguoi.FaceDescriptor = JsonConvert.SerializeObject(descriptorData.Descriptors[i]);
+                                        _logger.LogInformation("Saved FaceDescriptor for image {Index}: Length = {Length}", i, descriptorData.Descriptors[i].Length);
+                                    }
+
+                                    db.AnhTimNguois.Add(anhTimNguoi);
+                                }
+
 
                                 await db.SaveChangesAsync();
                                 await transaction.CommitAsync(); // QUAN TRỌNG: Phải commit transaction

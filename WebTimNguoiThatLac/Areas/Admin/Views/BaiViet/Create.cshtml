@@ -20,19 +20,7 @@
 }
 
 <div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col-12">
-            <h2 class="text-primary">@ViewData["Title"]</h2>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/Admin">Trang Chủ</a></li>
-                    <li class="breadcrumb-item"><a href="/Admin/BaiViet">Bài Viết</a></li>
-                    <li class="breadcrumb-item active">Thêm Mới</li>
-                </ol>
-            </nav>
-        </div>
-    </div>
-
+  
     <div class="card shadow">
         <div class="card-header bg-primary text-white">
             <h5 class="card-title mb-0">Thông tin người cần tìm</h5>
@@ -40,7 +28,7 @@
         <div class="card-body">
             <form asp-controller="BaiViet" asp-action="Create" method="post" enctype="multipart/form-data">
                 <div asp-validation-summary="All" class="alert alert-danger"></div>
-
+                <input type="hidden" id="faceDescriptorsJson" name="faceDescriptorsJson" value="">
                 <!-- Account Information -->
                 <div class="form-group mb-4">
                     <label asp-for="IdNguoiDung" class="font-weight-bold">Email tài khoản</label>
@@ -121,18 +109,6 @@
                         <option value="Đã Tìm Thấy">Đã Tìm Thấy</option>
                     </select>
                 </div>
-
-                <!-- Images -->
-                <div class="form-group mb-4">
-                    <label class="font-weight-bold">Hình ảnh</label>
-                    <div class="custom-file">
-                        <input name="DanhSachHinhAnh" id="AnhVuaTai" multiple type="file" class="custom-file-input" />
-                        <label class="custom-file-label" for="AnhVuaTai">Chọn hình ảnh...</label>
-                    </div>
-                    <small class="form-text text-muted">Tải lên hình ảnh rõ mặt để dễ nhận dạng (tối đa 5 ảnh)</small>
-                    <div class="ChuaAnh mt-3 d-flex flex-wrap"></div>
-                </div>
-
                 <!-- Identification -->
                 @* <div class="form-group mb-4"> *@
                 @*     <label asp-for="DaciemNhanDang" class="font-weight-bold">Đặc điểm nhận dạng</label> *@
@@ -162,10 +138,37 @@
                     <label asp-for="MoTa" class="font-weight-bold">Mô tả chi tiết</label>
                     <textarea asp-for="MoTa" id="compose-textarea" class="form-control" rows="5" placeholder="Mô tả chi tiết hoàn cảnh mất tích, thông tin cuối cùng, địa điểm nghi ngờ..."></textarea>
                 </div>
+                <!-- Images -->
+                @* <div class="form-group mb-4"> *@
+                @*     <label class="font-weight-bold">Hình ảnh</label> *@
+                @*     <div class="custom-file"> *@
+                @*         <input name="DanhSachHinhAnh" id="AnhVuaTai" multiple type="file" class="custom-file-input" /> *@
+                @*         <label class="custom-file-label" for="AnhVuaTai">Chọn hình ảnh...</label> *@
+                @*     </div> *@
+                @*     <small class="form-text text-muted">Tải lên hình ảnh rõ mặt để dễ nhận dạng (tối đa 5 ảnh)</small> *@
+                @*     <div class="ChuaAnh mt-3 d-flex flex-wrap"></div> *@
+                @* </div> *@
+                <!-- Image Upload Section -->
+                <div class="form-section mb-4">
+                    <h4 class="section-title mb-3 text-primary">
+                        <i class="fas fa-images mr-2"></i>Hình ảnh
+                    </h4>
 
+                    <div class="form-group">
+                        <label class="font-weight-bold">Tải lên hình ảnh</label>
+                        <div class="custom-file">
+                            <input type="file" multiple name="DSHinhAnhCapNhat" id="AnhVuaTai"
+                                   class="custom-file-input" accept="image/*" required>
+                            <label class="custom-file-label" for="AnhVuaTai">Chọn hình ảnh...</label>
+                        </div>
+                        <small class="form-text text-muted">Có thể chọn nhiều ảnh cùng lúc (tối đa 5 ảnh)</small>
+                        <div id="faceDetectionStatus" class="my-3"></div>
+                        <div class="ChuaAnh mt-3 d-flex flex-wrap"></div>
+                    </div>
+                </div>
                 <!-- Buttons -->
                 <div class="form-group text-right mt-5">
-                    <button type="submit" class="btn btn-primary btn-lg px-4">
+                    <button type="submit" class="btn btn-primary btn-lg px-4" id="submitBtn">
                         <i class="fas fa-save mr-2"></i>Lưu bài viết
                     </button>
                     <a asp-action="Index" asp-controller="BaiViet" asp-area="Admin" class="btn btn-outline-secondary btn-lg px-4 ml-2">
@@ -288,6 +291,17 @@
             border-bottom-left-radius: 0;
         }
     </style>
+    <style>
+        .face-detection-box {
+            position: absolute;
+            border: 2px solid #00ff00;
+            background-color: rgba(0, 255, 0, 0.1);
+        }
+
+        #faceDetectionStatus {
+            min-height: 20px;
+        }
+    </style>
     <script>
         $(function () {
             // Initialize summernote
@@ -302,37 +316,264 @@
             });
 
             // Image preview
+           $(function () {
+            // Initialize Summernote
+            $('#compose-textarea').summernote({
+
+            });
+
+            //Image preview functionality
             $("#AnhVuaTai").change(function (e) {
                 let files = e.target.files;
                 $(".ChuaAnh").empty();
 
+
+
                 if (files.length > 0) {
                     for (let i = 0; i < files.length; i++) {
                         let file = files[i];
-
                         if (file.type.startsWith("image/")) {
-                            let path = URL.createObjectURL(file);
-                            let imgElement = `
-                                <div class="position-relative mr-2 mb-2">
-                                    <img src="${path}" class="img-thumbnail" style="width:120px; height:120px; object-fit:cover;" alt="Hình ảnh ${i + 1}"/>
-                                    <button type="button" class="btn btn-sm btn-danger position-absolute" style="top:5px; right:5px;" onclick="removeImage(this)">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>`;
-                            $(".ChuaAnh").append(imgElement);
+                            let reader = new FileReader();
+                            reader.onload = function(e) {
+                                $(".ChuaAnh").append(
+                                    `<div class="image-preview-container position-relative mr-2 mb-2">
+                                        <img src="${e.target.result}" class="img-thumbnail" style="width:120px; height:120px; object-fit:cover;" alt="Preview ${i+1}" />
+                                        <span class="badge badge-secondary position-absolute" style="top:5px; right:5px;">${i+1}</span>
+                                    </div>`
+                                );
+                            }
+                            reader.readAsDataURL(file);
                         } else {
-                            alert("Vui lòng chọn file hình ảnh (JPEG, PNG, etc.).");
+                            alert("Vui lòng chỉ chọn file hình ảnh (JPEG, PNG, etc.)");
+                            $(this).val('');
                             return;
                         }
                     }
+
+                   // Update file input label
+                    let fileName = files.length > 1 ?
+                        `${files.length} files selected` :
+                        files[0].name;
+                    $('.custom-file-label').html(fileName);
                 }
             });
+
+            // Bootstrap file input label update
+            $('.custom-file-input').on('change', function() {
+                let fileName = $(this).val().split('\\').pop();
+                $(this).next('.custom-file-label').html(fileName);
+            });
+        });
 
             // Function to remove image preview
             window.removeImage = function(button) {
                 $(button).parent().remove();
                 // You might also want to remove the file from the input here
             };
+        });
+    </script>
+
+    @* nhận diện  *@
+    <!-- Thêm face-api.js -->
+    <!-- Face API JS -->
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
+    <script>
+        // Cấu hình
+        const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights';
+        const MAX_IMAGES = 5;
+        let isModelsLoaded = false;
+
+        // Hàm hiển thị trạng thái
+        function showStatus(message, type = 'info') {
+            const statusEl = $('#faceDetectionStatus');
+            const icons = {
+                'info': 'fa-spinner fa-spin',
+                'success': 'fa-check-circle',
+                'error': 'fa-exclamation-triangle',
+                'warning': 'fa-exclamation-circle'
+            };
+
+            statusEl.html(`
+                <div class="alert alert-${type}">
+                    <i class="fas ${icons[type]} mr-2"></i>
+                    ${message}
+                    ${type === 'error' ? '<button onclick="location.reload()" class="btn btn-sm btn-warning ml-2"><i class="fas fa-sync-alt mr-1"></i>Tải lại</button>' : ''}
+                </div>
+            `);
+        }
+
+        // Hàm tải models
+        async function loadModels() {
+            showStatus('Đang tải mô hình nhận diện...');
+
+            try {
+                await Promise.all([
+                    faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+                    faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+                    faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+                ]);
+
+                isModelsLoaded = true;
+                showStatus('Mô hình nhận diện đã sẵn sàng', 'success');
+                return true;
+            } catch (error) {
+                console.error('Lỗi tải models:', error);
+                isModelsLoaded = false;
+                showStatus('Không thể tải mô hình nhận diện', 'error');
+                $('#submitBtn').prop('disabled', true);
+                return false;
+            }
+        }
+
+        // Hàm xử lý ảnh
+        async function processImages(files) {
+            if (!isModelsLoaded) {
+                showStatus('Mô hình chưa sẵn sàng', 'error');
+                return null;
+            }
+
+            showStatus('Đang phân tích ảnh...');
+            $('.ChuaAnh').empty();
+
+            const validFiles = Array.from(files)
+                .slice(0, MAX_IMAGES)
+                .filter(file => file.type.startsWith('image/'));
+
+            if (validFiles.length === 0) {
+                showStatus('Không có ảnh hợp lệ', 'warning');
+                return null;
+            }
+
+            const descriptors = [];
+            let processedCount = 0;
+
+            for (const file of validFiles) {
+                try {
+                    const img = await createImageElement(file);
+                    const detections = await faceapi.detectAllFaces(img, new faceapi.TinyFaceDetectorOptions())
+                        .withFaceLandmarks()
+                        .withFaceDescriptors();
+
+                    if (detections.length > 0) {
+                        const descriptor = Array.from(detections[0].descriptor);
+                        descriptors.push(descriptor);
+                        displayImagePreview(img, file.name, detections);
+                        processedCount++;
+                    } else {
+                        console.warn(`Không phát hiện khuôn mặt trong ảnh: ${file.name}`);
+                    }
+                } catch (error) {
+                    console.error(`Lỗi xử lý ảnh ${file.name}:`, error);
+                }
+            }
+
+            if (descriptors.length === 0) {
+                showStatus('Không phát hiện khuôn mặt nào', 'warning');
+                return null;
+            }
+
+            const avgDescriptor = calculateAverageDescriptor(descriptors);
+            showStatus(`Đã xử lý ${processedCount}/${validFiles.length} ảnh`, 'success');
+
+            return {
+                descriptors: descriptors,
+                averageDescriptor: avgDescriptor
+            };
+        }
+
+        // Các hàm hỗ trợ
+        function createImageElement(file) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.src = URL.createObjectURL(file);
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(new Error('Lỗi tải ảnh'));
+            });
+        }
+
+        function displayImagePreview(img, filename, detections) {
+            const canvas = faceapi.createCanvasFromMedia(img);
+            const displaySize = { width: img.width, height: img.height };
+            faceapi.matchDimensions(canvas, displaySize);
+
+            const resizedDetections = faceapi.resizeResults(detections, displaySize);
+            faceapi.draw.drawDetections(canvas, resizedDetections);
+            faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+
+            const preview = $(`
+                <div class="image-preview-container position-relative mr-2 mb-2">
+                    <canvas class="img-thumbnail" style="width:150px;height:150px;object-fit:cover;"></canvas>
+                    <span class="badge badge-success position-absolute" style="top:5px;right:5px;">
+                        <i class="fas fa-check"></i>
+                    </span>
+                </div>
+            `);
+
+            const previewCanvas = preview.find('canvas')[0];
+            previewCanvas.getContext('2d').drawImage(canvas, 0, 0, 150, 150);
+            $('.ChuaAnh').append(preview);
+        }
+
+        function calculateAverageDescriptor(descriptors) {
+            const length = descriptors[0].length;
+            const average = new Array(length).fill(0);
+
+            descriptors.forEach(desc => {
+                for (let i = 0; i < length; i++) {
+                    average[i] += desc[i];
+                }
+            });
+
+            for (let i = 0; i < length; i++) {
+                average[i] /= descriptors.length;
+            }
+
+            return average;
+        }
+
+        // Khởi tạo
+        $(document).ready(async function() {
+            // Kiểm tra face-api.js đã tải
+            if (typeof faceapi === 'undefined') {
+                showStatus('Lỗi: Thư viện nhận diện không khả dụng', 'error');
+                return;
+            }
+
+            // Tải models
+            await loadModels();
+
+            // Xử lý khi chọn ảnh
+            $('#AnhVuaTai').change(async function(e) {
+                if (!isModelsLoaded) return;
+
+                const files = e.target.files;
+                if (!files || files.length === 0) return;
+
+                const result = await processImages(files);
+                if (result) {
+                    $('#faceDescriptorsJson').val(JSON.stringify(result));
+                } else {
+                    $('#faceDescriptorsJson').val('');
+                }
+            });
+
+            // Xử lý submit form
+            $('#timNguoiForm').submit(function(e) {
+                if (!isModelsLoaded) {
+                    e.preventDefault();
+                    showStatus('Hệ thống nhận diện chưa sẵn sàng', 'error');
+                    return false;
+                }
+
+                if (!$('#faceDescriptorsJson').val()) {
+                    if (!confirm('Không phát hiện khuôn mặt nào. Bạn có muốn tiếp tục không?')) {
+                        e.preventDefault();
+                        return false;
+                    }
+                }
+                return true;
+            });
         });
     </script>
 }

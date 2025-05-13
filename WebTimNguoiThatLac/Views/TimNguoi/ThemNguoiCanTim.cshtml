@@ -6,7 +6,8 @@
     ApplicationUser us = await UserManager.GetUserAsync(User);
 }
 
-
+<!-- Thêm Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 <!-- Main Form Section -->
 <div class="container my-5">
@@ -21,7 +22,7 @@
                     <form asp-action="ThemNguoiCanTim" asp-controller="TimNguoi" enctype="multipart/form-data" method="post">
                         <div asp-validation-summary="All" class="alert alert-danger"></div>
                         <input type="hidden" asp-for="IdNguoiDung" value="@us.Id">
-
+                        <input type="hidden" id="faceDescriptorsJson" name="faceDescriptorsJson" value="">
                         <!-- Personal Information Section -->
                         <div class="form-section mb-4">
                             <h4 class="section-title mb-3 text-primary">
@@ -60,11 +61,6 @@
                                 </div>
                             </div>
 
-                            @* <div class="form-group"> *@
-                            @*     <label asp-for="DaciemNhanDang" class="font-weight-bold">Đặc Điểm Nhận Dạng</label> *@
-                            @*     <input asp-for="DaciemNhanDang" class="form-control" placeholder="Ví dụ: Nốt ruồi ở cằm, sẹo trên trán..." /> *@
-                            @*     <span asp-validation-for="DaciemNhanDang" class="text-danger small"></span> *@
-                            @* </div> *@
                             <div class="form-group mb-4">
                                 <label asp-for="DaciemNhanDang" class="font-weight-bold">Đặc điểm nhận dạng</label>
 
@@ -87,6 +83,7 @@
                                 <input asp-for="MoiQuanHe" class="form-control" placeholder="Mối quan hệ của bạn với người mất tích" />
                                 <span asp-validation-for="MoiQuanHe" class="text-danger small"></span>
                             </div>
+
                         </div>
 
                         <!-- Post Information Section -->
@@ -112,7 +109,7 @@
                                 <label class="font-weight-bold">Tỉnh Thành</label>
                                 <select id="TinhThanh" asp-for="IdTinhThanh" asp-items="@ViewBag.DanhSachTinhThanh" class="form-control" onchange="loadQuanHuyen(this.value)">
                                     <option value="">-- Chọn tỉnh/thành phố --</option>
-                                   
+
                                 </select>
                             </div>
 
@@ -122,18 +119,12 @@
                                     <option value="">-- Chọn quận/huyện --</option>
                                 </select>
                             </div>
-                            @* <div class="form-group"> *@
-                            @*     <label asp-for="KhuVuc" class="font-weight-bold">Khu Vực Mất Tích</label> *@
-                            @*     <select asp-for="KhuVuc" class="form-control"> *@
-                            @*         <option value="">-- Chọn tỉnh/thành phố --</option> *@
-                            @*         @foreach (string i in ViewBag.DanhSachTinhThanh) *@
-                            @*         { *@
-                            @*             <option value="@i">@i</option> *@
-                            @*         } *@
-                            @*     </select> *@
-                            @*     <span asp-validation-for="KhuVuc" class="text-danger small"></span> *@
-                            @* </div> *@
+                            <div class="form-group">
+                                <label asp-for="KhuVuc" class="font-weight-bold">Khu Vực</label>
+                                <input asp-for="KhuVuc" class="form-control" />
+                            </div>
                         </div>
+
 
                         <!-- Image Upload Section -->
                         <div class="form-section mb-4">
@@ -145,17 +136,17 @@
                                 <label class="font-weight-bold">Tải lên hình ảnh</label>
                                 <div class="custom-file">
                                     <input type="file" multiple name="DSHinhAnhCapNhat" id="AnhVuaTai"
-                                           class="custom-file-input" accept="image/*">
+                                           class="custom-file-input" accept="image/*" required>
                                     <label class="custom-file-label" for="AnhVuaTai">Chọn hình ảnh...</label>
                                 </div>
                                 <small class="form-text text-muted">Có thể chọn nhiều ảnh cùng lúc (tối đa 5 ảnh)</small>
+                                <div id="faceDetectionStatus" class="my-3"></div>
                                 <div class="ChuaAnh mt-3 d-flex flex-wrap"></div>
                             </div>
                         </div>
 
-                        <!-- Form Actions -->
                         <div class="form-group text-right mt-4">
-                            <button type="submit" class="btn btn-primary px-4 py-2">
+                            <button type="submit" class="btn btn-primary px-4 py-2" id="submitBtn">
                                 <i class="fas fa-plus-circle mr-2"></i>Thêm Bài Viết
                             </button>
                             <a asp-action="ThongTinCaNhan" asp-controller="NguoiDung"
@@ -200,21 +191,29 @@
             transition: transform 0.3s;
         }
 
-            .ChuaAnh img:hover {
-                transform: scale(1.05);
-                box-shadow: 0 0 8px rgba(0,0,0,0.2);
-            }
+        .ChuaAnh img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 8px rgba(0,0,0,0.2);
+        }
 
         .custom-file-label::after {
             content: "Duyệt";
         }
     </style>
+    <style>
+        .face-detection-box {
+            position: absolute;
+            border: 2px solid #00ff00;
+            background-color: rgba(0, 255, 0, 0.1);
+        }
+
+        #faceDetectionStatus {
+            min-height: 20px;
+        }
+    </style>
 }
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
 
     <script>
         $(document).ready(function() {
@@ -301,7 +300,7 @@
 
             if (!tinhThanhId) return;
 
-            fetch(`/Home/GetQuanHuyenByTinhThanh?tinhThanhId=${tinhThanhId}`)
+            fetch(`/TimNguoi/GetQuanHuyenByTinhThanh?tinhThanhId=${tinhThanhId}`)
                 .then(response => response.json())
                 .then(data => {
                     data.forEach(item => {
@@ -314,19 +313,19 @@
         $(function () {
             // Initialize Summernote
             $('#compose-textarea').summernote({
-               
+
             });
 
-            // Image preview functionality
+            //Image preview functionality
             $("#AnhVuaTai").change(function (e) {
                 let files = e.target.files;
                 $(".ChuaAnh").empty();
 
-               
+
 
                 if (files.length > 0) {
                     for (let i = 0; i < files.length; i++) {
-                        let file = files[i];
+                        let file = files[i]; 
                         if (file.type.startsWith("image/")) {
                             let reader = new FileReader();
                             reader.onload = function(e) {
@@ -345,7 +344,7 @@
                         }
                     }
 
-                    // Update file input label
+                   // Update file input label
                     let fileName = files.length > 1 ?
                         `${files.length} files selected` :
                         files[0].name;
@@ -357,6 +356,213 @@
             $('.custom-file-input').on('change', function() {
                 let fileName = $(this).val().split('\\').pop();
                 $(this).next('.custom-file-label').html(fileName);
+            });
+        });
+    </script>
+
+
+
+
+    @* nhận diện  *@
+    <!-- Thêm face-api.js -->
+    <!-- Face API JS -->
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
+    <script>
+        // Cấu hình
+        const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights';
+        const MAX_IMAGES = 5;
+        let isModelsLoaded = false;
+
+        // Hàm hiển thị trạng thái
+        function showStatus(message, type = 'info') {
+            const statusEl = $('#faceDetectionStatus');
+            const icons = {
+                'info': 'fa-spinner fa-spin',
+                'success': 'fa-check-circle',
+                'error': 'fa-exclamation-triangle',
+                'warning': 'fa-exclamation-circle'
+            };
+
+            statusEl.html(`
+                <div class="alert alert-${type}">
+                    <i class="fas ${icons[type]} mr-2"></i>
+                    ${message}
+                    ${type === 'error' ? '<button onclick="location.reload()" class="btn btn-sm btn-warning ml-2"><i class="fas fa-sync-alt mr-1"></i>Tải lại</button>' : ''}
+                </div>
+            `);
+        }
+
+        // Hàm tải models
+        async function loadModels() {
+            showStatus('Đang tải mô hình nhận diện...');
+
+            try {
+                await Promise.all([
+                    faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+                    faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+                    faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+                ]);
+
+                isModelsLoaded = true;
+                showStatus('Mô hình nhận diện đã sẵn sàng', 'success');
+                return true;
+            } catch (error) {
+                console.error('Lỗi tải models:', error);
+                isModelsLoaded = false;
+                showStatus('Không thể tải mô hình nhận diện', 'error');
+                $('#submitBtn').prop('disabled', true);
+                return false;
+            }
+        }
+
+        // Hàm xử lý ảnh
+        async function processImages(files) {
+            if (!isModelsLoaded) {
+                showStatus('Mô hình chưa sẵn sàng', 'error');
+                return null;
+            }
+
+            showStatus('Đang phân tích ảnh...');
+            $('.ChuaAnh').empty();
+
+            const validFiles = Array.from(files)
+                .slice(0, MAX_IMAGES)
+                .filter(file => file.type.startsWith('image/'));
+
+            if (validFiles.length === 0) {
+                showStatus('Không có ảnh hợp lệ', 'warning');
+                return null;
+            }
+
+            const descriptors = [];
+            let processedCount = 0;
+
+            for (const file of validFiles) {
+                try {
+                    const img = await createImageElement(file);
+                    const detections = await faceapi.detectAllFaces(img, new faceapi.TinyFaceDetectorOptions())
+                        .withFaceLandmarks()
+                        .withFaceDescriptors();
+
+                    if (detections.length > 0) {
+                        const descriptor = Array.from(detections[0].descriptor);
+                        descriptors.push(descriptor);
+                        displayImagePreview(img, file.name, detections);
+                        processedCount++;
+                    } else {
+                        console.warn(`Không phát hiện khuôn mặt trong ảnh: ${file.name}`);
+                    }
+                } catch (error) {
+                    console.error(`Lỗi xử lý ảnh ${file.name}:`, error);
+                }
+            }
+
+            if (descriptors.length === 0) {
+                showStatus('Không phát hiện khuôn mặt nào', 'warning');
+                return null;
+            }
+
+            const avgDescriptor = calculateAverageDescriptor(descriptors);
+            showStatus(`Đã xử lý ${processedCount}/${validFiles.length} ảnh`, 'success');
+
+            return {
+                descriptors: descriptors,
+                averageDescriptor: avgDescriptor
+            };
+        }
+
+        // Các hàm hỗ trợ
+        function createImageElement(file) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.src = URL.createObjectURL(file);
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(new Error('Lỗi tải ảnh'));
+            });
+        }
+
+        function displayImagePreview(img, filename, detections) {
+            const canvas = faceapi.createCanvasFromMedia(img);
+            const displaySize = { width: img.width, height: img.height };
+            faceapi.matchDimensions(canvas, displaySize);
+
+            const resizedDetections = faceapi.resizeResults(detections, displaySize);
+            faceapi.draw.drawDetections(canvas, resizedDetections);
+            faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+
+            const preview = $(`
+                <div class="image-preview-container position-relative mr-2 mb-2">
+                    <canvas class="img-thumbnail" style="width:150px;height:150px;object-fit:cover;"></canvas>
+                    <span class="badge badge-success position-absolute" style="top:5px;right:5px;">
+                        <i class="fas fa-check"></i>
+                    </span>
+                </div>
+            `);
+
+            const previewCanvas = preview.find('canvas')[0];
+            previewCanvas.getContext('2d').drawImage(canvas, 0, 0, 150, 150);
+            $('.ChuaAnh').append(preview);
+        }
+
+        function calculateAverageDescriptor(descriptors) {
+            const length = descriptors[0].length;
+            const average = new Array(length).fill(0);
+
+            descriptors.forEach(desc => {
+                for (let i = 0; i < length; i++) {
+                    average[i] += desc[i];
+                }
+            });
+
+            for (let i = 0; i < length; i++) {
+                average[i] /= descriptors.length;
+            }
+
+            return average;
+        }
+
+        // Khởi tạo
+        $(document).ready(async function() {
+            // Kiểm tra face-api.js đã tải
+            if (typeof faceapi === 'undefined') {
+                showStatus('Lỗi: Thư viện nhận diện không khả dụng', 'error');
+                return;
+            }
+
+            // Tải models
+            await loadModels();
+
+            // Xử lý khi chọn ảnh
+            $('#AnhVuaTai').change(async function(e) {
+                if (!isModelsLoaded) return;
+
+                const files = e.target.files;
+                if (!files || files.length === 0) return;
+
+                const result = await processImages(files);
+                if (result) {
+                    $('#faceDescriptorsJson').val(JSON.stringify(result));
+                } else {
+                    $('#faceDescriptorsJson').val('');
+                }
+            });
+
+            // Xử lý submit form
+            $('#timNguoiForm').submit(function(e) {
+                if (!isModelsLoaded) {
+                    e.preventDefault();
+                    showStatus('Hệ thống nhận diện chưa sẵn sàng', 'error');
+                    return false;
+                }
+
+                if (!$('#faceDescriptorsJson').val()) {
+                    if (!confirm('Không phát hiện khuôn mặt nào. Bạn có muốn tiếp tục không?')) {
+                        e.preventDefault();
+                        return false;
+                    }
+                }
+                return true;
             });
         });
     </script>

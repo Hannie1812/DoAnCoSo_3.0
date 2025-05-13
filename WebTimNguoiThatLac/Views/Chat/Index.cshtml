@@ -69,70 +69,70 @@
     border-left: 4px solid #4e73df;
     }
 
-        /* Avatar styles */
-        .avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: #4e73df;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            font-weight: bold;
-            font-size: 1.2rem;
-            position: relative;
-            overflow: hidden;
-            border: 2px solid white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
+    /* Avatar styles */
+    .avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: #4e73df;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        font-weight: bold;
+        font-size: 1.2rem;
+        position: relative;
+        overflow: hidden;
+        border: 2px solid white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
 
-            .avatar img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
+    .avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
 
-            /* Avatar status indicator */
-            .avatar::after {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                right: 0;
-                width: 12px;
-                height: 12px;
-                border-radius: 50%;
-                background-color: #28a745;
-                border: 2px solid white;
-                display: none;
-            }
+    /* Avatar status indicator */
+    .avatar::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #28a745;
+        border: 2px solid white;
+        display: none;
+    }
 
-            .avatar.online::after {
-                display: block;
-            }
+    .avatar.online::after {
+        display: block;
+    }
 
-        /* Smaller avatar for messages */
-        .message .avatar {
-            width: 36px;
-            height: 36px;
-            font-size: 1rem;
-            margin-right: 10px;
-            flex-shrink: 0;
-        }
+    /* Smaller avatar for messages */
+    .message .avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+        margin-right: 10px;
+        flex-shrink: 0;
+    }
 
-        /* Avatar placeholder when no image */
-        .avatar-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
-            color: white;
-            font-weight: bold;
-        }
+    /* Avatar placeholder when no image */
+    .avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        color: white;
+        font-weight: bold;
+    }
 
     .info {
     flex: 1;
@@ -193,10 +193,10 @@
     background-size: 100px;
     }
 
-        .message-container {
-            overflow-y: auto; /* Cuộn nếu nội dung dài */
-            padding: 10px;
-        }
+    .message-container {
+        overflow-y: auto; /* Cuộn nếu nội dung dài */
+        padding: 10px;
+    }
     .message {
     display: flex;
     margin-bottom: 15px;
@@ -347,14 +347,14 @@
 
 
 
-            .avatar:hover {
-                transform: scale(1.05);
-                box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-            }
+    .avatar:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
 
         /* Pulse animation for online status */
-        @@keyframes pulse {
-            0%
+    @@keyframes pulse {
+        0%
 
         {
             transform: scale(1);
@@ -368,11 +368,76 @@
             transform: scale(1);
         }
 
-        }
+    }
 
-        .avatar.online::after {
-            animation: pulse 2s infinite;
-        }
+    .avatar.online::after {
+        animation: pulse 2s infinite;
+    }
+    /* Thêm style mới cho xử lý nội dung dài */
+    .message .text {
+        white-space: pre-wrap; /* Cho phép xuống dòng tự động */
+        word-break: break-word; /* Ngắt từ khi cần thiết */
+        overflow-wrap: break-word; /* Đảm bảo nội dung không tràn */
+    }
+
+    /* Style cho preview hình ảnh */
+    .file-preview-container {
+        margin-top: 10px;
+        border-radius: 8px;
+        overflow: hidden;
+        max-width: 250px;
+        position: relative;
+    }
+
+    .file-preview {
+        max-width: 100%;
+        max-height: 200px;
+        display: block;
+    }
+
+    .remove-file {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: rgba(0,0,0,0.5);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    /* Style cho trạng thái tin nhắn */
+    .message-status {
+        font-size: 0.75em;
+        margin-top: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    .message.received .message-status {
+        justify-content: flex-start;
+    }
+
+    .message-status .time {
+        margin-right: 5px;
+    }
+
+    /* Style cho phần thông báo đã gửi/đồng bộ */
+    .sync-notification {
+        text-align: center;
+        color: #666;
+        font-size: 0.8em;
+        margin: 10px 0;
+        padding: 5px;
+        background-color: #f5f5f5;
+        border-radius: 4px;
+    }
 </style>
 }
 
@@ -485,8 +550,20 @@
                 </div>
 
                 <div class="message-container" id="messageContainer">
+                    @{
+                        DateTime? lastDate = null;
+                    }
                     @foreach (var tinNhan in Model.HopThoaiHienTai.TinNhans.OrderBy(t => t.NgayGui))
                     {
+                        // Hiển thị ngày nếu khác với tin nhắn trước đó
+                        var currentDate = tinNhan.NgayGui.Date;
+                        if (lastDate == null || currentDate != lastDate)
+                        {
+                            <div class="sync-notification">
+                                @currentDate.ToString("dd/MM/yyyy")
+                            </div>
+                            lastDate = currentDate;
+                        }
                         <div class="message @(tinNhan.MaNguoiGui == User.FindFirstValue(ClaimTypes.NameIdentifier) ? "sent" : "received")">
                             @if (tinNhan.MaNguoiGui != User.FindFirstValue(ClaimTypes.NameIdentifier))
                             {
@@ -511,30 +588,42 @@
                                     <img src="@tinNhan.HinhAnh" class="message-image" alt="Hình ảnh">
                                 }
                                 <div class="text">@tinNhan.NoiDung</div>
-                                <div class="time">
-                                    @tinNhan.NgayGui.ToString("HH:mm")
+                                <div class="message-status">
+                                    <span class="time">@tinNhan.NgayGui.ToString("HH:mm")</span>
                                     @if (tinNhan.MaNguoiGui == User.FindFirstValue(ClaimTypes.NameIdentifier))
                                     {
-                                        <i class="fas @(tinNhan.IsRead ? "fa-check-double" : "fa-check") ms-1"></i>
+                                        if (tinNhan.IsRead)
+                                        {
+                                            <span class="sync-status">✓✓ Đã xem</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="sync-status">✓ Đã gửi</span>
+                                        }
                                     }
                                 </div>
                             </div>
                         </div>
+                        
                     }
                 </div>
 
                 <div class="chat-input">
-                    <form asp-action="GuiTinNhan" method="post" enctype="multipart/form-data" class="message-form">
+                    <form asp-action="GuiTinNhan" method="post" enctype="multipart/form-data" class="message-form" id="messageForm">
                         <input type="hidden" name="hopThoaiId" value="@Model.HopThoaiHienTai.Id">
                         <div class="input-group">
-                            <input type="text" name="noiDung" placeholder="Nhập tin nhắn..." required>
+                            <input type="text" name="noiDung" placeholder="Gửi tin nhắn" id="messageInput">
                             <label class="file-upload">
                                 <i class="fas fa-paperclip"></i>
-                                <input type="file" name="file" accept="image/*" hidden>
+                                <input type="file" name="file" accept="image/*" id="fileInput" hidden>
                             </label>
                             <button type="submit">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
+                        </div>
+                        <div class="file-preview-container" id="filePreviewContainer" style="display: none;">
+                            <img id="filePreview" class="file-preview">
+                            <button type="button" class="remove-file" id="removeFileBtn">×</button>
                         </div>
                     </form>
                 </div>
@@ -555,8 +644,8 @@
 
 @section Scripts {
     <script>
-        // Tự động scroll xuống tin nhắn mới nhất
         $(document).ready(function() {
+            // Tự động scroll xuống tin nhắn mới nhất
             var container = $('#messageContainer');
             if (container.length) {
                 container.scrollTop(container[0].scrollHeight);
@@ -573,7 +662,44 @@
                     </div>
                 `);
             });
+
+            // Xử lý preview hình ảnh trước khi gửi
+            $('#fileInput').change(function(e) {
+                if (this.files && this.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#filePreview').attr('src', e.target.result);
+                        $('#filePreviewContainer').show();
+                    }
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+
+            // Xử lý xóa hình ảnh đã chọn
+            $('#removeFileBtn').click(function() {
+                $('#fileInput').val('');
+                $('#filePreviewContainer').hide();
+            });
+
+            // Xử lý gửi tin nhắn với 
+            $('#messageForm').submit(function(e) {
+                var message = $('#messageInput').val();
+                if (message.trim() === '' && $('#fileInput').val() === '') {
+                    e.preventDefault();
+                    return false;
+                }
+            });
         });
+
+        // Hàm tự động điều chỉnh chiều cao ô nhập tin nhắn
+        function adjustTextareaHeight() {
+            var input = $('#messageInput');
+            input.css('height', 'auto');
+            input.css('height', input[0].scrollHeight + 'px');
+        }
+
+        // Gọi hàm khi nội dung thay đổi
+        $('#messageInput').on('input', adjustTextareaHeight);
     </script>
 }
 

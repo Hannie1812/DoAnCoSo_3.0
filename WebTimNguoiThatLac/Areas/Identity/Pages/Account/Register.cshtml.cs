@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using WebTimNguoiThatLac.Areas.Admin.Models;
 using WebTimNguoiThatLac.Models;
 
@@ -178,26 +179,14 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
             {
                 if (cccdImage == null || string.IsNullOrEmpty(capturedImageBase64))
                 {
-                    _logger.LogWarning("VerifyFaceAsync: Ảnh CCCD hoặc ảnh khuôn mặt không được cung cấp");
+                    _logger.LogWarning("Thiếu ảnh CCCD hoặc ảnh khuôn mặt.");
                     return false;
                 }
 
-                // Loại bỏ prefix của base64 image nếu có
-                string base64Data = capturedImageBase64;
-                if (base64Data.Contains(","))
-                {
-                    base64Data = base64Data.Substring(base64Data.IndexOf(",") + 1);
-                }
-
-                var apiUrl = "https://api.fpt.ai/vision/face/verifications";
-                var apiKey = "S6X5dLj4vaMzn52cEWshCUrXLgkb7lJi";
-
-                byte[] cccdBytes;
-                using (var ms = new MemoryStream())
-                {
-                    await cccdImage.CopyToAsync(ms);
-                    cccdBytes = ms.ToArray();
-                }
+                // Xử lý base64 ảnh khuôn mặt
+                string base64Data = capturedImageBase64.Contains(",")
+                    ? capturedImageBase64.Substring(capturedImageBase64.IndexOf(",") + 1)
+                    : capturedImageBase64;
 
                 byte[] faceBytes;
                 try
@@ -206,33 +195,47 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
                 }
                 catch (FormatException ex)
                 {
-                    _logger.LogError(ex, "Lỗi chuyển đổi ảnh khuôn mặt từ base64");
+                    _logger.LogError(ex, "Lỗi giải mã base64 ảnh khuôn mặt");
                     return false;
                 }
+
+                byte[] cccdBytes;
+                using (var ms = new MemoryStream())
+                {
+                    await cccdImage.CopyToAsync(ms);
+                    cccdBytes = ms.ToArray();
+                }
+
+                // Gọi API mới
+                var apiUrl = "https://api.fpt.ai/dmp/checkface/v1";
+                var apiKey = "S6X5dLj4vaMzn52cEWshCUrXLgkb7lJi";
 
                 using var client = new HttpClient();
                 client.DefaultRequestHeaders.Add("api-key", apiKey);
 
                 using var content = new MultipartFormDataContent();
-                content.Add(new ByteArrayContent(cccdBytes), "image1", "cccd.jpg");
-                content.Add(new ByteArrayContent(faceBytes), "image2", "face.jpg");
+                content.Add(new ByteArrayContent(cccdBytes), "file[]", "cccd.jpg");
+                content.Add(new ByteArrayContent(faceBytes), "file[]", "face.jpg");
 
                 var response = await client.PostAsync(apiUrl, content);
                 var json = await response.Content.ReadAsStringAsync();
+                _logger.LogInformation("API Response: " + json);
 
-                _logger.LogInformation($"API Response: {json}");
-
-                dynamic result = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+                dynamic result = JsonConvert.DeserializeObject(json);
+                bool matched = result?.data?.matched ?? false;
                 double similarity = result?.data?.similarity ?? 0;
 
-                return similarity >= 0.75;
+                _logger.LogInformation($"Matched: {matched}, Similarity: {similarity}");
+
+                return matched && similarity >= 0.75;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi trong quá trình xác thực khuôn mặt");
+                _logger.LogError(ex, "Lỗi xác thực khuôn mặt");
                 return false;
             }
         }
+
 
         public async Task<IActionResult> OnPostAsync(string action, string returnUrl = null)
         {

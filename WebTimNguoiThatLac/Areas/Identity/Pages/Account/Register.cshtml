@@ -211,7 +211,15 @@
         </div>
     </div>
 </div>
-
+@if (ViewData.ModelState[""]?.Errors.Count > 0)
+{
+    <div class="alert alert-danger">
+        @foreach (var err in ViewData.ModelState[""].Errors)
+        {
+            <div><i class="fas fa-times-circle"></i> @err.ErrorMessage</div>
+        }
+    </div>
+}
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 

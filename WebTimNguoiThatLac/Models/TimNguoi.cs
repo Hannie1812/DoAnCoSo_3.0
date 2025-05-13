@@ -1,13 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using WebTimNguoiThatLac.Data;
+using WebTimNguoiThatLac.Extensions;
 
 namespace WebTimNguoiThatLac.Models
 {
     [Table("TimNguoi")]
     public class TimNguoi
     {
-        
-        public  TimNguoi()
+
+        public TimNguoi()
         {
             this.AnhTimNguois = new HashSet<AnhTimNguoi>();
             this.BinhLuans = new HashSet<BinhLuan>();
@@ -25,7 +29,7 @@ namespace WebTimNguoiThatLac.Models
         [DataType(DataType.Html)]
         [Required(ErrorMessage = "Nội dung mô tả không được để trống")]
         public string? MoTa { get; set; }
-        public string DaciemNhanDang { get; set; } 
+        public string DaciemNhanDang { get; set; }
         public int? GioiTinh { get; set; }
         public bool active { get; set; } = false;
         public string? TrangThai { get; set; } = "Đang Tìm Kiếm";// Cần hỗ trợ từ cộng đồng , Đã tìm thấy
@@ -56,13 +60,13 @@ namespace WebTimNguoiThatLac.Models
         [DataType(DataType.Date)]
         public DateTime? NgaySinh { get; set; }  // Ngày sinh
         public bool NguoiDangBaiXoa { get; set; } = false; // Người đăng bài Đã Xóa bài viết
-        public  ICollection<AnhTimNguoi>? AnhTimNguois { get; set; }
+        public ICollection<AnhTimNguoi>? AnhTimNguois { get; set; }
 
         public string? IdNguoiDung { get; set; }
         [ForeignKey("IdNguoiDung")]
-        public  ApplicationUser? ApplicationUser { get; set; }
+        public ApplicationUser? ApplicationUser { get; set; }
 
-        public  ICollection<BinhLuan>? BinhLuans { get; set; }
+        public ICollection<BinhLuan>? BinhLuans { get; set; }
 
         public string? DonDangKiTrinhBao { get; set; }
         public ICollection<BaoCaoBaiViet> BaoCaoBaiViets { get; set; }
@@ -70,8 +74,55 @@ namespace WebTimNguoiThatLac.Models
         public ICollection<NhanChung> NhanChungs { get; set; }
 
 
-    
+        // Lưu descriptor trung bình
+        [Column(TypeName = "varbinary(512)")]
+        public byte[]? AverageDescriptorBytes { get; set; }
 
+        [NotMapped]
+        public float[]? AverageDescriptor
+        {
+            get => AverageDescriptorBytes?.ToFloatArray();
+            set => AverageDescriptorBytes = value?.ToByteArray();
+        }
 
+        public virtual ICollection<FaceDescriptor>? FaceDescriptors { get; set; }
+
+        public void CalculateAverageDescriptor(IEnumerable<float[]> descriptors)
+        {
+            if (descriptors?.Any() != true)
+            {
+                AverageDescriptorBytes = null;
+                return;
+            }
+
+            int length = descriptors.First().Length;
+            float[] average = new float[length];
+
+            foreach (var descriptor in descriptors)
+            {
+                for (int i = 0; i < length; i++)
+                {
+                    average[i] += descriptor[i];
+                }
+            }
+
+            for (int i = 0; i < length; i++)
+            {
+                average[i] /= descriptors.Count();
+            }
+
+            AverageDescriptorBytes = average.ToByteArray();
+        }
+
+        // Có thể thêm phương thức update khi thêm/xóa ảnh
+        public async Task UpdateAverageDescriptorAsync(ApplicationDbContext db)
+        {
+            var descriptors = await db.AnhTimNguois
+                .Where(a => a.IdNguoiCanTim == this.Id && a.FaceDescriptor != null)
+                .Select(a => JsonConvert.DeserializeObject<float[]>(a.FaceDescriptor))
+                .ToListAsync();
+
+            CalculateAverageDescriptor(descriptors);
+        }
     }
 }

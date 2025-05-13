@@ -31,5 +31,7 @@ namespace WebTimNguoiThatLac.Data
         public DbSet<TinhThanh> TinhThanhs { get; set; }
         public DbSet<QuanHuyen> QuanHuyens { get; set; }
 
+        public DbSet<FaceDescriptor> FaceDescriptors { get; set; } // Bảng lưu trữ FaceDescriptor
+
     }
 }

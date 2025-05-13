@@ -12,10 +12,10 @@ namespace WebTimNguoiThatLac.Models
         public int? TrangThai { get; set; }
 
         public int IdNguoiCanTim { get; set; }
-        [ForeignKey("IdNguoiCanTim")] 
+        [ForeignKey("IdNguoiCanTim")]
         public virtual TimNguoi? TimNguoi { get; set; }
 
-
+        public string? FaceDescriptor { get; set; }
 
     }
 }

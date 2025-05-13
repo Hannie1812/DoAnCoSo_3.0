@@ -26,6 +26,7 @@ namespace WebTimNguoiThatLac.Models
             set => _cccd = value == null ? null : WebTimNguoiThatLac.BoTro.Filter.EncryptCCCD(value);
         }
         public string? HinhAnh { get; set; }
+        public bool IsAvatarCustomized { get; set; } = false; // Đánh dấu avatar đã được người dùng tự thay đổi
         public int SoLanViPham { get; set; } = 0; // 👉 Đếm số lần vi phạm
 
         public bool IsAdmin { get; set; } = false; // 👉 Thêm để phân quyền

@@ -1,0 +1,644 @@
+﻿<style>
+    .custom-file-label::after {
+        content: "Chọn";
+        background-color: #4e73df;
+        color: white;
+        border-left: 1px solid #d1d3e2;
+    }
+
+    .custom-file-input:lang(en) ~ .custom-file-label::after {
+        content: "Select";
+    }
+
+    #searchResults {
+        display: block !important;
+        opacity: 1;
+        transition: all 0.3s ease;
+    }
+
+    .detection-container {
+        position: relative;
+        margin: 0 auto;
+        max-width: 500px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .detection-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+    }
+
+    .progress-container {
+        height: 6px;
+        background: #f0f0f0;
+        border-radius: 3px;
+        margin-top: 10px;
+        overflow: hidden;
+    }
+
+    .progress-bar-animated {
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, #4e73df, #224abe);
+        transition: width 0.3s ease;
+    }
+
+    .similarity-badge {
+        min-width: 60px;
+        font-size: 0.8rem;
+        padding: 5px 8px;
+    }
+
+    .result-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+        .result-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.12);
+        }
+
+    .face-count-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+    }
+
+    .loading-spinner {
+        width: 3rem;
+        height: 3rem;
+        border-width: 0.3em;
+    }
+
+    .upload-area {
+        border: 2px dashed #d1d3e2;
+        border-radius: 8px;
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: #f8f9fc;
+        margin-bottom: 1rem;
+    }
+
+        .upload-area:hover {
+            border-color: #4e73df;
+            background: #f0f4ff;
+        }
+
+    .upload-icon {
+        font-size: 3rem;
+        color: #4e73df;
+        margin-bottom: 1rem;
+    }
+</style>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-gradient-primary text-white py-3 border-0">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-circle bg-white text-primary mr-3">
+                            <i class="fas fa-camera-retro"></i>
+                        </div>
+                        <div>
+                            <h2 class="h4 mb-0">Tìm kiếm bằng hình ảnh</h2>
+                            <p class="small mb-0 opacity-75">Tải lên hình ảnh để tìm kiếm bài viết phù hợp</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-lg-5">
+                    <!-- Upload Area -->
+                    <div id="uploadArea" class="upload-area">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <h5 class="font-weight-bold">Kéo thả ảnh vào đây hoặc nhấn để chọn</h5>
+                        <p class="small text-muted">Hỗ trợ định dạng JPG, PNG (tối đa 5MB)</p>
+                        <div class="progress-container">
+                            <div id="uploadProgress" class="progress-bar-animated"></div>
+                        </div>
+                    </div>
+
+                    <!-- File Input (hidden) -->
+                    <div class="form-group d-none">
+                        <div class="custom-file">
+                            <input type="file" id="searchImage" class="custom-file-input" accept="image/*">
+                            <label class="custom-file-label" for="searchImage">Chọn hình ảnh...</label>
+                        </div>
+                    </div>
+
+                    <!-- Detection Result -->
+                    <div id="detectionResult" class="mt-4" style="display:none;">
+                        <div class="alert alert-success d-flex align-items-center">
+                            <i class="fas fa-check-circle fa-lg mr-3"></i>
+                            <div>
+                                <h5 class="alert-heading mb-1" id="detectionMessage">Đã phát hiện khuôn mặt</h5>
+                                <p class="small mb-0">Nhấn nút bên dưới để tìm kiếm bài viết phù hợp</p>
+                            </div>
+                        </div>
+
+                        <div class="detection-container">
+                            <img id="previewImage" class="img-fluid d-block">
+                            <canvas id="detectionCanvas" class="detection-canvas"></canvas>
+                            <div id="faceCountBadge" class="face-count-badge"></div>
+                        </div>
+
+                        <button id="searchBtn" class="btn btn-primary btn-block mt-4 py-2">
+                            <i class="fas fa-search mr-2"></i>Tìm kiếm bài viết
+                        </button>
+                    </div>
+
+                    <!-- Loading Section -->
+                    <div id="loadingSection" class="text-center py-5" style="display:none;">
+                        <div class="loading-spinner spinner-border text-primary" role="status">
+                            <span class="sr-only">Đang tải...</span>
+                        </div>
+                        <h5 class="mt-3" id="loadingMessage">Đang xử lý...</h5>
+                        <div class="progress w-50 mx-auto mt-3">
+                            <div id="modelLoadProgress" class="progress-bar progress-bar-striped progress-bar-animated"
+                                 role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Error Section -->
+                    <div id="errorSection" class="alert alert-danger mt-3" style="display:none;">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-exclamation-triangle fa-lg mr-3"></i>
+                            <div>
+                                <h5 class="alert-heading mb-1" id="errorTitle">Đã xảy ra lỗi</h5>
+                                <p class="mb-0" id="errorMessage"></p>
+                            </div>
+                        </div>
+                        <div id="errorActions" class="mt-3 text-center"></div>
+                    </div>
+
+                    <!-- Search Results -->
+                    <div id="searchResults" class="mt-5">
+                        <h4 class="h5 text-center text-muted mb-4">
+                            <i class="fas fa-image mr-2"></i>Kết quả tìm kiếm sẽ hiển thị tại đây
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <script>
+        // State management
+        const appState = {
+            faceDescriptor: null,
+            isProcessing: false,
+            modelsLoaded: false,
+            modelLoadProgress: 0
+        };
+
+        // Initialize
+        $(document).ready(async function() {
+            setupDragAndDrop();
+            setupEventListeners();
+            await loadFaceModels();
+        });
+
+        // Setup drag and drop
+        function setupDragAndDrop() {
+            const uploadArea = $('#uploadArea')[0];
+            const fileInput = $('#searchImage')[0];
+
+            uploadArea.addEventListener('click', () => fileInput.click());
+
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                $(uploadArea).css('border-color', '#4e73df');
+                $(uploadArea).css('background', '#f0f4ff');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                $(uploadArea).css('border-color', '#d1d3e2');
+                $(uploadArea).css('background', '#f8f9fc');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                $(uploadArea).css('border-color', '#d1d3e2');
+                $(uploadArea).css('background', '#f8f9fc');
+
+                if (e.dataTransfer.files.length) {
+                    fileInput.files = e.dataTransfer.files;
+                    handleImageUpload({ target: fileInput });
+                }
+            });
+        }
+
+        // Load face recognition models with progress tracking
+        async function loadFaceModels() {
+            if (appState.modelsLoaded) return;
+
+            try {
+                showLoading("Đang tải mô hình nhận diện...", true);
+
+                // Update progress during model loading
+                const updateProgress = (progress) => {
+                    appState.modelLoadProgress = progress;
+                    $('#modelLoadProgress').css('width', `${progress}%`);
+
+                    if (progress < 30) {
+                        $('#loadingMessage').text("Đang tải mô hình phát hiện khuôn mặt...");
+                    } else if (progress < 70) {
+                        $('#loadingMessage').text("Đang tải mô hình nhận diện đặc điểm...");
+                    } else {
+                        $('#loadingMessage').text("Đang khởi tạo hệ thống nhận diện...");
+                    }
+                };
+
+                // Load models with simulated progress
+                await Promise.all([
+                    simulateProgress(10, 30, updateProgress),
+                    faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights'),
+                    simulateProgress(30, 60, updateProgress),
+                    faceapi.nets.faceLandmark68Net.loadFromUri('https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights'),
+                    simulateProgress(60, 90, updateProgress),
+                    faceapi.nets.faceRecognitionNet.loadFromUri('https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights'),
+                    simulateProgress(90, 100, updateProgress)
+                ]);
+
+                appState.modelsLoaded = true;
+                hideLoading();
+                console.log("Mô hình nhận diện đã sẵn sàng");
+            } catch (error) {
+                console.error("Lỗi tải mô hình:", error);
+                showError("Không thể tải mô hình nhận diện. Vui lòng tải lại trang.", true);
+            }
+        }
+
+        // Simulate progress for better UX
+        function simulateProgress(start, end, callback, duration = 1000) {
+            return new Promise(resolve => {
+                const stepTime = 50;
+                const steps = duration / stepTime;
+                const increment = (end - start) / steps;
+                let current = start;
+
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= end) {
+                        current = end;
+                        clearInterval(timer);
+                        resolve();
+                    }
+                    callback(Math.floor(current));
+                }, stepTime);
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            $('#searchImage').change(handleImageUpload);
+            $('#searchBtn').click(performSearch);
+        }
+
+        // Handle image upload with progress
+        async function handleImageUpload(e) {
+            if (!appState.modelsLoaded) {
+                showError("Mô hình nhận diện chưa sẵn sàng");
+                return;
+            }
+
+            const file = e.target.files[0];
+            if (!file) return;
+
+            resetUI();
+            showLoading("Đang tải ảnh lên...");
+
+            try {
+                // Simulate upload progress
+                await simulateUploadProgress(file);
+
+                // Validate image
+                if (!file.type.match('image.*')) {
+                    throw new Error("File không phải là ảnh");
+                }
+                if (file.size > 5 * 1024 * 1024) {
+                    throw new Error("Ảnh quá lớn (>5MB)");
+                }
+
+                $('#loadingMessage').text("Đang phân tích ảnh...");
+
+                const imgUrl = URL.createObjectURL(file);
+                const img = await faceapi.fetchImage(imgUrl);
+
+                // Detect faces with progress feedback
+                $('#loadingMessage').text("Đang phát hiện khuôn mặt...");
+                const detections = await faceapi.detectAllFaces(img,
+                    new faceapi.TinyFaceDetectorOptions())
+                    .withFaceLandmarks()
+                    .withFaceDescriptors();
+
+                if (detections.length === 0) {
+                    throw new Error("Không phát hiện khuôn mặt trong ảnh");
+                }
+
+                // Store descriptor
+                appState.faceDescriptor = Array.from(detections[0].descriptor);
+
+                // Display results
+                displayDetectionResult(img, detections, imgUrl);
+
+            } catch (error) {
+                console.error("Lỗi phân tích ảnh:", error);
+                showError(error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Simulate upload progress
+        function simulateUploadProgress(file) {
+            return new Promise(resolve => {
+                let progress = 0;
+                $('#uploadProgress').css('width', '0%');
+
+                const interval = setInterval(() => {
+                    progress += 5 + Math.random() * 10;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
+                        setTimeout(resolve, 300);
+                    }
+                    $('#uploadProgress').css('width', `${progress}%`);
+                }, 100);
+            });
+        }
+
+        // Display detection results
+        function displayDetectionResult(img, detections, imgUrl) {
+            const canvas = $('#detectionCanvas')[0];
+            const displaySize = {
+                width: Math.min(img.width, 500),
+                height: Math.min(img.height, 500) * (img.height / img.width)
+            };
+
+            // Set canvas dimensions
+            canvas.width = displaySize.width;
+            canvas.height = displaySize.height;
+
+            // Resize detections to display size
+            const resizedDetections = faceapi.resizeResults(detections, displaySize);
+
+            // Draw detections
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Use nicer drawing styles
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#4e73df';
+            ctx.fillStyle = 'rgba(78, 115, 223, 0.2)';
+
+            faceapi.draw.drawDetections(canvas, resizedDetections);
+            faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+
+            // Draw face count
+            if (detections.length > 1) {
+                $('#faceCountBadge').text(detections.length).show();
+            } else {
+                $('#faceCountBadge').hide();
+            }
+
+            // Display image with proper dimensions
+            $('#previewImage').attr('src', imgUrl)
+                .css('width', '100%')
+                .css('height', 'auto')
+                .on('load', function() {
+                    URL.revokeObjectURL(imgUrl);
+                });
+
+            // Update message
+            const faceText = detections.length > 1 ? `Đã phát hiện ${detections.length} khuôn mặt` : 'Đã phát hiện khuôn mặt';
+            $('#detectionMessage').text(faceText);
+            $('#detectionResult').show();
+
+            // Reset upload progress
+            $('#uploadProgress').css('width', '0%');
+        }
+
+        // Perform search
+        async function performSearch() {
+            if (!appState.faceDescriptor) {
+                showError("Vui lòng chọn ảnh có khuôn mặt trước");
+                return;
+            }
+
+            resetResults();
+            showLoading("Đang tìm kiếm bài viết...");
+            $('#searchBtn').prop('disabled', true);
+
+            try {
+                const response = await fetch('/TimNguoi/TimKiemBangHinhAnh', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ descriptor: appState.faceDescriptor })
+                });
+
+                const data = await response.json();
+                console.log("Kết quả từ server:", data);
+
+                if (!response.ok) {
+                    const errorDetails = data.details ? `<br><small>${data.details}</small>` : '';
+                    throw new Error(`${data.message || "Lỗi khi tìm kiếm"}${errorDetails}`);
+                }
+
+                const resultPosts = data.data?.posts || data.posts || [];
+                displaySearchResults(resultPosts);
+
+            } catch (error) {
+                console.error("Lỗi tìm kiếm:", error);
+                showError(error.message, true);
+            } finally {
+                hideLoading();
+                $('#searchBtn').prop('disabled', false);
+            }
+        }
+
+        // Display search results
+        function displaySearchResults(posts) {
+            const $results = $('#searchResults');
+            $results.empty();
+
+            if (!posts || posts.length === 0) {
+                $results.html(`
+                    <div class="text-center py-4">
+                        <div class="empty-state">
+                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                            <h4 class="h5">Không tìm thấy bài viết phù hợp</h4>
+                            <p class="text-muted">Hãy thử với hình ảnh khác hoặc kiểm tra lại sau</p>
+                        </div>
+                    </div>
+                `);
+                return;
+            }
+
+            let html = `
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="h5 mb-0"><i class="fas fa-list-ul mr-2"></i>Kết quả tìm kiếm</h4>
+                    <span class="badge badge-primary">${posts.length} kết quả</span>
+                </div>
+            `;
+
+            posts.forEach((item, index) => {
+                const post = {
+                    id: item.postId || item.partial || item.Id || item.id,
+                    title: item.title || item.TieuDe,
+                    description: item.description || item.MoTa,
+                    imageUrl: item.imageUrl || item.MainImage,
+                    similarity: item.similarity || item.Similarity
+                };
+
+                const similarityPercent = Math.round((post.similarity || 0) * 100);
+                const similarityColor = getSimilarityColor(similarityPercent);
+                const similarityClass = getSimilarityClass(similarityPercent);
+
+                // Format description to show only first 100 characters
+                const shortDescription = post.description
+                    ? (post.description.length > 100
+                        ? post.description.substring(0, 100) + '...'
+                        : post.description)
+                    : 'Không có mô tả';
+
+                html += `
+                <div class="result-card mb-4">
+                    <div class="card-body p-0">
+                        <div class="row no-gutters">
+                            <div class="col-md-4">
+                                <div class="position-relative h-100">
+                                    <img src="${post.imageUrl || '/images/default-avatar.jpg'}"
+                                         class="img-fluid h-100 w-100 object-cover"
+                                         style="min-height: 200px;"
+                                         onerror="this.src='/images/default-avatar.jpg'">
+                                    <span class="badge ${similarityClass} similarity-badge position-absolute"
+                                          style="bottom: 15px; left: 15px;">
+                                        ${similarityPercent}% phù hợp
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="p-4 h-100 d-flex flex-column">
+                                    <h5 class="font-weight-bold">${post.title || 'Không có tiêu đề'}</h5>
+                                    <p class="text-muted flex-grow-1">${shortDescription}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <a href="/TimNguoi/ChiTietBaiTimNguoi/${post.id}"
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye mr-1"></i>Xem chi tiết
+                                        </a>
+                                        <small class="text-muted">Kết quả #${index + 1}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+
+            $results.html(html).show();
+        }
+
+        // Helper functions
+        function showLoading(message, isModelLoading = false) {
+            $('#loadingSection').show();
+            $('#loadingMessage').text(message);
+
+            if (isModelLoading) {
+                $('#modelLoadProgress').parent().show();
+            } else {
+                $('#modelLoadProgress').parent().hide();
+            }
+        }
+
+        function hideLoading() {
+            $('#loadingSection').hide();
+        }
+
+        function showError(message, showRetry = false) {
+            $('#errorTitle').text(showRetry ? "Đã xảy ra lỗi" : "Thông báo");
+            $('#errorMessage').html(message);
+
+            let actions = '';
+            if (showRetry) {
+                actions = `
+                    <button onclick="retrySearch()" class="btn btn-primary mr-2">
+                        <i class="fas fa-redo mr-1"></i>Thử lại
+                    </button>
+                `;
+            }
+
+            $('#errorActions').html(actions);
+            $('#errorSection').show();
+        }
+
+        function hideError() {
+            $('#errorSection').hide();
+        }
+
+        function resetUI() {
+            hideError();
+            hideLoading();
+            $('#detectionResult').hide();
+            $('#faceCountBadge').hide();
+            $('#searchResults').empty().html(`
+                <h4 class="h5 text-center text-muted mb-4">
+                    <i class="fas fa-image mr-2"></i>Kết quả tìm kiếm sẽ hiển thị tại đây
+                </h4>
+            `);
+        }
+
+        function resetResults() {
+            $('#searchResults').empty();
+            hideError();
+        }
+
+        function getSimilarityColor(percent) {
+            if (percent >= 80) return '#28a745';
+            if (percent >= 60) return '#17a2b8';
+            if (percent >= 40) return '#ffc107';
+            return '#dc3545';
+        }
+
+        function getSimilarityClass(percent) {
+            if (percent >= 80) return 'badge-success';
+            if (percent >= 60) return 'badge-info';
+            if (percent >= 40) return 'badge-warning';
+            return 'badge-danger';
+        }
+
+        function retrySearch() {
+            if (appState.faceDescriptor) {
+                performSearch();
+            } else if ($('#searchImage')[0].files.length) {
+                handleImageUpload({ target: $('#searchImage')[0] });
+            }
+        }
+    </script>
+}

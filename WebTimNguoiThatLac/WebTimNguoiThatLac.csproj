@@ -7,27 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\wwwroot\uploads\**" />
+    <Content Remove="wwwroot\wwwroot\uploads\**" />
+    <EmbeddedResource Remove="wwwroot\wwwroot\uploads\**" />
+    <None Remove="wwwroot\wwwroot\uploads\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
     <Folder Include="ViewComponents\" />
     <Folder Include="wwwroot\DangKiTimKiem\" />
-    <Folder Include="wwwroot\uploads\AnhMinhChungTimThay\" />
-    <Folder Include="wwwroot\uploads\AnhTinNhan\" />
-    <Folder Include="wwwroot\uploads\BinhLuan\" />
-    <Folder Include="wwwroot\uploads\CCCD_NguoiDung\" />
-    <Folder Include="wwwroot\uploads\GioiThieu\" />
-    <Folder Include="wwwroot\uploads\AnhNhanChung\" />
-    <Folder Include="wwwroot\uploads\TinTuc\" />
-    <Folder Include="wwwroot\uploads\TrungBayHinhAnh\" />
+    <Folder Include="wwwroot\temp\uploads\" />
+    <Folder Include="wwwroot\uploads\TempImages\" />
     <Folder Include="wwwroot\wwwroot\DangKiTimKiem\" />
-    <Folder Include="wwwroot\wwwroot\uploads\AnhMinhChungTimThay\" />
-    <Folder Include="wwwroot\wwwroot\uploads\AnhMinhTrungBaoCaoBaiViet\" />
-    <Folder Include="wwwroot\wwwroot\uploads\AnhNguoiCanTim\" />
-    <Folder Include="wwwroot\wwwroot\uploads\AnhTinNhan\" />
-    <Folder Include="wwwroot\wwwroot\uploads\BinhLuan\" />
-    <Folder Include="wwwroot\wwwroot\uploads\CCCD_NguoiDung\" />
-    <Folder Include="wwwroot\wwwroot\uploads\GioiThieu\" />
-    <Folder Include="wwwroot\wwwroot\uploads\TinTuc\" />
-    <Folder Include="wwwroot\wwwroot\uploads\TrungBayHinhAnh\" />
     <Folder Include="wwwroot\wwwroot\XacNhanTimThay\" />
     <Folder Include="wwwroot\XacNhanTimThay\" />
   </ItemGroup>

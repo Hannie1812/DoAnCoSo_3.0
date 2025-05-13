@@ -79,5 +79,10 @@ namespace WebTimNguoiThatLac.Controllers
             };
             return View(errorModel);
         }
+
+        public IActionResult test()
+        {
+            return View();
+        }
     }
 }

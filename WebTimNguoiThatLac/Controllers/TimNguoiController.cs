@@ -1,14 +1,10 @@
-﻿using DocumentFormat.OpenXml.InkML;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Microsoft.AspNetCore.Authorization;
+﻿
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+
 using System.Security.Claims;
 using WebTimNguoiThatLac.BoTro;
 using WebTimNguoiThatLac.Data;
@@ -17,8 +13,13 @@ using WebTimNguoiThatLac.Services;
 using X.PagedList.Extensions;
 using WebTimNguoiThatLac.ViewModels;
 using WebTimNguoiThatLac.Areas.Admin.Models;
-using X.PagedList;
-using System.Threading.Tasks;
+
+using Newtonsoft.Json;
+
+using WebTimNguoiThatLac.Extensions;
+using WebTimNguoiThatLac.ThuMucTimKiem;
+using WebTimNguoiThatLac.Helpers;
+
 
 namespace WebTimNguoiThatLac.Controllers
 {
@@ -32,6 +33,8 @@ namespace WebTimNguoiThatLac.Controllers
         private readonly OtpService _otpService;
         private readonly ILogger<TimNguoiController> _logger;
         private const int ReportThreshold = 3;// vi pham
+        private readonly IWebHostEnvironment _env;
+
 
         /*private static readonly IEnumerable<string> TinhThanhIEnumerable = new List<string>
         {
@@ -100,13 +103,17 @@ namespace WebTimNguoiThatLac.Controllers
             "Phú Yên"
         };*/
 
-        public TimNguoiController(ApplicationDbContext db, UserManager<ApplicationUser> userManager, EmailService emailService, OtpService otpService, ILogger<TimNguoiController> logger)
+ 
+
+        public TimNguoiController(ApplicationDbContext db, UserManager<ApplicationUser> userManager, EmailService emailService, OtpService otpService, ILogger<TimNguoiController> logger, IWebHostEnvironment env)
         {
             this.db = db;
             _userManager = userManager;
             _emailService = emailService;
             _otpService = otpService;
             _logger = logger;
+            _env = env;
+
         }
 
         [HttpGet]
@@ -383,6 +390,7 @@ namespace WebTimNguoiThatLac.Controllers
 
             return View(pagedList);
         }
+
         public async Task<IActionResult> ThemNguoiCanTim()
         {
             // Kiểm tra xem email đã được xác thực chưa
@@ -400,12 +408,12 @@ namespace WebTimNguoiThatLac.Controllers
                     }
                     else
                     {
-                        return RedirectToAction("VerifyOtp");
+                        //return RedirectToAction("VerifyOtp");
                     }
                 }
                 else
                 {
-                    return RedirectToAction("VerifyOtp");
+                    //return RedirectToAction("VerifyOtp");
                 }
             }
             if (User.Identity.IsAuthenticated)
@@ -443,81 +451,101 @@ namespace WebTimNguoiThatLac.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ThemNguoiCanTim(TimNguoi timNguoi, List<IFormFile> DSHinhAnhCapNhat)
+        public async Task<IActionResult> ThemNguoiCanTim(
+                                                                TimNguoi timNguoi,
+                                                                List<IFormFile> DSHinhAnhCapNhat,
+                                                                string faceDescriptorsJson)
         {
-            if (User.Identity.IsAuthenticated)
+            if (!User.Identity.IsAuthenticated)
             {
-                var nguoiDung = await _userManager.GetUserAsync(User);
-                if (nguoiDung == null)
-                {
-                    // Ghi log
-                    _logger.LogWarning($"Tài khoản {nguoiDung.Email} đã bị vô hiệu hóa do vi phạm quy định.");
-                    TempData["WarningMessage"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
-                    return Redirect("/Identity/Account/Login");
-                }
-                if (nguoiDung.Active == false)
-                {
-                    TempData["WarningMessage"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
-                    return RedirectToAction("Index", "LoiViPham", new { area = "" });
-                }
+                return Redirect("/Identity/Account/Login");
+            }
+
+            var nguoiDung = await _userManager.GetUserAsync(User);
+            if (nguoiDung == null || nguoiDung.Active == false)
+            {
+                TempData["WarningMessage"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
+                return RedirectToAction("Index", "LoiViPham", new { area = "" });
             }
             await LoadSelectListsAsync();
 
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
+                return View(timNguoi);
+            }
 
-                if (DSHinhAnhCapNhat == null)
-                {
-                    ModelState.AddModelError("Lỗi", "Chưa Có Hình Ảnh");
-                    await LoadSelectListsAsync();
-                    return View(timNguoi);
-                }
+            if (DSHinhAnhCapNhat == null || DSHinhAnhCapNhat.Count == 0)
+            {
+                ModelState.AddModelError("Lỗi", "Chưa Có Hình Ảnh");
+                return View(timNguoi);
+            }
 
-                timNguoi.active = false;
-                db.Add(timNguoi);
-                await db.SaveChangesAsync();
-                int d = 0;
-                if (DSHinhAnhCapNhat.Count == 0)
+            // Xử lý descriptors từ client
+            FaceDescriptorData? descriptorData = null;
+            if (!string.IsNullOrEmpty(faceDescriptorsJson))
+            {
+                try
                 {
-                    ModelState.AddModelError("Lỗi", "Chưa Có Hình Ảnh");
-                    await LoadSelectListsAsync();
-                    return View(timNguoi);
-                }
-                foreach (IFormFile i in DSHinhAnhCapNhat)
-                {
-                    AnhTimNguoi x = new AnhTimNguoi();
-                    x.IdNguoiCanTim = timNguoi.Id;
-                    if (d == 0)
+                    descriptorData = JsonConvert.DeserializeObject<FaceDescriptorData>(faceDescriptorsJson);
+                    _logger.LogInformation("Parsed faceDescriptorsJson: DescriptorsCount={DescriptorsCount}, AverageDescriptorLength={AvgLength}",
+                        descriptorData?.Descriptors?.Count, descriptorData?.AverageDescriptor?.Length);
+
+                    if (descriptorData?.AverageDescriptor != null && descriptorData.AverageDescriptor.Length == 128)
                     {
-                        x.TrangThai = 1;
-                        d++;
+                        timNguoi.AverageDescriptor = descriptorData.AverageDescriptor;
+                        _logger.LogInformation("Đã gán AverageDescriptor cho bài viết ID {Id}", timNguoi.Id);
                     }
                     else
                     {
-                        x.TrangThai = 0;
+                        _logger.LogWarning("AverageDescriptor không hợp lệ: {Length}", descriptorData?.AverageDescriptor?.Length);
                     }
-                    x.HinhAnh = await SaveImage(i, "AnhNguoiCanTim");
-                    db.AnhTimNguois.Add(x);
-                    await db.SaveChangesAsync();
                 }
-                //TempData["WarningMessage"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
-
-                return Redirect("/Identity/Account/Manage/Index");
-                //return RedirectToAction("Index", "LoiViPham", new { area = "" });
-
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Lỗi khi xử lý face descriptors: {Json}", faceDescriptorsJson);
+                }
+            }
+            else
+            {
+                _logger.LogWarning("faceDescriptorsJson rỗng hoặc null");
             }
 
-            await LoadSelectListsAsync();
-            return View(timNguoi);
+            timNguoi.active = false;
+            db.Add(timNguoi);
+            await db.SaveChangesAsync();
+
+            int primaryImageIndex = 0;
+            for (int i = 0; i < DSHinhAnhCapNhat.Count; i++)
+            {
+                var file = DSHinhAnhCapNhat[i];
+                var anhTimNguoi = new AnhTimNguoi
+                {
+                    IdNguoiCanTim = timNguoi.Id,
+                    TrangThai = (i == primaryImageIndex) ? 1 : 0,
+                    HinhAnh = await SaveImage(file, "AnhNguoiCanTim")
+                };
+
+                if (descriptorData?.Descriptors != null && i < descriptorData.Descriptors.Count)
+                {
+                    anhTimNguoi.FaceDescriptor = JsonConvert.SerializeObject(descriptorData.Descriptors[i]);
+                    _logger.LogInformation("Saved FaceDescriptor for image {Index}: Length = {Length}", i, descriptorData.Descriptors[i].Length);
+                }
+
+                db.AnhTimNguois.Add(anhTimNguoi);
+            }
+
+            await db.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Đã thêm bài viết thành công. Bài viết đang chờ kiểm duyệt.";
+            return Redirect("/Identity/Account/Manage/Index");
         }
-        private async Task LoadSelectListsAsync()
+
+        public class FaceDescriptorData
         {
-            var tinhThanhs = await db.TinhThanhs.ToListAsync();
-            var quanHuyens = await db.QuanHuyens.ToListAsync();
-            ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
-            ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
+            public List<float[]> Descriptors { get; set; }
+            public float[] AverageDescriptor { get; set; }
         }
+
 
         public async Task<string> SaveImage(IFormFile ImageURL, string subFolder)
         {
@@ -546,6 +574,8 @@ namespace WebTimNguoiThatLac.Controllers
             {
                 await ImageURL.CopyToAsync(fileStream);
             }
+
+
 
             // Trả về đường dẫn tương đối để hiển thị ảnh trên web
             return $"/uploads/{subFolder}/{uniqueFileName}";
@@ -745,7 +775,7 @@ namespace WebTimNguoiThatLac.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CapNhatBaiViet(TimNguoi x, List<IFormFile>? DSHinhAnhCapNhat)
+        public async Task<IActionResult> CapNhatBaiViet(TimNguoi x, List<IFormFile>? DSHinhAnhCapNhat, string? faceDescriptorsJson)
         {
             if (!User.Identity.IsAuthenticated)
             {
@@ -822,20 +852,6 @@ namespace WebTimNguoiThatLac.Controllers
                             await db.SaveChangesAsync();
                         }
 
-                        int d = 0;
-                        foreach (IFormFile i in DSHinhAnhCapNhat)
-                        {
-                            var z = new AnhTimNguoi();
-
-                            z.IdNguoiCanTim = y.Id;
-                            z.TrangThai = (d == 0) ? 1 : 0;
-                            z.HinhAnh = await SaveImage(i, "AnhNguoiCanTim");
-
-                            db.AnhTimNguois.Add(z);
-                            await db.SaveChangesAsync();
-                            d++;
-                        }
-
                         await db.SaveChangesAsync();
                         await transaction.CommitAsync(); // QUAN TRỌNG: Phải commit transaction
 
@@ -847,6 +863,61 @@ namespace WebTimNguoiThatLac.Controllers
                         ModelState.AddModelError("", "Có lỗi xảy ra khi cập nhật hình ảnh");
                         return View(x);
                     }
+
+
+                    // Xử lý descriptors từ client
+                    FaceDescriptorData? descriptorData = null;
+                    if (!string.IsNullOrEmpty(faceDescriptorsJson))
+                    {
+                        try
+                        {
+                            descriptorData = JsonConvert.DeserializeObject<FaceDescriptorData>(faceDescriptorsJson);
+                            _logger.LogInformation("Parsed faceDescriptorsJson: DescriptorsCount={DescriptorsCount}, AverageDescriptorLength={AvgLength}",
+                                descriptorData?.Descriptors?.Count, descriptorData?.AverageDescriptor?.Length);
+
+                            if (descriptorData?.AverageDescriptor != null && descriptorData.AverageDescriptor.Length == 128)
+                            {
+                                y.AverageDescriptor = descriptorData.AverageDescriptor; // cập nhật
+                                _logger.LogInformation("Đã gán AverageDescriptor cho bài viết ID {Id}", y.Id);
+                            }
+                            else
+                            {
+                                _logger.LogWarning("AverageDescriptor không hợp lệ: {Length}", descriptorData?.AverageDescriptor?.Length);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Lỗi khi xử lý face descriptors: {Json}", faceDescriptorsJson);
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogWarning("faceDescriptorsJson rỗng hoặc null");
+                    }
+
+                    await db.SaveChangesAsync();
+
+                    int primaryImageIndex = 0;
+                    for (int i = 0; i < DSHinhAnhCapNhat.Count; i++)
+                    {
+                        var file = DSHinhAnhCapNhat[i];
+                        var anhTimNguoi = new AnhTimNguoi
+                        {
+                            IdNguoiCanTim = y.Id,
+                            TrangThai = (i == primaryImageIndex) ? 1 : 0,
+                            HinhAnh = await SaveImage(file, "AnhNguoiCanTim")
+                        };
+
+                        if (descriptorData?.Descriptors != null && i < descriptorData.Descriptors.Count)
+                        {
+                            anhTimNguoi.FaceDescriptor = JsonConvert.SerializeObject(descriptorData.Descriptors[i]);
+                            _logger.LogInformation("Saved FaceDescriptor for image {Index}: Length = {Length}", i, descriptorData.Descriptors[i].Length);
+                        }
+
+                        db.AnhTimNguois.Add(anhTimNguoi);
+                    }
+
+                    await db.SaveChangesAsync();
                 }
             }
 
@@ -1626,67 +1697,133 @@ namespace WebTimNguoiThatLac.Controllers
         {
             return View();
         }
+
         [HttpPost]
-        [RequestSizeLimit(5 * 1024 * 1024)] // Giới hạn 5MB
-        public async Task<IActionResult> TimKiemBangHinhAnh(IFormFile file)
+        public async Task<IActionResult> TimKiemBangHinhAnh([FromBody] FaceSearchRequest request)
         {
             try
             {
-                // 1. Validate file
-                if (file == null || file.Length == 0)
+                _logger.LogInformation("Bắt đầu tìm kiếm bằng hình ảnh, Descriptor length = {Length}", request?.Descriptor?.Length);
+                if (request?.Descriptor == null || request.Descriptor.Length != 128)
                 {
-                    Console.WriteLine("❌ File null!");
-                    return BadRequest("File null rồi bạn ơi!");
+                    _logger.LogWarning("Dữ liệu khuôn mặt không hợp lệ: {DescriptorLength}", request?.Descriptor?.Length);
+                    return BadRequest(new ApiResponse
+                    {
+                        Success = false,
+                        Message = "Dữ liệu khuôn mặt không hợp lệ",
+                        ErrorCode = "INVALID_DESCRIPTOR"
+                    });
                 }
 
-                if (file.Length > 5 * 1024 * 1024) // 5MB
-                    return BadRequest("Kích thước ảnh không được vượt quá 5MB");
-
-                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
-                var fileExtension = Path.GetExtension(file.FileName).ToLower();
-                if (!allowedExtensions.Contains(fileExtension))
-                    return BadRequest("Chỉ chấp nhận file ảnh (jpg, jpeg, png)");
-
-                // 2. Lưu ảnh tạm
-                var tempImagePath = await SaveImage(file, "TempImages");
-                if (string.IsNullOrEmpty(tempImagePath))
-                    return StatusCode(500, "Lỗi khi lưu ảnh tạm");
-
-                var tempImageUrl = $"{Request.Scheme}://{Request.Host}{tempImagePath}";
-
-                // 3. Lấy dữ liệu bài viết (tối ưu chỉ lấy trường cần thiết)
-                var allPosts = await db.TimNguois
-                    .AsNoTracking() // Tăng performance
-                    .Where(t => t.active)
-                    .Include(t => t.AnhTimNguois)
-                    .Select(t => new {
-                        t.Id,
-                        t.HoTen,
-                        t.TieuDe,
-                        t.MoTa,
-                        DacDiem = t.DaciemNhanDang,
-                        t.NgayDang,
-                        Images = t.AnhTimNguois.Select(a => new {
-                            Url = a.HinhAnh,
-                            IsMain = a.TrangThai == 1
-                        }).ToList()
+                _logger.LogInformation("Truy vấn bài viết từ database");
+                var posts = await db.TimNguois
+                    .Include(p => p.AnhTimNguois)
+                    .Where(p => p.active) // Chỉ lấy bài viết active
+                    .Select(p => new
+                    {
+                        p.Id,
+                        p.TieuDe,
+                        p.MoTa,
+                        p.NgayDang,
+                        p.HoTen,
+                        MainImage = p.AnhTimNguois.FirstOrDefault(a => a.TrangThai == 1).HinhAnh,
+                        p.AverageDescriptorBytes
                     })
+                    .AsNoTracking()
                     .ToListAsync();
 
-                // 4. Trả về kết quả
-                return Json(new
+                _logger.LogInformation("Đã lấy được {PostCount} bài viết", posts.Count);
+                if (!posts.Any())
+                {
+                    _logger.LogWarning("Không có bài viết nào trong database");
+                    return Ok(new ApiResponse
+                    {
+                        Success = true,
+                        Data = new
+                        {
+                            posts = new List<object>(),
+                            metadata = new { totalCompared = 0, matchedCount = 0 }
+                        },
+                        Message = "Không có bài viết nào để so sánh"
+                    });
+                }
+
+                var results = new List<SearchResult>();
+                foreach (var post in posts)
+                {
+                    try
+                    {
+                        if (post.AverageDescriptorBytes == null || post.AverageDescriptorBytes.Length != 512)
+                        {
+                            _logger.LogWarning("Bài viết ID {PostId} có AverageDescriptorBytes null hoặc không hợp lệ, Length = {Length}", post.Id, post.AverageDescriptorBytes?.Length);
+                            continue;
+                        }
+
+                        _logger.LogInformation("Xử lý bài viết ID {PostId}, DescriptorBytes length = {Length}", post.Id, post.AverageDescriptorBytes.Length);
+                        var postDescriptor = WebTimNguoiThatLac.Helpers.FaceRecognitionHelper.ToFloatArray(post.AverageDescriptorBytes);
+                        if (postDescriptor == null || postDescriptor.Length != 128)
+                        {
+                            _logger.LogWarning("Descriptor không hợp lệ cho bài viết ID {PostId}: Length = {Length}", post.Id, postDescriptor?.Length);
+                            continue;
+                        }
+
+                        var similarity = 1 - FaceRecognitionHelper.CalculateEuclideanDistance(request.Descriptor, postDescriptor);
+                        _logger.LogInformation("Bài viết ID {PostId}: Similarity = {Similarity}", post.Id, similarity);
+                        if (similarity > 0.4) // Giảm ngưỡng xuống 0.4
+                        {
+                            results.Add(new SearchResult
+                            {
+                                PostId = post.Id,
+                                Title = post.TieuDe,
+                                Description = post.MoTa,
+                                Name = post.HoTen,
+                                PostedDate = post.NgayDang,
+                                ImageUrl = post.MainImage ?? "/images/default-avatar.jpg",
+                                Similarity = similarity
+                            });
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Lỗi khi xử lý bài viết ID {PostId}: {ErrorMessage}", post.Id, ex.Message);
+                        continue;
+                    }
+                }
+
+                _logger.LogInformation("Tìm thấy {ResultCount} kết quả", results.Count);
+                return Ok(new
                 {
                     success = true,
-                    tempImageUrl,
-                    posts = allPosts
+                    data = new
+                    {
+                        posts = results.OrderByDescending(M => M.Similarity).Select(r => new {
+                            postId = r.PostId,
+                            title = r.Title,
+                            description = r.Description,
+                            imageUrl = r.ImageUrl,
+                            similarity = r.Similarity
+                        }),
+                        metadata = new
+                        {
+                            totalCompared = posts.Count,
+                            matchedCount = results.Count
+                        }
+                    }
                 });
             }
             catch (Exception ex)
             {
-                // Log lỗi ở đây (sử dụng ILogger)
-                return StatusCode(500, $"Đã xảy ra lỗi: {ex.Message}");
+                _logger.LogError(ex, "Lỗi hệ thống khi tìm kiếm bằng hình ảnh: {ErrorMessage}", ex.Message);
+                return StatusCode(500, new ApiResponse
+                {
+                    Success = false,
+                    Message = "Lỗi hệ thống: " + ex.Message,
+                    ErrorCode = "SERVER_ERROR"
+                });
             }
         }
+
+
     }
 
 }

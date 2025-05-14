@@ -47,7 +47,13 @@
                                     <label asp-for="Input.FullName">Họ và tên</label>
                                     <span asp-validation-for="Input.FullName" class="text-danger"></span>
                                 </div>
-
+                                <div class="form-group mb-3">
+                                    <label for="imageUpload"><i class="fas fa-id-card"></i> Tải ảnh CCCD</label>
+                                    <input type="file" id="imageUpload" class="form-control" accept="image/*">
+                                    <button type="button" id="extractCCCD" class="btn btn-primary mt-2">
+                                        <i class="fas fa-extract"></i> Trích xuất CCCD
+                                    </button>
+                                </div>
                                 <!-- CCCD Number Input -->
                                 <div class="form-group mb-3">
                                     <label asp-for="Input.CCCD"><i class="fas fa-id-card"></i> Số CCCD</label>
@@ -222,7 +228,37 @@
 }
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            $("#extractCCCD").click(function () {
+                var fileInput = $("#imageUpload")[0].files[0];
 
+                if (!fileInput) {
+                    alert("Vui lòng chọn một ảnh CCCD.");
+                    return;
+                }
+
+                var formData = new FormData();
+                formData.append("imageFile", fileInput);
+
+                $.ajax({
+                    url: "/OCR/ExtractCCCD",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        $("#cccdInput").val(response.cccd);
+                        $("#fullNameInput").val(response.hoTen);
+                        alert("Trích xuất thành công!");
+                    },
+                    error: function (xhr) {
+                        alert("Lỗi OCR: " + xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
     <script>
         // Camera access and capture
         const video = document.getElementById('video');

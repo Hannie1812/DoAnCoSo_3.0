@@ -414,20 +414,13 @@ $(document).ready(function () {
     initFaceRecognition();
   }
 });
-async function verifyCCCD(cameraImageFile, cccdImageFile) {
+// Hàm xác thực nhận vào Image object thay vì file
+async function verifyCCCDWithImages(cameraImg, cccdImg) {
     const progressDiv = document.getElementById("cccdVerifyProgress");
     const resultDiv = document.getElementById("cccdVerifyResult");
     try {
-        progressDiv.innerText = "0% - Đang đọc ảnh...";
-        resultDiv.innerHTML = "";
-
-        // Đọc file thành image element
-        const cameraImg = await fileToImage(cameraImageFile);
-        progressDiv.innerText = "30% - Đang xử lý ảnh chụp...";
-        const cccdImg = await fileToImage(cccdImageFile);
         progressDiv.innerText = "60% - Đang phát hiện khuôn mặt...";
 
-        // Phát hiện khuôn mặt và lấy descriptor
         const options = new faceapi.TinyFaceDetectorOptions({
             inputSize: 320,
             scoreThreshold: 0.5,
@@ -450,7 +443,6 @@ async function verifyCCCD(cameraImageFile, cccdImageFile) {
 
         progressDiv.innerText = "80% - Đang so sánh khuôn mặt...";
 
-        // So sánh descriptor
         let similarities = [];
         for (let cam of camDetections) {
             for (let cccd of cccdDetections) {
@@ -462,7 +454,7 @@ async function verifyCCCD(cameraImageFile, cccdImageFile) {
             similarities.reduce((a, b) => a + b, 0) / similarities.length
         ).toFixed(2);
         progressDiv.innerText = "100% - Hoàn thành";
-        const isVerified = similarity > 50; // hoặc điều chỉnh ngưỡng tùy thực tế
+        const isVerified = similarity > 50;
 
         resultDiv.innerHTML = isVerified
             ? `<div class="alert alert-success">✅ Xác thực thành công! Độ tương đồng: <b>${similarity}%</b></div>`
@@ -478,7 +470,6 @@ async function verifyCCCD(cameraImageFile, cccdImageFile) {
         return false;
     }
 }
-
 // Phân tích và vẽ khung khuôn mặt khi chọn ảnh
 async function analyzeAndDrawFace(inputId, imgId, canvasId) {
   const fileInput = document.getElementById(inputId);
@@ -556,16 +547,26 @@ function previewImage(input, imgId) {
     img.classList.add("d-none");
   }
 }
-
 function startCCCDVerification() {
-  const cameraFile = document.getElementById("cameraImage").files[0];
   const cccdFile = document.getElementById("cccdImage").files[0];
   const resultDiv = document.getElementById("cccdVerifyResult");
   resultDiv.innerHTML = "";
-  if (!cameraFile || !cccdFile) {
+
+  // Lấy ảnh từ canvas (ảnh vừa chụp)
+  const preview = document.getElementById("preview");
+  if (!cccdFile || !preview.src || preview.style.display === "none") {
     resultDiv.innerHTML =
       '<div class="alert alert-warning">Vui lòng chọn đủ hai ảnh!</div>';
     return;
   }
-  verifyCCCD(cameraFile, cccdFile);
+
+  // Chuyển ảnh preview (base64) thành Image object
+  const cameraImg = new Image();
+  cameraImg.src = preview.src;
+  cameraImg.onload = async function () {
+    // Đọc file CCCD thành Image object
+    fileToImage(cccdFile).then((cccdImg) => {
+      verifyCCCDWithImages(cameraImg, cccdImg);
+    });
+  };
 }

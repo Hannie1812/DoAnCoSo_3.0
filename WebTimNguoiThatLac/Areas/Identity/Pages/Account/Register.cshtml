@@ -53,34 +53,35 @@
                             <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
                         </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="fw-bold mb-1"><i class="fas fa-id-card"></i> Ảnh CCCD</label>
-                                <input type="file" id="cccdImage" class="form-control mb-2" accept="image/*"
-                                       onchange="analyzeAndDrawFace('cccdImage', 'cccdCanvasImg', 'cccdCanvas')">
-                                <div class="position-relative d-inline-block text-center">
-                                    <img id="cccdCanvasImg" src="#" alt="Ảnh CCCD" class="img-thumbnail d-none" style="max-width: 220px;">
-                                    <canvas id="cccdCanvas" class="position-absolute top-0 start-0"></canvas>
-                                </div>
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label class="fw-bold mb-1"><i class="fas fa-id-card"></i> Ảnh CCCD</label>
+                            <input type="file" id="cccdImage" class="form-control mb-2" accept="image/*"
+                                   onchange="analyzeAndDrawFace('cccdImage', 'cccdCanvasImg', 'cccdCanvas')">
+                            <div class="position-relative d-inline-block text-center">
+                                <img id="cccdCanvasImg" src="#" alt="Ảnh CCCD" class="img-thumbnail d-none" style="max-width: 220px;">
+                                <canvas id="cccdCanvas" class="position-absolute top-0 start-0"></canvas>
                             </div>
-                            <div class="col-md-6">
-                                <label class="fw-bold mb-1"><i class="fas fa-camera"></i> Chụp ảnh khuôn mặt</label>
-                                <div class="text-center mt-2">
-                                    <video id="video" width="220" height="165" autoplay class="border rounded"></video>
-                                    <div class="mt-2">
-                                        <button type="button" id="snap" class="btn btn-secondary">
-                                            <i class="fas fa-camera"></i> Chụp ảnh
-                                        </button>
-                                    </div>
-                                    <canvas id="canvas" width="220" height="165" style="display: none;"></canvas>
-                                    <input type="hidden" asp-for="Input.CapturedImageBase64" id="CapturedImageBase64" />
-                                    <div class="mt-2 position-relative d-inline-block">
-                                        <img id="preview" src="#" class="border rounded" style="display:none; max-width: 220px;" />
-                                        <canvas id="previewCanvas" width="220" height="165" style="display:none; position:absolute; top:0; left:0;"></canvas>
-                                    </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="fw-bold mb-1"><i class="fas fa-camera"></i> Ảnh chụp khuôn mặt</label>
+                            <div class="text-center mt-2">
+
+                                <video id="video" width="220" height="165" autoplay class="border rounded"></video>
+                                <div class="mt-2">
+                                    <button type="button" id="snap" class="btn btn-secondary">
+                                        <i class="fas fa-camera"></i> Chụp ảnh
+                                    </button>
+                                </div>
+                                <canvas id="canvas" width="220" height="165" style="display: none;"></canvas>
+                                <input type="hidden" asp-for="Input.CapturedImageBase64" id="CapturedImageBase64" />
+                                <div class="mt-2 position-relative d-block" style="width:100%;">
+                                    <img id="preview" src="#" class="border rounded" style="display:none;width:100%;max-width:100%;min-width:220px;" />
+                                    <canvas id="previewCanvas" width="640" height="480" style="display:none;position:absolute;top:0;left:0;width:100%;max-width:100%;min-width:220px;"></canvas>
                                 </div>
                             </div>
                         </div>
+
+                        
                         <div class="row mb-3">
                             <div class="col text-center">
                                 <button type="button" class="btn btn-outline-primary px-4" onclick="startCCCDVerification()">
@@ -280,5 +281,18 @@
             background-color: #145DBF;
             color: white;
         }
+
+    #cccdImage.form-control, #preview, #cccdCanvasImg, #previewCanvas, #cccdCanvas {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 220px;
+        height: auto !important;
+        display: block;
+        margin-left: 0;
+    }
+
+    .position-relative, .d-block {
+        width: 100%;
+    }
     
 </style>

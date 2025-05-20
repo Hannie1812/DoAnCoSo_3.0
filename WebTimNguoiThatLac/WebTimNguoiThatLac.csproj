@@ -7,15 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ViewComponents\**" />
     <Compile Remove="wwwroot\wwwroot\uploads\**" />
+    <Content Remove="ViewComponents\**" />
     <Content Remove="wwwroot\wwwroot\uploads\**" />
+    <EmbeddedResource Remove="ViewComponents\**" />
     <EmbeddedResource Remove="wwwroot\wwwroot\uploads\**" />
+    <None Remove="ViewComponents\**" />
     <None Remove="wwwroot\wwwroot\uploads\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
-    <Folder Include="ViewComponents\" />
     <Folder Include="wwwroot\DangKiTimKiem\" />
     <Folder Include="wwwroot\temp\uploads\" />
     <Folder Include="wwwroot\uploads\TempImages\" />

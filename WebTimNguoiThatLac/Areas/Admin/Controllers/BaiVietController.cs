@@ -109,6 +109,8 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         {
             IEnumerable<TimNguoi> ds = await db.TimNguois
                                                             .Include(u => u.ApplicationUser)
+                                                            .Include(u => u.TinhThanh)
+                                                            .Include(u => u.QuanHuyen)
                                                             .OrderByDescending(m => m.NgayDang)
                                                             .Include(u => u.TinhThanh)
                                                             .Include(u => u.QuanHuyen)
@@ -360,6 +362,19 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         {
             try
             {
+                // Luôn thiết lập ViewBag trước khi trả về View
+                IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
+                IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
+
+
+                ViewBag.DanhSachTinhThanh = tinhThanhs;
+                ViewBag.DanhSachQuanHuyen = quanHuyens;
+
+                ViewBag.SelectedTinhThanh = x.IdTinhThanh;
+                ViewBag.SelectedQuanHuyen = x.IdQuanHuyen;
+                string tt = db.TinhThanhs.FirstOrDefault(i => i.Id == x.IdTinhThanh).TenTinhThanh ?? "";
+                ViewBag.SelectedNameTinhThanh = tt;
+
                 if (ModelState.IsValid)
                 {
                     TimNguoi y = await db.TimNguois.FirstOrDefaultAsync(i => i.Id == x.Id);
@@ -375,6 +390,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
 
                     if (!ModelState.IsValid)
                     {
+
                         ViewData["ErrorMessage"] = " Lỗi Khi Thay Đổi";
                         return View(x);
                     }
@@ -557,7 +573,9 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     {
                         db.BaoCaoBinhLuans.RemoveRange(bc);
                     }
+                    DeleteImage(i.HinhAnh, "BinhLuan");
                 }
+
 
                 db.BinhLuans.RemoveRange(dsBinhLuan);
 

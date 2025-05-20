@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using WebTimNguoiThatLac.Data;
 using WebTimNguoiThatLac.Extensions;
+//using WebTimNguoiThatLac.Helpers;
 
 namespace WebTimNguoiThatLac.Models
 {
@@ -74,6 +75,8 @@ namespace WebTimNguoiThatLac.Models
         public ICollection<NhanChung> NhanChungs { get; set; }
 
 
+        // tìm hình ảnh
+
         // Lưu descriptor trung bình
         [Column(TypeName = "varbinary(512)")]
         public byte[]? AverageDescriptorBytes { get; set; }
@@ -85,7 +88,7 @@ namespace WebTimNguoiThatLac.Models
             set => AverageDescriptorBytes = value?.ToByteArray();
         }
 
-        public virtual ICollection<FaceDescriptor>? FaceDescriptors { get; set; }
+        //public virtual ICollection<FaceDescriptor>? FaceDescriptors { get; set; }
 
         public void CalculateAverageDescriptor(IEnumerable<float[]> descriptors)
         {
@@ -124,5 +127,20 @@ namespace WebTimNguoiThatLac.Models
 
             CalculateAverageDescriptor(descriptors);
         }
+
+        // end tìm hình ảnh
+
+        // Cột mới để lưu QR Code
+        public byte[]? QRCodeImage { get; set; }
+
+        public void GenerateQRCode(string baseUrl)
+        {
+            // Tạo URL đến trang chi tiết bài viết
+            string url = $"{baseUrl}/TimNguoi/Details/{Id}";
+
+            // Tạo QR code từ URL
+            this.QRCodeImage = Helpers.QRCodeHelper.GenerateQRCode(url);
+        }
     }
 }
+

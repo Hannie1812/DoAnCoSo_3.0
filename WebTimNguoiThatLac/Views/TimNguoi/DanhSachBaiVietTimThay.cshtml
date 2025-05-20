@@ -3,7 +3,7 @@
 @using X.PagedList.Mvc.Core;
 
 @{
-    ViewData["Title"] = "Danh Sách Người Thất Lạc";
+    ViewData["Title"] = "Danh Sách Các Bài Viết Đã Tìm Thấy";
 }
 
 
@@ -311,28 +311,24 @@
                     <div class="col-md-12">
                         <div class="form-floating">
                             <input type="text" name="ten" class="form-control"
-                            id="ten" placeholder="Nhập tên hoặc tiêu đề"
-                            value="@ViewBag.TenFilter">
+                                   id="ten" placeholder="Nhập tên hoặc tiêu đề"
+                                   value="@ViewBag.TenFilter">
                             <label for="ten">
                                 <i class="fas fa-user-tag me-2 text-muted"></i>Tên hoặc tiêu đề
                             </label>
                         </div>
                     </div>
 
-
-                   
-
-
                     <div class="col-md-6 mb-3">
                         <label for="TinhThanhInput" class="form-label fw-bold text-primary">Tỉnh/Thành</label>
 
                         <input type="text"
-                        id="TinhThanhInput"
-                        class="form-control"
-                        list="ListTinhThanh"
-                        placeholder="Nhập hoặc chọn tỉnh..."
-                        value="@ViewBag.SelectedNameTinhThanh"
-                        oninput="handleTinhThanhChange(this.value)" />
+                               id="TinhThanhInput"
+                               class="form-control"
+                               list="ListTinhThanh"
+                               placeholder="Nhập hoặc chọn tỉnh..."
+                               value="@ViewBag.SelectedNameTinhThanh"
+                               oninput="handleTinhThanhChange(this.value)" />
 
                         <datalist id="ListTinhThanh">
                             @foreach (var tinh in ViewBag.TinhThanhList as List<WebTimNguoiThatLac.Models.TinhThanh>)
@@ -367,9 +363,9 @@
                     <div class="col-md-5">
                         <div class="form-floating">
                             <input type="text" name="dacDiem" class="form-control"
-                            id="dacDiem"
-                            placeholder="Ví dụ: sẹo mắt trái, nốt ruồi má phải, áo đỏ"
-                            value="@ViewBag.DacDiemFilter">
+                                   id="dacDiem"
+                                   placeholder="Ví dụ: sẹo mắt trái, nốt ruồi má phải, áo đỏ"
+                                   value="@ViewBag.DacDiemFilter">
                             <label for="dacDiem">
                                 <i class="fas fa-id-card me-2 text-muted"></i>Đặc điểm nhận dạng
                             </label>
@@ -388,12 +384,6 @@
                         </button>
                         <a asp-action="Index" class="btn btn-outline-secondary px-4 py-2">
                             <i class="fas fa-undo me-2"></i> Đặt lại
-                        </a>
-                        <a asp-action="TimKiemNangCao" class="btn btn-outline-primary px-4 py-2">
-                            <i class="fas fa-sliders-h me-2"></i> Nâng cao
-                        </a>
-                        <a asp-action="TimKiemBangHinhAnh" class="btn btn-outline-primary px-4 py-2">
-                            <i class="fas fa-sliders-h me-2"></i> hình ảnh
                         </a>
                     </div>
                 </div>
@@ -443,30 +433,21 @@
                             <h5 class="card-title">@item.TieuDe</h5>
                             <p class="card-text"><strong>Họ tên:</strong> @item.HoTen</p>
                             @{
-                                string s = "";
-                                int d = 0;
+                                string khuvuc = "";
                                 if (item.IdTinhThanh != null)
                                 {
-                                    s = s + item.TinhThanh.TenTinhThanh;
-                                    d++;
+                                    khuvuc = khuvuc + item.TinhThanh.TenTinhThanh + ", ";
                                 }
                                 if (item.IdQuanHuyen != null)
                                 {
-                                    s = s + (d == 0 ? "" : ", ") + item.QuanHuyen.TenQuanHuyen;
-                                    d++;
+                                    khuvuc = khuvuc + item.QuanHuyen.TenQuanHuyen + ", ";
                                 }
-
-                                if (!string.IsNullOrEmpty(item.KhuVuc))
+                                if (item.KhuVuc != null)
                                 {
-                                    s = s + (d == 0 ? "" : ", ") + item.KhuVuc;
-                                }
-
-                                if (d == 0)
-                                {
-                                    s = "Chưa xác định";
+                                    khuvuc = khuvuc + item.KhuVuc;
                                 }
                             }
-                            <p class="card-text"><strong>Khu vực:</strong>   @s</p>
+                            <p class="card-text"><strong>Khu vực:</strong>   @khuvuc</p>
                             <p class="card-text"><strong>Ngày đăng:</strong> @item.NgayDang.ToString("dd/MM/yyyy")</p>
 
                             @if (dacDiemItems != null && dacDiemItems.Any())
@@ -507,14 +488,14 @@
                         khuVuc = ViewBag.KhuVucFilter,
                         dacDiem = ViewBag.DacDiemFilter
                     }), new PagedListRenderOptions
-               {
-                   LiElementClasses = new[] { "page-item" },
-                   PageClasses = new[] { "page-link" },
-                   UlElementClasses = new[] { "pagination", "justify-content-center" },
-                   DisplayLinkToFirstPage = PagedListDisplayMode.IfNeeded,
-                   DisplayLinkToLastPage = PagedListDisplayMode.IfNeeded,
-                   MaximumPageNumbersToDisplay = 5
-               })
+       {
+           LiElementClasses = new[] { "page-item" },
+           PageClasses = new[] { "page-link" },
+           UlElementClasses = new[] { "pagination", "justify-content-center" },
+           DisplayLinkToFirstPage = PagedListDisplayMode.IfNeeded,
+           DisplayLinkToLastPage = PagedListDisplayMode.IfNeeded,
+           MaximumPageNumbersToDisplay = 5
+       })
             </div>
         </div>
     }
@@ -524,7 +505,7 @@
             <i class="fas fa-user-times"></i>
             <h4>Không tìm thấy kết quả phù hợp</h4>
             <p class="text-muted">Hãy thử thay đổi tiêu chí tìm kiếm hoặc đăng bài nếu bạn đang tìm người thất lạc</p>
-            <a href="@Url.Action("ThemNguoiCanTim", "TimNguoi")" class="btn btn-primary mt-3">
+            <a href="@Url.Action("Create", "TimNguoi")" class="btn btn-primary mt-3">
                 <i class="fas fa-plus me-1"></i> Đăng bài tìm người
             </a>
         </div>
@@ -560,10 +541,10 @@
                 });
 
                     // Giữ lại quận huyện cũ nếu có
-            @if (ViewBag.SelectedQuanHuyen != null)
-            {
-                @:quanHuyenDropdown.val('@ViewBag.SelectedQuanHuyen');
-            }
+        @if (ViewBag.SelectedQuanHuyen != null)
+        {
+            @:quanHuyenDropdown.val('@ViewBag.SelectedQuanHuyen');
+        }
                 }).fail(function () {
                     console.error("Lỗi khi tải danh sách quận huyện");
                 });
@@ -661,5 +642,5 @@
         });
     </script>
 
-  
+
 }

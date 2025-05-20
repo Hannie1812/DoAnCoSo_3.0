@@ -72,16 +72,42 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="font-weight-bold">Tỉnh Thành</label>
-                            <select id="TinhThanh" asp-for="IdTinhThanh" asp-items="@ViewBag.DanhSachTinhThanh" class="form-control" onchange="loadQuanHuyen(this.value)">
-                                <option value="">-- Chọn tỉnh/thành phố --</option>
-                            </select>
+                            <label for="TinhThanhInput" class="form-label fw-bold text-primary">Tỉnh/Thành</label>
+
+                            <!-- Input ẩn chứa ID thực sự sẽ được submit -->
+                            <input type="hidden" asp-for="IdTinhThanh" id="IdTinhThanhHidden" value="@ViewBag.SelectedTinhThanh" />
+
+                            <!-- Input hiển thị tên tỉnh thành -->
+                            <input type="text"
+                                   id="TinhThanhInput"
+                                   class="form-control"
+                                   list="ListTinhThanh"
+                                   placeholder="Nhập hoặc chọn tỉnh..."
+                                   value="@ViewBag.SelectedNameTinhThanh"
+                                   oninput="handleTinhThanhChange(this.value)" />
+
+                            <datalist id="ListTinhThanh">
+                                @foreach (var tinh in ViewBag.DanhSachTinhThanh as List<WebTimNguoiThatLac.Models.TinhThanh>)
+                                {
+                                    <option value="@tinh.TenTinhThanh" data-id="@tinh.Id"></option>
+                                }
+                            </datalist>
                         </div>
 
                         <div class="form-group">
-                            <label class="font-weight-bold">Quận Huyện</label>
-                            <select id="QuanHuyen" asp-for="IdQuanHuyen" asp-items="@ViewBag.DanhSachQuanHuyen" class="form-control">
-                                <option value="">-- Chọn quận/huyện --</option>
+                            <label class="form-label">Quận/Huyện</label>
+                            <select asp-for="IdQuanHuyen" class="form-select form-control" id="QuanHuyen">
+                                <option value="">Tất cả quận</option>
+                                @if (ViewBag.DanhSachQuanHuyen != null && ViewBag.SelectedTinhThanh != null)
+                                {
+                                    foreach (var huyen in ((List<WebTimNguoiThatLac.Models.QuanHuyen>)ViewBag.DanhSachQuanHuyen)
+                                    .Where(q => q.IdTinhThanh == ViewBag.SelectedTinhThanh))
+                                    {
+                                        <option value="@huyen.Id" selected="@(ViewBag.SelectedQuanHuyen == huyen.Id ? "selected" : null)">
+                                            @huyen.TenQuanHuyen
+                                        </option>
+                                    }
+                                }
                             </select>
                         </div>
 
@@ -185,18 +211,32 @@
 
     @* khu vực *@
     <script>
+        function handleTinhThanhChange(tenTinh) {
+            const options = document.querySelectorAll('#ListTinhThanh option');
+            let matchedOption = Array.from(options).find(opt => opt.value === tenTinh);
+
+            if (matchedOption) {
+                // Gán ID vào hidden input
+                document.getElementById('IdTinhThanhHidden').value = matchedOption.dataset.id;
+                loadQuanHuyen(matchedOption.dataset.id);
+            } else {
+                document.getElementById('IdTinhThanhHidden').value = '';
+                $("#QuanHuyen").empty().append('<option value="">Tất cả quận</option>');
+            }
+        }
+
         function loadQuanHuyen(tinhThanhId) {
             const quanHuyenDropdown = $("#QuanHuyen");
             quanHuyenDropdown.empty().append('<option value="">Tất cả quận</option>');
 
             if (!tinhThanhId) return;
 
-            $.getJSON(`/Admin/BaiViet/GetQuanHuyenByTinhThanh?tinhThanhId=${tinhThanhId}`, function(data) {
+            $.getJSON(`/TimNguoi/GetQuanHuyenByTinhThanh?tinhThanhId=${tinhThanhId}`, function(data) {
                 $.each(data, function(index, item) {
                     quanHuyenDropdown.append($('<option></option>').val(item.id).text(item.tenQuanHuyen));
                 });
 
-                // Giữ lại giá trị đã chọn nếu có
+                // Giữ lại quận huyện cũ nếu có
         @if (ViewBag.SelectedQuanHuyen != null)
         {
             @:quanHuyenDropdown.val('@ViewBag.SelectedQuanHuyen');
@@ -206,9 +246,9 @@
             });
         }
 
-        // Khởi tạo khi trang được tải
         $(document).ready(function() {
-            const tinhThanhId = $("#TinhThanh").val();
+            // Khởi tạo khi load trang
+            const tinhThanhId = $("#IdTinhThanhHidden").val();
             if (tinhThanhId) {
                 loadQuanHuyen(tinhThanhId);
             }

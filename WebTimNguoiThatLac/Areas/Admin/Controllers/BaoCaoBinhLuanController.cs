@@ -290,9 +290,10 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             try
             {
                 var comment = await _context.BinhLuans
-                    .Include(c => c.ApplicationUser)
-                    .Include(c => c.TimNguoi)
-                    .FirstOrDefaultAsync(c => c.Id == commentId);
+                                                     .Include(c => c.ApplicationUser)
+                                                     .Include(c => c.TimNguoi)
+                                                     .Include(c => c.TraLois) // Bao gồm các reply
+                                                     .FirstOrDefaultAsync(c => c.Id == commentId);
 
                 if (comment == null)
                 {
@@ -307,12 +308,16 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 }
 
                 // Xóa tất cả báo cáo liên quan
-                var relatedReports = await _context.BaoCaoBinhLuans
-                    .Where(b => b.MaBinhLuan == commentId)
-                    .ToListAsync();
+                //var relatedReports = await _context.BaoCaoBinhLuans
+                //    .Where(b => b.MaBinhLuan == commentId)
+                //    .ToListAsync();
 
-                _context.BaoCaoBinhLuans.RemoveRange(relatedReports);
-                _context.BinhLuans.Remove(comment);
+                //_context.BaoCaoBinhLuans.RemoveRange(relatedReports);
+                //_context.BinhLuans.Remove(comment);
+
+                // Xóa đệ quy các bình luận con
+                await DeleteCommentAndReplies(comment);
+
                 await _context.SaveChangesAsync();
 
                 // Gửi email thông báo
@@ -334,6 +339,29 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 TempData["ErrorMessage"] = "Lỗi khi xóa: " + ex.Message;
                 return RedirectToAction("Details", new { id = reportId });
             }
+        }
+
+        // Hàm đệ quy xóa bình luận và các reply
+        private async Task DeleteCommentAndReplies(BinhLuan comment)
+        {
+            // Xóa hình ảnh nếu có
+            if (!string.IsNullOrEmpty(comment.HinhAnh))
+            {
+                DeleteImage(comment.HinhAnh, "BinhLuan");
+            }
+
+            // Xóa đệ quy các reply
+            if (comment.TraLois != null && comment.TraLois.Any())
+            {
+                foreach (var reply in comment.TraLois.ToList())
+                {
+                    await DeleteCommentAndReplies(reply);
+                }
+            }
+            List<BaoCaoBinhLuan> ds = _context.BaoCaoBinhLuans.Where(x => x.MaBinhLuan == comment.Id).ToList();
+            _context.BaoCaoBinhLuans.RemoveRange(ds);
+
+            _context.BinhLuans.Remove(comment);
         }
 
         private void DeleteImage(string imageUrl, string subFolder) // Xóa hình ảnh

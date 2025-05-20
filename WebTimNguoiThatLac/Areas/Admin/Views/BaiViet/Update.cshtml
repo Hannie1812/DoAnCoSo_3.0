@@ -188,12 +188,8 @@
                             <div class="col-md-6">
                                 <h4 class="mb-3 text-primary"><i class="fas fa-info-circle mr-2"></i>Thông tin bổ sung</h4>
 
-                                @* <div class="form-group"> *@
-                                @*     <label asp-for="DaciemNhanDang" class="font-weight-bold">Đặc điểm nhận dạng</label> *@
-                                @*     <textarea asp-for="DaciemNhanDang" class="form-control" rows="3" placeholder="Mô tả đặc điểm nhận dạng" required></textarea> *@
-                                @*     <span asp-validation-for="DaciemNhanDang" class="text-danger small"></span> *@
-                                @* </div> *@
-                                <!-- Thay thế phần Đặc điểm nhận dạng hiện tại bằng đoạn code này -->
+                              
+                                <!--  Đặc điểm nhận dạng  -->
                                 <div class="form-group">
                                     <label asp-for="DaciemNhanDang" class="font-weight-bold">Đặc điểm nhận dạng</label>
 
@@ -232,27 +228,44 @@
 
 
 
-                                @* <div class="form-group"> *@
-                                @*     <label asp-for="KhuVuc" class="font-weight-bold">Khu vực</label> *@
-                                @*     <select asp-for="KhuVuc" class="form-control" required> *@
-                                @*         @foreach (string i in ViewBag.DanhSachTinhThanh) *@
-                                @*         { *@
-                                @*             <option value="@i" selected="@(i == Model.KhuVuc)">@i</option> *@
-                                @*         } *@
-                                @*     </select> *@
-                                @*     <span asp-validation-for="KhuVuc" class="text-danger small"></span> *@
-                                @* </div> *@
+                               
                                 <div class="form-group">
-                                    <label class="font-weight-bold">Tỉnh Thành</label>
-                                    <select id="TinhThanh" asp-for="IdTinhThanh" asp-items="@ViewBag.DanhSachTinhThanh" class="form-control" onchange="loadQuanHuyen(this.value)">
-                                        <option value="">-- Chọn tỉnh/thành phố --</option>
-                                    </select>
+                                    <label for="TinhThanhInput" class="form-label fw-bold text-primary">Tỉnh/Thành</label>
+
+                                    <!-- Input ẩn chứa ID thực sự sẽ được submit -->
+                                    <input type="hidden" asp-for="IdTinhThanh" id="IdTinhThanhHidden" value="@ViewBag.SelectedTinhThanh" />
+
+                                    <!-- Input hiển thị tên tỉnh thành -->
+                                    <input type="text"
+                                           id="TinhThanhInput"
+                                           class="form-control"
+                                           list="ListTinhThanh"
+                                           placeholder="Nhập hoặc chọn tỉnh..."
+                                           value="@ViewBag.SelectedNameTinhThanh"
+                                           oninput="handleTinhThanhChange(this.value)" />
+
+                                    <datalist id="ListTinhThanh">
+                                        @foreach (var tinh in ViewBag.DanhSachTinhThanh as List<WebTimNguoiThatLac.Models.TinhThanh>)
+                                        {
+                                            <option value="@tinh.TenTinhThanh" data-id="@tinh.Id"></option>
+                                        }
+                                    </datalist>
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="font-weight-bold">Quận Huyện</label>
-                                    <select id="QuanHuyen" asp-for="IdQuanHuyen" asp-items="@ViewBag.DanhSachQuanHuyen" class="form-control">
-                                        <option value="">-- Chọn quận/huyện --</option>
+                                    <label class="form-label">Quận/Huyện</label>
+                                    <select asp-for="IdQuanHuyen" class="form-select form-control" id="QuanHuyen">
+                                        <option value="">Tất cả quận</option>
+                                        @if (ViewBag.DanhSachQuanHuyen != null && ViewBag.SelectedTinhThanh != null)
+                                        {
+                                            foreach (var huyen in ((List<WebTimNguoiThatLac.Models.QuanHuyen>)ViewBag.DanhSachQuanHuyen)
+                                            .Where(q => q.IdTinhThanh == ViewBag.SelectedTinhThanh))
+                                            {
+                                                <option value="@huyen.Id" selected="@(ViewBag.SelectedQuanHuyen == huyen.Id ? "selected" : null)">
+                                                    @huyen.TenQuanHuyen
+                                                </option>
+                                            }
+                                        }
                                     </select>
                                 </div>
 
@@ -264,10 +277,9 @@
                         </div>
 
                         <!-- Mô tả -->
-                        <div class="form-group mt-4">
-                            <label asp-for="MoTa" class="font-weight-bold">Nội dung chi tiết</label>
-                            <textarea asp-for="MoTa" id="compose-textarea" class="form-control" rows="5" placeholder="Nhập nội dung chi tiết..." required></textarea>
-                            <span asp-validation-for="MoTa" class="text-danger small"></span>
+                        <div class="form-group mb-4">
+                            <label asp-for="MoTa" class="font-weight-bold">Mô tả chi tiết</label>
+                            <textarea asp-for="MoTa" id="compose-textarea" class="form-control" rows="5" placeholder="Mô tả chi tiết hoàn cảnh mất tích, thông tin cuối cùng, địa điểm nghi ngờ..."></textarea>
                         </div>
 
                         <!-- Hình ảnh -->
@@ -342,24 +354,35 @@
 
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
 
     @* khu vực *@
     <script>
+                function handleTinhThanhChange(tenTinh) {
+            const options = document.querySelectorAll('#ListTinhThanh option');
+            let matchedOption = Array.from(options).find(opt => opt.value === tenTinh);
+
+            if (matchedOption) {
+                // Gán ID vào hidden input
+                document.getElementById('IdTinhThanhHidden').value = matchedOption.dataset.id;
+                loadQuanHuyen(matchedOption.dataset.id);
+            } else {
+                document.getElementById('IdTinhThanhHidden').value = '';
+                $("#QuanHuyen").empty().append('<option value="">Tất cả quận</option>');
+            }
+        }
+
         function loadQuanHuyen(tinhThanhId) {
             const quanHuyenDropdown = $("#QuanHuyen");
             quanHuyenDropdown.empty().append('<option value="">Tất cả quận</option>');
 
             if (!tinhThanhId) return;
 
-            $.getJSON(`/Admin/BaiViet/GetQuanHuyenByTinhThanh?tinhThanhId=${tinhThanhId}`, function(data) {
+            $.getJSON(`/TimNguoi/GetQuanHuyenByTinhThanh?tinhThanhId=${tinhThanhId}`, function(data) {
                 $.each(data, function(index, item) {
                     quanHuyenDropdown.append($('<option></option>').val(item.id).text(item.tenQuanHuyen));
                 });
 
-                // Giữ lại giá trị đã chọn nếu có
+                // Giữ lại quận huyện cũ nếu có
         @if (ViewBag.SelectedQuanHuyen != null)
         {
             @:quanHuyenDropdown.val('@ViewBag.SelectedQuanHuyen');
@@ -369,9 +392,9 @@
             });
         }
 
-        // Khởi tạo khi trang được tải
         $(document).ready(function() {
-            const tinhThanhId = $("#TinhThanh").val();
+            // Khởi tạo khi load trang
+            const tinhThanhId = $("#IdTinhThanhHidden").val();
             if (tinhThanhId) {
                 loadQuanHuyen(tinhThanhId);
             }
@@ -797,7 +820,9 @@
 
             return average;
         }
+        $('#compose-textarea').summernote({
 
+            });
         // Khởi tạo
         $(document).ready(async function() {
             // Kiểm tra face-api.js đã tải

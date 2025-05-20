@@ -36,6 +36,13 @@ builder.Services.AddTransient<IEmailSender, EmailService>(); // email
 builder.Services.AddScoped<EmailService>(); // Đăng ký EmailService
 builder.Services.AddScoped<OtpService>(); // Đăng ký OtpService
 
+builder.Services.AddCors(options => { // tai qr
+    options.AddPolicy("AllowAll", builder =>
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader());
+});
+
 // Trong ConfigureServices (Startup.cs) hoặc Program.cs
 builder.Services.AddScoped<ITimNguoiRepository, EFTimNguoiRepository>();
 
@@ -91,6 +98,7 @@ app.UseAuthorization();
 
 app.MapRazorPages(); // n�y
 
+app.UseCors("AllowAll"); // QR
 
 
 // Sử dụng Session (cần cho SessionId)

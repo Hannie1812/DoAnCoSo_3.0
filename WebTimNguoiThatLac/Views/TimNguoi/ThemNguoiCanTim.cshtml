@@ -105,18 +105,50 @@
                                 <span asp-validation-for="MoTa" class="text-danger small"></span>
                             </div>
                             @* khu vực *@
-                            <div class="form-group">
-                                <label class="font-weight-bold">Tỉnh Thành</label>
-                                <select id="TinhThanh" asp-for="IdTinhThanh" asp-items="@ViewBag.DanhSachTinhThanh" class="form-control" onchange="loadQuanHuyen(this.value)">
-                                    <option value="">-- Chọn tỉnh/thành phố --</option>
+                            @* <div class="form-group"> *@
+                            @*     <label class="font-weight-bold">Tỉnh Thành</label> *@
+                            @*     <select id="TinhThanh" asp-for="IdTinhThanh" asp-items="@ViewBag.DanhSachTinhThanh" class="form-control" onchange="loadQuanHuyen(this.value)"> *@
+                            @*         <option value="">-- Chọn tỉnh/thành phố --</option> *@
 
-                                </select>
+                            @*     </select> *@
+                            @* </div> *@
+                            <div class="form-group">
+                                <label for="TinhThanhInput" class="form-label fw-bold text-primary">Tỉnh/Thành</label>
+
+                                <!-- Input ẩn chứa ID thực sự sẽ được submit -->
+                                <input type="hidden" asp-for="IdTinhThanh" id="IdTinhThanhHidden" value="@ViewBag.SelectedTinhThanh" />
+
+                                <!-- Input hiển thị tên tỉnh thành -->
+                                <input type="text"
+                                       id="TinhThanhInput"
+                                       class="form-control"
+                                       list="ListTinhThanh"
+                                       placeholder="Nhập hoặc chọn tỉnh..."
+                                       value="@ViewBag.SelectedNameTinhThanh"
+                                       oninput="handleTinhThanhChange(this.value)" />
+
+                                <datalist id="ListTinhThanh">
+                                    @foreach (var tinh in ViewBag.DanhSachTinhThanh as List<WebTimNguoiThatLac.Models.TinhThanh>)
+                                    {
+                                        <option value="@tinh.TenTinhThanh" data-id="@tinh.Id"></option>
+                                    }
+                                </datalist>
                             </div>
 
                             <div class="form-group">
-                                <label class="font-weight-bold">Quận Huyện</label>
-                                <select id="QuanHuyen" asp-for="IdQuanHuyen" asp-items="@ViewBag.DanhSachQuanHuyen" class="form-control">
-                                    <option value="">-- Chọn quận/huyện --</option>
+                                <label class="form-label">Quận/Huyện</label>
+                                <select asp-for="IdQuanHuyen" class="form-select form-control" id="QuanHuyen">
+                                    <option value="">Tất cả quận</option>
+                                    @if (ViewBag.DanhSachQuanHuyen != null && ViewBag.SelectedTinhThanh != null)
+                                    {
+                                        foreach (var huyen in ((List<WebTimNguoiThatLac.Models.QuanHuyen>)ViewBag.DanhSachQuanHuyen)
+                                        .Where(q => q.IdTinhThanh == ViewBag.SelectedTinhThanh))
+                                        {
+                                            <option value="@huyen.Id" selected="@(ViewBag.SelectedQuanHuyen == huyen.Id ? "selected" : null)">
+                                                @huyen.TenQuanHuyen
+                                            </option>
+                                        }
+                                    }
                                 </select>
                             </div>
                             <div class="form-group">
@@ -293,23 +325,67 @@
     <!-- Summernote -->
     <script src="~/clients/plugins/summernote/summernote-bs4.min.js"></script>
     <script>
-                   // Đảm bảo hàm này được định nghĩa trong global scope
-        window.loadQuanHuyen = function(tinhThanhId) {
-            const quanHuyenSelect = document.getElementById('QuanHuyen');
-            quanHuyenSelect.innerHTML = '<option value="">-- Chọn quận/huyện --</option>';
+                function handleTinhThanhChange(tenTinh) {
+            const options = document.querySelectorAll('#ListTinhThanh option');
+            let matchedOption = Array.from(options).find(opt => opt.value === tenTinh);
+
+            if (matchedOption) {
+                // Gán ID vào hidden input
+                document.getElementById('IdTinhThanhHidden').value = matchedOption.dataset.id;
+                loadQuanHuyen(matchedOption.dataset.id);
+            } else {
+                document.getElementById('IdTinhThanhHidden').value = '';
+                $("#QuanHuyen").empty().append('<option value="">Tất cả quận</option>');
+            }
+        }
+
+        function loadQuanHuyen(tinhThanhId) {
+            const quanHuyenDropdown = $("#QuanHuyen");
+            quanHuyenDropdown.empty().append('<option value="">Tất cả quận</option>');
 
             if (!tinhThanhId) return;
 
-            fetch(`/TimNguoi/GetQuanHuyenByTinhThanh?tinhThanhId=${tinhThanhId}`)
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(item => {
-                        const option = new Option(item.tenQuanHuyen, item.id);
-                        quanHuyenSelect.add(option);
-                    });
-                })
-                .catch(error => console.error('Error:', error));
+            $.getJSON(`/TimNguoi/GetQuanHuyenByTinhThanh?tinhThanhId=${tinhThanhId}`, function(data) {
+                $.each(data, function(index, item) {
+                    quanHuyenDropdown.append($('<option></option>').val(item.id).text(item.tenQuanHuyen));
+                });
+
+                // Giữ lại quận huyện cũ nếu có
+        @if (ViewBag.SelectedQuanHuyen != null)
+        {
+            @:quanHuyenDropdown.val('@ViewBag.SelectedQuanHuyen');
         }
+            }).fail(function() {
+                console.error("Lỗi khi tải danh sách quận huyện");
+            });
+        }
+
+        $(document).ready(function() {
+            // Khởi tạo khi load trang
+            const tinhThanhId = $("#IdTinhThanhHidden").val();
+            if (tinhThanhId) {
+                loadQuanHuyen(tinhThanhId);
+            }
+        });
+    </script>
+    <script>
+                   // Đảm bảo hàm này được định nghĩa trong global scope
+        // window.loadQuanHuyen = function(tinhThanhId) {
+        //     const quanHuyenSelect = document.getElementById('QuanHuyen');
+        //     quanHuyenSelect.innerHTML = '<option value="">-- Chọn quận/huyện --</option>';
+
+        //     if (!tinhThanhId) return;
+
+        //     fetch(`/TimNguoi/GetQuanHuyenByTinhThanh?tinhThanhId=${tinhThanhId}`)
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             data.forEach(item => {
+        //                 const option = new Option(item.tenQuanHuyen, item.id);
+        //                 quanHuyenSelect.add(option);
+        //             });
+        //         })
+        //         .catch(error => console.error('Error:', error));
+        // }
         $(function () {
             // Initialize Summernote
             $('#compose-textarea').summernote({
@@ -567,3 +643,4 @@
         });
     </script>
 }
+

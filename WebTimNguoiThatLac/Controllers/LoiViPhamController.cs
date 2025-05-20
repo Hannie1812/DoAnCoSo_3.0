@@ -65,6 +65,7 @@ namespace WebTimNguoiThatLac.Controllers
                 HanhViDangNgo? h = await db.HanhViDangNgos.FirstOrDefaultAsync(i => i.Id == id);
                 if (h != null)
                 {
+                    h.DaXem = true;
                     h.KhangNghi = true;
                     h.TrangThaiKhangNghi = "";
                     await db.SaveChangesAsync();

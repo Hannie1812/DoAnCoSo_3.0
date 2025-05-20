@@ -109,6 +109,8 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         {
             IEnumerable<TimNguoi> ds = await db.TimNguois
                                                             .Include(u => u.ApplicationUser)
+                                                            .Include(u => u.TinhThanh)
+                                                            .Include(u => u.QuanHuyen)
                                                             .OrderByDescending(m => m.NgayDang)
                                                             .ToListAsync();
             ViewBag.TimKiem = TimKiem;
@@ -167,9 +169,10 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
             IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
 
+            ViewBag.DanhSachTinhThanh = tinhThanhs;
+            ViewBag.DanhSachQuanHuyen = quanHuyens;
 
-            ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
-            ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
+
             return View();
         }
 
@@ -181,6 +184,18 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         {
             IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
             IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
+
+
+
+            //ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
+            //ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
+            ViewBag.DanhSachTinhThanh = tinhThanhs;
+            ViewBag.DanhSachQuanHuyen = quanHuyens;
+
+            ViewBag.SelectedTinhThanh = x.IdTinhThanh;
+            ViewBag.SelectedQuanHuyen = x.IdQuanHuyen;
+            string tt = db.TinhThanhs.FirstOrDefault(i => i.Id == x.IdTinhThanh).TenTinhThanh ?? "";
+            ViewBag.SelectedNameTinhThanh = tt;
 
 
             ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
@@ -352,14 +367,30 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 return RedirectToAction("Index");
             }
 
-            //IEnumerable<string> DanhSachTinhThanh = TinhThanhIEnumerable;
-            //ViewBag.DanhSachTinhThanh = DanhSachTinhThanh;
 
+
+            //IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
+            //IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
+
+            //ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
+            //ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
+
+
+            // Luôn thiết lập ViewBag trước khi trả về View
             IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
             IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
 
-            ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
-            ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
+
+
+            //ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
+            //ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
+            ViewBag.DanhSachTinhThanh = tinhThanhs;
+            ViewBag.DanhSachQuanHuyen = quanHuyens;
+
+            ViewBag.SelectedTinhThanh = x.TinhThanh?.Id;
+            ViewBag.SelectedQuanHuyen = x.QuanHuyen?.Id ;
+            string tt = db.TinhThanhs.FirstOrDefault(i => i.Id == x.IdTinhThanh).TenTinhThanh ?? "";
+            ViewBag.SelectedNameTinhThanh = tt;
 
 
             ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == id).ToList();
@@ -372,6 +403,19 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         {
             try
             {
+                // Luôn thiết lập ViewBag trước khi trả về View
+                IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
+                IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
+
+
+                ViewBag.DanhSachTinhThanh = tinhThanhs;
+                ViewBag.DanhSachQuanHuyen = quanHuyens;
+
+                ViewBag.SelectedTinhThanh = x.IdTinhThanh;
+                ViewBag.SelectedQuanHuyen = x.IdQuanHuyen;
+                string tt = db.TinhThanhs.FirstOrDefault(i => i.Id == x.IdTinhThanh).TenTinhThanh ?? "";
+                ViewBag.SelectedNameTinhThanh = tt;
+
                 if (ModelState.IsValid)
                 {
                     TimNguoi y = await db.TimNguois.FirstOrDefaultAsync(i => i.Id == x.Id);
@@ -382,11 +426,12 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     }
 
                     // Luôn thiết lập ViewBag trước khi trả về View
-                    ViewBag.DanhSachTinhThanh = TinhThanhIEnumerable;
+                    
                     ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == x.Id).ToList();
 
                     if (!ModelState.IsValid)
                     {
+
                         ViewData["ErrorMessage"] = " Lỗi Khi Thay Đổi";
                         return View(x);
                     }
@@ -501,14 +546,11 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 }
 
 
-                //IEnumerable<string> DanhSachTinhThanh = TinhThanhIEnumerable;
-                //ViewBag.DanhSachTinhThanh = DanhSachTinhThanh;
 
-                IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
-                IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
+              
 
-                ViewBag.DanhSachTinhThanh = new SelectList(tinhThanhs, "Id", "TenTinhThanh");
-                ViewBag.DanhSachQuanHuyen = new SelectList(quanHuyens, "Id", "TenQuanHuyen");
+
+
 
                 ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == x.Id).ToList();
                 ViewData["ErrorMessage"] = " Nhập Đầy Đủ Thông Tin";
@@ -579,7 +621,9 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     {
                         db.BaoCaoBinhLuans.RemoveRange(bc);
                     }
+                    DeleteImage(i.HinhAnh, "BinhLuan");
                 }
+
 
                 db.BinhLuans.RemoveRange(dsBinhLuan);
 

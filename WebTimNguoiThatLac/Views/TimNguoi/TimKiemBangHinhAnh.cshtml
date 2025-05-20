@@ -108,6 +108,208 @@
         color: #4e73df;
         margin-bottom: 1rem;
     }
+
+    :root {
+        --primary-color: #4361ee;
+        --success-color: #4cc9f0;
+        --warning-color: #f8961e;
+        --danger-color: #f72585;
+        --text-color: #333;
+        --light-gray: #f5f5f5;
+        --border-radius: 8px;
+        --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .search-result-card {
+        display: flex;
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        overflow: hidden;
+        margin-bottom: 20px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .search-result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+    .result-image-container {
+        position: relative;
+        width: 250px;
+        min-width: 250px;
+        overflow: hidden;
+    }
+
+    .result-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        min-height: 250px;
+    }
+
+    .similarity-badge {
+        position: absolute;
+        bottom: 15px;
+        left: 15px;
+        padding: 5px 12px;
+        border-radius: 20px;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        background: var(--primary-color);
+    }
+
+        .similarity-badge.high {
+            background: var(--success-color);
+        }
+
+        .similarity-badge.medium {
+            background: var(--warning-color);
+            color: #333;
+        }
+
+        .similarity-badge.low {
+            background: var(--danger-color);
+        }
+
+    .result-content {
+        flex: 1;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .result-header {
+        margin-bottom: 15px;
+    }
+
+    .result-title {
+        margin: 0 0 5px 0;
+        color: var(--text-color);
+        font-size: 1.25rem;
+    }
+
+    .result-meta {
+        display: flex;
+        align-items: center;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .meta-separator {
+        margin: 0 8px;
+        color: #ddd;
+    }
+
+    .result-details {
+        flex: 1;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 10px;
+        font-size: 0.95rem;
+    }
+
+        .detail-item i {
+            margin-right: 10px;
+            color: var(--primary-color);
+            min-width: 20px;
+            text-align: center;
+        }
+
+    .features-text {
+        color: #555;
+        line-height: 1.4;
+    }
+
+    .result-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+    }
+
+    .view-detail-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 16px;
+        background: var(--primary-color);
+        color: white;
+        border-radius: var(--border-radius);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: background 0.3s ease;
+    }
+
+    .view-detail-btn:hover {
+        background: #3a56d4;
+        color: white;
+    }
+
+    .view-detail-btn i {
+        margin-right: 8px;
+    }
+
+    .result-number {
+        color: #999;
+        font-size: 0.85rem;
+    }
+
+    /* Responsive design */
+    @@media (max-width: 768px) {
+        .search-result-card
+        {
+            flex-direction: column;
+        }
+
+        .result-image-container {
+            width: 100%;
+            height: 200px;
+        }
+
+        .result-content {
+            padding: 15px;
+        }
+
+    }
+
+    .similarity-badge {
+        position: absolute;
+        bottom: 15px;
+        left: 15px;
+        padding: 5px 12px;
+        border-radius: 20px;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        background: var(--primary-color); /* Màu mặc định */
+    }
+
+        /* Màu cho độ tương đồng cao (80-100%) */
+        .similarity-badge.high {
+            background: var(--success-color); /* Màu xanh lá */
+            box-shadow: 0 2px 8px rgba(76, 201, 240, 0.4);
+        }
+
+        /* Màu cho độ tương đồng trung bình (60-79%) */
+        .similarity-badge.medium {
+            background: var(--danger-color); /* Màu đỏ */  
+            /* color: #333; /* Chữ màu tối để dễ đọc */ 
+            box-shadow: 0 2px 8px rgba(248, 150, 30, 0.4);
+        }
+
+        /* Màu cho độ tương đồng thấp (40-59%) */
+        .similarity-badge.low {
+            background: var(--warning-color); /* Màu cam */
+            /* color: #333; /* Chữ màu tối để dễ đọc */ 
+            box-shadow: 0 2px 8px rgba(247, 37, 133, 0.4);
+        }
 </style>
 
 <div class="container my-5">
@@ -508,12 +710,20 @@
                 </div>
             `;
 
-            posts.forEach((item, index) => {
+            
+
+            // mới
+                posts.forEach((item, index) => {
                 const post = {
                     id: item.postId || item.partial || item.Id || item.id,
                     title: item.title || item.TieuDe,
-                    description: item.description || item.MoTa,
-                    imageUrl: item.imageUrl || item.MainImage,
+                    description: item.description || item.MoTa || item.description,
+                    features: item.NhanDang || item.nhanDang || item.DaciemNhanDang,
+                    missingDate: item.NgayMatTich || item.ngayMatTich, 
+                    gender: item.GioiTinh || item.gioiTinh,
+                    name: item.Name || item.HoTen || item.name,
+                    postedDate: item.PostedDate || item.NgayDang || item.postedDate,
+                    imageUrl: item.imageUrl || item.MainImage || '/images/default-avatar.jpg',
                     similarity: item.similarity || item.Similarity
                 };
 
@@ -521,42 +731,60 @@
                 const similarityColor = getSimilarityColor(similarityPercent);
                 const similarityClass = getSimilarityClass(similarityPercent);
 
-                // Format description to show only first 100 characters
-                const shortDescription = post.description
-                    ? (post.description.length > 100
-                        ? post.description.substring(0, 100) + '...'
-                        : post.description)
-                    : 'Không có mô tả';
+                // Format dates
+                const formattedMissingDate = post.missingDate ? new Date(post.missingDate).toLocaleDateString('vi-VN') : 'Chưa xác định';
+                const formattedPostedDate = post.postedDate ? new Date(post.postedDate).toLocaleDateString('vi-VN') : 'Chưa xác định';
+
+                // Format gender
+                const genderIcon = post.gender == "1" ? 'mars' : post.gender == "2" ? 'venus' : 'genderless';
+                const genderText = post.gender || 'Không xác định';
 
                 html += `
-                <div class="result-card mb-4">
-                    <div class="card-body p-0">
-                        <div class="row no-gutters">
-                            <div class="col-md-4">
-                                <div class="position-relative h-100">
-                                    <img src="${post.imageUrl || '/images/default-avatar.jpg'}"
-                                         class="img-fluid h-100 w-100 object-cover"
-                                         style="min-height: 200px;"
-                                         onerror="this.src='/images/default-avatar.jpg'">
-                                    <span class="badge ${similarityClass} similarity-badge position-absolute"
-                                          style="bottom: 15px; left: 15px;">
-                                        ${similarityPercent}% phù hợp
-                                    </span>
-                                </div>
+                <div class="search-result-card" data-similarity="${similarityPercent}">
+                    <div class="result-image-container">
+                        <img src="${post.imageUrl}"
+                             alt="${post.title || 'Bài đăng tìm người'}"
+                             class="result-image"
+                             onerror="this.src='/images/default-avatar.jpg'">
+                        <div class="similarity-badge ${similarityClass}">
+                            ${similarityPercent}% phù hợp
+                        </div>
+
+                    </div>
+
+                    <div class="result-content">
+                        <div class="result-header">
+                            <h3 class="result-title">${post.title || 'Không có tiêu đề'}</h3>
+                            <span class="result-meta">
+                                <i class="fas fa-${genderIcon}"></i> ${genderText}
+                                <span class="meta-separator">•</span>
+                                <i class="far fa-calendar-alt"></i> ${formattedPostedDate}
+                            </span>
+                        </div>
+
+                        <div class="result-details">
+                            <div class="detail-item">
+                                <i class="fas fa-user"></i>
+                                <span>${post.name || 'Không xác định'}</span>
                             </div>
-                            <div class="col-md-8">
-                                <div class="p-4 h-100 d-flex flex-column">
-                                    <h5 class="font-weight-bold">${post.title || 'Không có tiêu đề'}</h5>
-                                    <p class="text-muted flex-grow-1">${shortDescription}</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <a href="/TimNguoi/ChiTietBaiTimNguoi/${post.id}"
-                                           class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-eye mr-1"></i>Xem chi tiết
-                                        </a>
-                                        <small class="text-muted">Kết quả #${index + 1}</small>
-                                    </div>
-                                </div>
+
+                            <div class="detail-item">
+                                <i class="fas fa-calendar-times"></i>
+                                <span>Ngày mất tích: ${formattedMissingDate}</span>
                             </div>
+
+                            <div class="detail-item">
+                                <i class="fas fa-search"></i>
+                                <span class="features-text">${post.features || 'Không có thông tin đặc điểm nhận dạng'}</span>
+                            </div>
+                        </div>
+
+                        <div class="result-footer">
+                            <a href="/TimNguoi/ChiTietBaiTimNguoi/${post.id}"
+                               class="view-detail-btn">
+                                <i class="fas fa-eye"></i> Xem chi tiết
+                            </a>
+                            <span class="result-number">#${index + 1}</span>
                         </div>
                     </div>
                 </div>`;
@@ -626,11 +854,12 @@
             return '#dc3545';
         }
 
-        function getSimilarityClass(percent) {
-            if (percent >= 80) return 'badge-success';
-            if (percent >= 60) return 'badge-info';
-            if (percent >= 40) return 'badge-warning';
-            return 'badge-danger';
+        
+            function getSimilarityClass(percent) {
+            if (percent >= 80) return 'high';      // Màu xanh dương đậm (tốt)
+            if (percent >= 60) return 'medium';    // Màu vàng (trung bình)
+            if (percent >= 40) return 'low';       // Màu đỏ (thấp)
+            return '';                             // Không có class nếu dưới 40%
         }
 
         function retrySearch() {

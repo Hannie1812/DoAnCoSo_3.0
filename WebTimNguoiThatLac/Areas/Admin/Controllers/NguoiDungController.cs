@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.VariantTypes;
+﻿using DocumentFormat.OpenXml.InkML;
+using DocumentFormat.OpenXml.VariantTypes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -292,6 +293,12 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 user.NgaySinh = model.NgaySinh;
                 user.Address = model.Address;
                 user.Active = model.Active;
+                if (user.Active == true)
+                {
+
+                    user.SoLanViPham = 0;
+                }
+                
 
                 // Handle image upload
                 if (HinhAnhCapNhat != null && HinhAnhCapNhat.Length > 0)
@@ -380,10 +387,20 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     return Json(new { success = false, message = "Ko Có Id Cần chỉnh sửa" });
                 }
 
+                string s = "";
+                if (y.Active == false)
+                {
+                    s = "Tài khoản đã được mở";
+                    y.SoLanViPham = 0;
+                }
+                else
+                {
+                    s = "Tài khoản đã khóa thành công";
+                }
                 y.Active = !y.Active;
 
                 await db.SaveChangesAsync();
-                return Json(new { success = true, message = "Thành Công" });
+                return Json(new { success = true, message = s });
             }
             catch (Exception ex)
             {
@@ -430,23 +447,31 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                                  .ToListAsync();
                 db.BaoCaoBinhLuans.RemoveRange(dsBCBLUS);
 
-                // Xóa bình luận của us
+                //// Xóa bình luận của us
                 var dsBLus = await db.BinhLuans
                                    .Where(m => m.UserId == y.Id)
                                    .ToListAsync();
 
 
-                foreach(var d in dsBLus)
-                {
-                    List<BaoCaoBinhLuan> dsBCBLCUAUS = db.BaoCaoBinhLuans.Where(i => i.MaBinhLuan == d.Id).ToList();
-                    db.BaoCaoBinhLuans.RemoveRange(dsBCBLCUAUS);
-                }
+
 
                 foreach (var d in dsBLus)
                 {
-                    DeleteImage(d.HinhAnh, "BinhLuan");
+                    //List<BaoCaoBinhLuan> dsBCBLCUAUS = db.BaoCaoBinhLuans.Where(i => i.MaBinhLuan == d.Id).ToList();
+                    //db.BaoCaoBinhLuans.RemoveRange(dsBCBLCUAUS);
+
+                    await DeleteCommentAndReplies(d);
                 }
-                db.BinhLuans.RemoveRange(dsBLus);
+
+
+
+                //foreach (var d in dsBLus)
+                //{
+                //    DeleteImage(d.HinhAnh, "BinhLuan");
+                //}
+                //db.BinhLuans.RemoveRange(dsBLus);
+
+                
 
                 // xóa người dùng báo cáo bài viết
                 var dsBCBVUS = await db.BaoCaoBaiViets
@@ -604,6 +629,29 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 return Json(new { success = false, message = "Lỗi: " + ex.Message });
             }
 
+        }
+
+        // Hàm đệ quy xóa bình luận và các reply
+        private async Task DeleteCommentAndReplies(BinhLuan comment)
+        {
+            // Xóa hình ảnh nếu có
+            if (!string.IsNullOrEmpty(comment.HinhAnh))
+            {
+                DeleteImage(comment.HinhAnh, "BinhLuan");
+            }
+
+            // Xóa đệ quy các reply
+            if (comment.TraLois != null && comment.TraLois.Any())
+            {
+                foreach (var reply in comment.TraLois.ToList())
+                {
+                    await DeleteCommentAndReplies(reply);
+                }
+            }
+            List<BaoCaoBinhLuan> ds = db.BaoCaoBinhLuans.Where(x => x.MaBinhLuan == comment.Id).ToList();
+            db.BaoCaoBinhLuans.RemoveRange(ds);
+
+            db.BinhLuans.Remove(comment);
         }
 
 

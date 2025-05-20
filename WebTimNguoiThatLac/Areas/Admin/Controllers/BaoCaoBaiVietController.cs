@@ -231,6 +231,27 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     return NotFound();
                 }
 
+                
+
+                
+                post.active = !post.active;
+               
+
+
+                if(post.active == true)
+                {
+                    
+                    var reports = await _context.BaoCaoBaiViets
+                        .Where(b => b.MaBaiViet == postId)
+                        .ToListAsync();
+                    //_context.BaoCaoBaiViets.RemoveRange(reports); // xóa báo cáo
+
+                    foreach (var report in reports)
+                    {
+                        report.check = true; // Đánh dấu là đã xử lý
+                    }
+                    await _context.SaveChangesAsync();
+                }
                 if (post.active == true)
                 {
                     // Gửi thông báo cho Người Dùng
@@ -250,27 +271,8 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     );
                 }
 
-                
-                post.active = !post.active;
                 _context.Update(post);
                 await _context.SaveChangesAsync();
-
-
-                if(post.active == true)
-                {
-                    
-                    var reports = await _context.BaoCaoBaiViets
-                        .Where(b => b.MaBaiViet == postId)
-                        .ToListAsync();
-                    _context.BaoCaoBaiViets.RemoveRange(reports);
-
-                    foreach (var report in reports)
-                    {
-                        report.check = true; // Đánh dấu là đã xử lý
-                    }
-                    await _context.SaveChangesAsync();
-                }
-                
                 TempData["SuccessMessage"] = $"Đã {(post.active ? "kích hoạt" : "vô hiệu hóa")} bài viết thành công";
                 return RedirectToAction("Details", new { id = ReportId });
             }

@@ -1,0 +1,230 @@
+﻿@using WebTimNguoiThatLac.ViewModels
+@model CommentViewModel
+@{
+    var comment = Model.Comment;
+    var depth = Model.Depth;
+    var maxDepth = 5; // Giới hạn độ sâu để tránh lặp vô hạn
+    @using Microsoft.AspNetCore.Identity
+    @inject UserManager<ApplicationUser> UserManager
+    @inject RoleManager<IdentityRole> RoleManager
+
+
+
+    var user = await UserManager.GetUserAsync(User);
+    var userId = user?.Id;
+
+}
+
+<div class="d-flex">
+    <!-- Avatar -->
+    <div class="me-3">
+        @if (comment.ApplicationUser.Id == userId)
+        {
+            <div class="comment-avatar bg-primary text-white d-flex align-items-center justify-content-center rounded-circle"
+                 style="width: @(48 - depth*4)px; height: @(48 - depth*4)px; font-size: @(1.2 - depth*0.1)rem;">
+                @if (!string.IsNullOrEmpty(comment.ApplicationUser?.HinhAnh))
+                {
+                    <img src="@comment.ApplicationUser?.HinhAnh" alt="Ảnh đại diện"
+                         class="rounded-circle border"
+                         width="@(48 - depth*4)" height="@(48 - depth*4)"
+                         style="object-fit: cover; border: 2px solid #ddd;" />
+                }
+                else
+                {
+                    <i class="fas fa-user"></i>
+
+                }
+            </div>
+        }
+        else
+        {
+            <a href="/Chat/BatDauChat?nguoiNhanId=@comment.ApplicationUser.Id">
+                <div class="comment-avatar bg-primary text-white d-flex align-items-center justify-content-center rounded-circle"
+                     style="width: @(48 - depth*4)px; height: @(48 - depth*4)px; font-size: @(1.2 - depth*0.1)rem;">
+                    @if (!string.IsNullOrEmpty(comment.ApplicationUser?.HinhAnh))
+                    {
+                        <img src="@comment.ApplicationUser?.HinhAnh" alt="Ảnh đại diện"
+                             class="rounded-circle border"
+                             width="@(48 - depth*4)" height="@(48 - depth*4)"
+                             style="object-fit: cover; border: 2px solid #ddd;" />
+                    }
+                    else
+                    {
+                        <i class="fas fa-user"></i>
+                    }
+                </div>
+            </a>
+        }
+    </div>
+
+    <!-- Content -->
+    <div class="flex-grow-1">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+                <div class="d-flex align-items-center">
+                    @if (comment.ApplicationUser.Id == userId)
+                    {
+                        <h6 class="comment-author mb-0 fw-semibold me-2" style="font-size: @(1 - depth*0.05)rem">
+                            @comment.ApplicationUser?.FullName
+                        </h6>
+                        <span class="badge bg-success" style="font-size: @(0.8 - depth*0.05)rem">bạn</span>
+                    }
+                    else
+                    {
+                        <a href="/Chat/BatDauChat?nguoiNhanId=@comment.ApplicationUser.Id">
+                            <h6 class="comment-author mb-0 fw-semibold me-2" style="font-size: @(1 - depth*0.05)rem">
+                                @comment.ApplicationUser?.FullName
+                            </h6>
+                        </a>
+                    }
+                    @if (comment.ApplicationUser?.Id == Model.Model.IdNguoiDung)
+                    {
+                        <span class="badge bg-info" style="font-size: @(0.8 - depth*0.05)rem">Tác giả</span>
+                    }
+                </div>
+                <small class="text-muted" style="font-size: @(0.9 - depth*0.05)rem">
+                    <i class="far fa-clock me-1"></i>
+                    @comment.NgayBinhLuan.ToString("dd/MM/yyyy HH:mm")
+                </small>
+            </div>
+
+            @if (comment.ApplicationUser?.Id != Model.UserId && Model.CurrentUser != null)
+            {
+                <div class="dropdown">
+                    <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown" style="font-size: @(0.8 - depth*0.05)rem">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <button class="dropdown-item text-danger report-comment-btn"
+                                    data-comment-id="@comment.Id"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#reportCommentModal"
+                                    style="font-size: @(0.8 - depth*0.05)rem">
+                                <i class="fas fa-flag me-2"></i> Báo cáo
+                            </button>
+                        </li>
+                        @if (Model.IsAuthor)
+                        {
+                            <li>
+                                <button class="dropdown-item text-danger d-flex align-items-center"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#XoaBinhLuan-@comment.Id"
+                                        style="font-size: @(0.8 - depth*0.05)rem">
+                                    <i class="fas fa-trash-alt me-2"></i>
+                                    Xóa bình luận
+                                </button>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+        </div>
+
+        <div class="comment-content mb-3" style="font-size: @(1 - depth*0.05)rem">
+            @comment.NoiDung
+        </div>
+
+        @if (!string.IsNullOrEmpty(comment.HinhAnh))
+        {
+            <div class="mt-2">
+                <img src="@comment.HinhAnh"
+                     class="comment-image rounded-3 shadow-sm"
+                     onclick="showImageModal('@comment.HinhAnh')"
+                     alt="Ảnh bình luận"
+                     style="max-width: @(300 - depth*50)px; max-height: @(300 - depth*50)px; cursor: pointer;"
+                     loading="lazy">
+            </div>
+        }
+
+        <!-- Reply Button -->
+        <button class="btn btn-sm btn-outline-primary mt-2 reply-btn"
+                data-comment-id="@comment.Id"
+                data-depth="@depth">
+            <i class="fas fa-reply me-1"></i> Trả lời
+        </button>
+
+        <!-- Nút ẩn/hiện trả lời (nếu có) -->
+        @if (comment.TraLois != null && comment.TraLois.Any() && depth < maxDepth)
+        {
+            <button class="btn btn-sm btn-outline-secondary mt-2 ms-2 toggle-replies-btn"
+                    data-comment-id="@comment.Id">
+                <i class="fas fa-comments me-1"></i> Hiện trả lời (@comment.TraLois.Count)
+            </button>
+        }
+
+        <!-- Reply Form (Hidden by default) -->
+        <div class="reply-form mt-3 d-none" id="reply-form-@comment.Id">
+            <form asp-action="ReplyComment" asp-controller="TimNguoi" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="PostId" value="@Model.Model.Id" />
+                <input type="hidden" name="UserId" value="@Model.UserId" />
+                <input type="hidden" name="ParentCommentId" value="@comment.Id" />
+
+                <div class="form-floating mb-2">
+                    <textarea name="NoiDung" class="form-control" placeholder="Viết trả lời..." style="min-height: 80px" required></textarea>
+                    <label><i class="far fa-comment me-2"></i>Viết trả lời...</label>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="flex-grow-1 me-2">
+                        <input type="file" name="HinhAnh" class="form-control form-control-sm" accept="image/*">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="fas fa-paper-plane me-1"></i> Gửi
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Replies List -->
+        @if (comment.TraLois != null && comment.TraLois.Any() && depth < maxDepth)
+        {
+            <div id="replies-@comment.Id" class="replies-container mt-3 ps-4 border-start border-2 border-light d-none"
+                 style="margin-left: @(10 + depth*5)px; padding-left: @(15 + depth*5)px;">
+                @foreach (var reply in comment.TraLois.OrderBy(r => r.NgayBinhLuan))
+                {
+                    <div class="reply-item py-2" id="reply-@reply.Id">
+                        @await Html.PartialAsync("_CommentPartial", new CommentViewModel
+                       {
+                           Comment = reply,
+                           Model = Model.Model,
+                           UserId = Model.UserId,
+                           IsAuthor = Model.IsAuthor,
+                           CurrentUser = Model.CurrentUser,
+                           Depth = depth + 1
+                       })
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Delete Comment Modal -->
+<div class="modal fade" id="XoaBinhLuan-@comment.Id" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0">
+                <div class="d-flex align-items-center">
+                    <div class="bg-danger text-white bg-opacity-10 p-2 rounded-circle me-3 d-flex justify-content-center align-item-center">
+                        <i class="fas fa-trash-alt"></i>
+                    </div>
+                    <h5 class="modal-title">Xác nhận xóa bình luận</h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <p>Bạn có chắc chắn muốn xóa bình luận này không?</p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Hủy
+                </button>
+                <button type="button" onclick="XacNhanXoaBinhLuan('@comment.Id')"
+                        class="btn btn-danger" data-bs-dismiss="modal">
+                    <i class="fas fa-trash-alt me-1"></i> Xóa
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

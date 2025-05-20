@@ -438,8 +438,338 @@
         background-color: #f5f5f5;
         border-radius: 4px;
     }
+
+    /* Style cho nút chia sẻ vị trí */
+    .location-btn {
+        background: #4e73df;
+        color: white;
+        border: none;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-right: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .location-btn:hover {
+        background: #3a5bbf;
+        transform: scale(1.05);
+    }
+    /* END Style cho nút chia sẻ vị trí */
+
+
+
+    /* test */
+        
+        /* Chat input container styles */
+        .chat-input-container {
+            padding: 12px 16px;
+            background: #ffffff;
+            border-top: 1px solid #e9ecef;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        /* File preview styles */
+        .file-preview-wrapper {
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .file-preview-container {
+            position: relative;
+            max-width: 200px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .file-preview {
+            display: block;
+            max-width: 100%;
+            max-height: 150px;
+            object-fit: contain;
+        }
+
+        .remove-file-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+            .remove-file-btn:hover {
+                background: rgba(0, 0, 0, 0.8);
+                transform: scale(1.1);
+            }
+
+        /* Main input area */
+        .input-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .text-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        #messageInput {
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 24px;
+            background: #f5f7fb;
+            font-size: 15px;
+            resize: none;
+            outline: none;
+            transition: all 0.3s;
+            min-height: 48px;
+            max-height: 120px;
+            box-sizing: border-box;
+        }
+
+            #messageInput:focus {
+                background: #e9eff7;
+                box-shadow: 0 0 0 2px rgba(78, 115, 223, 0.2);
+            }
+
+        .input-underline {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #4e73df;
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        #messageInput:focus ~ .input-underline {
+            transform: scaleX(1);
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            align-items: center;
+            justify-content : center;
+            gap: 4px;
+        }
+
+        .input-action-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+            .input-action-btn:hover {
+                background: #f1f3f5;
+                color: #4e73df;
+            }
+
+        .file-upload-btn { 
+             position: relative; 
+         }
+
+        .send-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: #4e73df;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+            .send-btn:hover {
+                background: #3a5bbf;
+                transform: scale(1.05);
+            }
+
+            .send-btn:disabled {
+                background: #b0c4ff;
+                cursor: not-allowed;
+            }
+
+        /* Responsive adjustments */
+        @@media (max-width: 768px) {
+            .input-area {
+                gap: 4px;
+            }
+
+            .input-action-btn {
+                width: 36px;
+                height: 36px;
+            }
+
+            .send-btn {
+                width: 36px;
+                height: 36px;
+            }
+        }
+    
+    /* end test */
 </style>
+    <style>
+        /* Chat input container */
+        .chat-input-container {
+            padding: 12px 16px;
+            background: #ffffff;
+            border-top: 1px solid #e9ecef;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        /* File preview styles */
+        .file-preview-wrapper {
+            margin-bottom: 12px;
+        }
+
+        .file-preview-container {
+            position: relative;
+            max-width: 200px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .file-preview {
+            display: block;
+            max-width: 100%;
+            max-height: 150px;
+            object-fit: contain;
+        }
+
+        .remove-file-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Main input area with equal height elements */
+        .input-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: 48px; /* Fixed height for the container */
+        }
+
+        .text-input-wrapper {
+            flex: 1;
+            height: 100%;
+        }
+
+        .message-input {
+            width: 100%;
+            height: 100%;
+            padding: 0 16px;
+            border: none;
+            border-radius: 24px;
+            background: #f5f7fb;
+            font-size: 15px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+            .message-input:focus {
+                background: #e9eff7;
+                box-shadow: 0 0 0 2px rgba(78, 115, 223, 0.2);
+            }
+
+        /* Action buttons with equal height */
+        .action-buttons {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            height: 100%;
+        }
+
+        .input-action-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+            .input-action-btn:hover {
+                background: #f1f3f5;
+                color: #4e73df;
+            }
+
+        .send-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            background: #4e73df;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+            .send-btn:hover {
+                background: #3a5bbf;
+            }
+
+            .send-btn:disabled {
+                background: #b0c4ff;
+                cursor: not-allowed;
+            }
+    </style>
 }
+<!-- Notification Area -->
+<div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+
+
 
 <div class="container-fluid px-4 py-4">
     <h1 class="mb-4" style="color: #4e73df;">TIN NHẮN</h1>
@@ -608,25 +938,54 @@
                     }
                 </div>
 
-                <div class="chat-input">
+               
+                <div class="chat-input-container">
                     <form asp-action="GuiTinNhan" method="post" enctype="multipart/form-data" class="message-form" id="messageForm">
                         <input type="hidden" name="hopThoaiId" value="@Model.HopThoaiHienTai.Id">
-                        <div class="input-group">
-                            <input type="text" name="noiDung" placeholder="Gửi tin nhắn" id="messageInput">
-                            <label class="file-upload">
-                                <i class="fas fa-paperclip"></i>
-                                <input type="file" name="file" accept="image/*" id="fileInput" hidden>
-                            </label>
-                            <button type="submit">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
+
+                        <!-- File preview section -->
+                        <div class="file-preview-wrapper" id="filePreviewContainer" style="display: none;">
+                            <div class="file-preview-container">
+                                <img id="filePreview" class="file-preview">
+                                <button type="button" class="remove-file-btn" id="removeFileBtn">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="file-preview-container" id="filePreviewContainer" style="display: none;">
-                            <img id="filePreview" class="file-preview">
-                            <button type="button" class="remove-file" id="removeFileBtn">×</button>
+
+                        <!-- Main input area -->
+                        <div class="input-area">
+                           
+
+                            <!-- Text input with consistent height -->
+                            <div class="text-input-wrapper">
+                                <input type="text" name="noiDung" placeholder="Nhập tin nhắn..." id="messageInput"
+                                       class="message-input" autocomplete="off" aria-label="Tin nhắn">
+                            </div>
+
+                            <!-- Action buttons with consistent height -->
+                            <div class="action-buttons">
+                                <!-- File upload button -->
+                                <label class="input-action-btn file-upload-btn" title="Đính kèm hình ảnh">
+                                    <i class="fas fa-image"></i>
+                                    <input type="file" name="file" accept="image/*" id="fileInput" hidden>
+                                </label>
+
+                                <!-- Location sharing button -->
+                                <button type="button" id="shareLocationBtn" class="input-action-btn location-btn"
+                                        title="Chia sẻ vị trí">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </button>
+
+                                <!-- Send button -->
+                                <button type="submit" class="send-btn" id="sendButton" title="Gửi tin nhắn">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
+
             }
             else
             {
@@ -701,6 +1060,97 @@
         // Gọi hàm khi nội dung thay đổi
         $('#messageInput').on('input', adjustTextareaHeight);
     </script>
+
+
+    <script>
+                // Xử lý chia sẻ vị trí
+        $('#shareLocationBtn').click(function() {
+            if (navigator.geolocation) {
+                // Hiển thị thông báo đang lấy vị trí
+                 showNotification('info', 'Đang Lấy Vị Trí');
+
+
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        // Tạo link Google Maps
+                        var lat = position.coords.latitude;
+                        var lng = position.coords.longitude;
+                        var mapUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+                        var locationMessage = `Vị trí của tôi: ${mapUrl}`;
+
+                        // Tự động điền vào ô tin nhắn
+                        $('#messageInput').val(locationMessage);
+
+                        // Focus vào ô tin nhắn để người dùng có thể gửi ngay
+                        $('#messageInput').focus();
+
+                          showNotification('success', 'Lấy Vị trí Thành Công');
+                    },
+                    function(error) {
+                        var errorMessage;
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMessage = "Bạn đã từ chối chia sẻ vị trí.";
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMessage = "Thông tin vị trí không khả dụng.";
+                                break;
+                            case error.TIMEOUT:
+                                errorMessage = "Yêu cầu lấy vị trí đã hết thời gian.";
+                                break;
+                            case error.UNKNOWN_ERROR:
+                                errorMessage = "Đã xảy ra lỗi không xác định.";
+                                break;
+                        }
+                         showNotification('error', 'Lấy Vị Trí Không Thành Công: '+ errorMessage);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                showNotification('error', 'Trình duyệt của bạn không hỗ trợ chia sẻ vị trí.');
+
+            }
+        });
+    </script>
+    @* test *@
+    <script>
+        // Enable/disable send button based on input
+        document.getElementById('messageInput').addEventListener('input', function() {
+            const sendBtn = document.getElementById('sendButton');
+            sendBtn.disabled = this.value.trim() === '' &&
+                              document.getElementById('fileInput').files.length === 0;
+        });
+
+        // File input handling
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const previewContainer = document.getElementById('filePreviewContainer');
+            const preview = document.getElementById('filePreview');
+            const sendBtn = document.getElementById('sendButton');
+
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                    sendBtn.disabled = false;
+                }
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        // Remove file
+        document.getElementById('removeFileBtn').addEventListener('click', function() {
+            document.getElementById('fileInput').value = '';
+            document.getElementById('filePreviewContainer').style.display = 'none';
+            document.getElementById('sendButton').disabled =
+                document.getElementById('messageInput').value.trim() === '';
+        });
+    </script>
+    @* end test *@
 }
 
 @functions {

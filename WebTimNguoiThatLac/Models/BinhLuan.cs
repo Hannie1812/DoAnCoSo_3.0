@@ -20,6 +20,12 @@ namespace WebTimNguoiThatLac.Models
         [ForeignKey("UserId")]
         public virtual ApplicationUser? ApplicationUser { get; set; }
 
+        // Thêm trường cho bình luận cha (nếu là reply)
+        public int? ParentId { get; set; }
+
+        [ForeignKey("ParentId")]
+        public virtual BinhLuan? ParentBinhLuan { get; set; }
+
         public int? IdBaiViet { get; set; }
         [ForeignKey("IdBaiViet")]
         public virtual TimNguoi? TimNguoi { get; set; }
@@ -27,5 +33,6 @@ namespace WebTimNguoiThatLac.Models
         public bool DaDoc { get; set; } = false; // Mặc định là chưa đọc
         public bool NguoiDangBaiXoa { get; set; } = false; // Mặc định là chuaxoa
         public ICollection<BaoCaoBinhLuan> BaoCaoBinhLuans { get; set; }
+        public ICollection<BinhLuan> TraLois { get; set; } // Danh sách các reply
     }
 }

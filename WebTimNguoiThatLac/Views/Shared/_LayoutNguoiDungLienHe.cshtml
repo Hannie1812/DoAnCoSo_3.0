@@ -1,8 +1,24 @@
-﻿
-<style>
+﻿<style>
 
     .btn-send:hover {
         color: white;
+    }
+
+    /* Đổi màu cho các label */
+    .volunteer label {
+        color: white; /* Màu xanh dương, bạn có thể đổi sang màu khác */
+        font-weight: 500;
+    }
+
+    /* Đổi màu nền và viền cho ô nhập mô tả vấn đề */
+    #compose-textarea {
+        background-color: #f0f8ff; /* Màu nền nhạt */
+        border: 2px solid white; /* Viền xanh dương */
+        color: #333;
+    }
+    #compose-textarea:focus {
+        background-color: #e6f2ff;
+        border-color: white;
     }
 
 </style>
@@ -16,7 +32,7 @@
                 <div class="img img-2 align-self-stretch" style="background-image: url(/Templet/images/bg_4.jpg);"></div>
             </div>
             <div class="col-md-6 volunteer pl-md-5 ftco-animate">
-                <h4 class="form-title">Gửi Tin Nhắn Cho Chúng Tôi</h4>
+                <h4 class="form-title" style="color: white;"><strong>Gửi Tin Nhắn Cho Chúng Tôi</strong></h4>
                 <form asp-action="LienHe" asp-controller="Home" method="post" class="volunter-form" enctype="multipart/form-data">
                     <div class="form-row">
                         <div class="form-group col-md-6">
@@ -37,9 +53,8 @@
                         <input name="VanDeLienHe" type="text" class="form-control" placeholder="Vấn Đề Bạn Đang Gặp Phải ">
                     </div>
                     <div class="form-group">
-                        <textarea name="NoiBungLienHe" id="compose-textarea" class="form-control border-0 bg-light px-4 py-3" rows="5" placeholder="Mô Tả Vấn Đề"></textarea>
- 
-
+                        <label name="VanDeLienHe" for="subject">Mô Tả  <span class="text-danger">*</span></label>
+                        <textarea name="NoiBungLienHe" id="compose-textarea" class="form-control bg-light px-4 py-3" rows="5" placeholder="Mô Tả Vấn Đề Của Bạn"></textarea>
                     </div>
                     <button type="submit" class="btn btn-white btn-send">
                         <i class="fas fa-paper-plane mr-2"></i> Gửi Tin Nhắn

@@ -75,6 +75,20 @@
     }
 </style>
 
+<style>
+    /* Thêm vào phần style */
+    .tooltip-inner {
+        max-width: 300px;
+        padding: 8px 12px;
+        font-size: 0.875rem;
+        background-color: rgba(0,0,0,0.9);
+    }
+
+    .bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before,
+    .bs-tooltip-top .tooltip-arrow::before {
+        border-top-color: rgba(0,0,0,0.9);
+    }
+</style>
 
 <div class="container-fluid">
 
@@ -135,18 +149,18 @@
                                     </td>
                                     @if (i.Active == true)
                                     {
-                                        <td class="trangthaiActive" id="active_id_@i.Id">
+                                        <td class="trangthaiActive" id="active_id_@i.Id" data-bs-toggle="tooltip" title="Đang Hoạt Động">
                                             <i class="fa-regular fa-circle-check text-success hoatdong" id="logo_@i.Id" data-check="v" data-id="@i.Id"></i>
                                         </td>
                                     }
                                     else
                                     {
-                                        <td class="trangthaiActive" id="active_id_@i.Id">
+                                        <td class="trangthaiActive" id="active_id_@i.Id" data-bs-toggle="tooltip" title="Dừng Hoạt Động">
                                             <i class="fa-regular fa-circle-xmark text-danger hoatdong" id="logo_@i.Id" data-check="x" data-id="@i.Id"></i>
                                         </td>
                                     }
                                     <td>
-                                        <a asp-action="Update" asp-area="Admin" asp-controller="TinTuc" asp-route-id="@i.Id" class="btn btn-info">
+                                        <a asp-action="Update" asp-area="Admin" data-bs-toggle="tooltip" title="Chỉnh Sửa" asp-controller="TinTuc" asp-route-id="@i.Id" class="btn btn-info">
                                             <i class="fas fa-edit"></i>
                                             Sửa
                                         </a>

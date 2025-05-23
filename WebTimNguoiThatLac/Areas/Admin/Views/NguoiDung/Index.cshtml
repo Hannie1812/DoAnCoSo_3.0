@@ -198,6 +198,82 @@
         .notification.info {
             background-color: #17a2b8;
         }
+    /* Professional Loading Modal Styles */
+    #proLoadingModal {
+        z-index: 99999 !important;
+    }
+
+        #proLoadingModal .modal-dialog {
+            pointer-events: none;
+            max-width: 300px;
+        }
+
+        #proLoadingModal .modal-backdrop {
+            opacity: 0.8 !important;
+            background-color: #1a1a1a !important;
+        }
+
+    .pro-spinner {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto;
+        position: relative;
+        animation: pulse 1.5s infinite ease-in-out;
+    }
+
+    .spinner-inner {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #007bff, #00c4ff);
+        border: 4px solid transparent;
+        border-top-color: #fff;
+        border-bottom-color: #fff;
+        animation: spin 1s linear infinite;
+    }
+
+    /* Animations */
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    @@keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.1);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    #proLoadingModal .modal-body {
+        padding: 2rem;
+        border-radius: 15px;
+        background: rgba(0, 0, 0, 0.7);
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    #proLoadingModal.fade .modal-dialog {
+        transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        transform: translateY(-50px);
+    }
+
+    #proLoadingModal.show .modal-dialog {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    /* END Professional Loading Modal Styles */
 </style>
 
 
@@ -557,6 +633,22 @@
     </div>
 </div>
 
+
+<!-- Professional Loading Modal -->
+<div class="modal fade" id="proLoadingModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="background: transparent; border: none; box-shadow: none;">
+            <div class="modal-body text-center">
+                <div class="pro-spinner">
+                    <div class="spinner-inner"></div>
+                </div>
+                <p class="text-white mt-3 mb-0" style="font-size: 1.1rem; font-weight: 500;">Đang xử lý, vui lòng chờ...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 @functions {
     public string GetRoleBadgeClass(string role)
     {
@@ -591,9 +683,52 @@
 
     @* end tooltip *@
 
+
+
+
     <script>
+
+        // Hàm hiển thị loading
+        function showLoading() {
+            console.log('Hiển thị modal loading');
+            const $modal = $('#proLoadingModal');
+            if ($modal.length) {
+                $modal.modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+                $modal.modal('show');
+            } else {
+                console.error('Không tìm thấy phần tử #proLoadingModal trong DOM');
+            }
+        }
+
+        // Hàm ẩn loading
+        function hideLoading() {
+            console.log('Ẩn modal loading');
+            const $modal = $('#proLoadingModal');
+            if ($modal.length) {
+                $modal.modal('hide');
+                // Dọn dẹp backdrop và trạng thái modal
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open').css('padding-right', '');
+                // Đảm bảo modal được ẩn hoàn toàn
+                $modal.removeClass('show').css('display', 'none');
+            } else {
+                console.warn('Không tìm thấy phần tử #proLoadingModal khi ẩn');
+            }
+        }
+
+        // Lưu trữ request AJAX hiện tại
+        let currentAjax = null;
+
         function XoaNguoiDung(id) {
-            $.ajax({
+             if (currentAjax) {
+                console.log('Hủy AJAX request trước đó');
+                currentAjax.abort();
+            }
+            showLoading();
+            currentAjax = $.ajax({
                 type: "POST",
                 url: "/Admin/NguoiDung/Delete",
                 data: { id: id },
@@ -608,6 +743,11 @@
                 },
                 error: function() {
                     showNotification('error', 'Lỗi hệ thống khi xóa người dùng');
+                },
+                complete: function() {
+                    console.log('Hoàn tất AJAX XoaBaiViet');
+                    hideLoading();
+                    currentAjax = null;
                 }
             });
         }

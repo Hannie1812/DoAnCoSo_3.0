@@ -460,6 +460,12 @@ async function verifyCCCDWithImages(cameraImg, cccdImg) {
             ? `<div class="alert alert-success">✅ Xác thực thành công! Độ tương đồng: <b>${similarity}%</b></div>`
             : `<div class="alert alert-danger">❌ Xác thực thất bại! Độ tương đồng: <b>${similarity}%</b></div>`;
 
+        // mở nút ra
+        if (similarity>50) {
+            let nut = document.getElementById('registerSubmit');
+            nut.disabled = false;
+        }
+        // mở nút ra
         return isVerified;
     } catch (err) {
         progressDiv.innerText = "";

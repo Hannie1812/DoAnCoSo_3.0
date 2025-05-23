@@ -185,7 +185,94 @@
     .notification.info {
     background-color: #17a2b8;
     }
+
+    
+    /* Professional Loading Modal Styles */
+    #proLoadingModal {
+        z-index: 99999 !important;
+    }
+
+        #proLoadingModal .modal-dialog {
+            pointer-events: none;
+            max-width: 300px;
+        }
+
+        #proLoadingModal .modal-backdrop {
+            opacity: 0.8 !important;
+            background-color: #1a1a1a !important;
+        }
+
+    .pro-spinner {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto;
+        position: relative;
+        animation: pulse 1.5s infinite ease-in-out;
+    }
+
+    .spinner-inner {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #007bff, #00c4ff);
+        border: 4px solid transparent;
+        border-top-color: #fff;
+        border-bottom-color: #fff;
+        animation: spin 1s linear infinite;
+    }
+
+    /* Animations */
+    @@keyframes spin {
+        0%
+
+    {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+
+    }
+
+    @@keyframes pulse {
+        0%
+
+    {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+
+    }
+
+    #proLoadingModal .modal-body {
+        padding: 2rem;
+        border-radius: 15px;
+        background: rgba(0, 0, 0, 0.7);
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    #proLoadingModal.fade .modal-dialog {
+        transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        transform: translateY(-50px);
+    }
+
+    #proLoadingModal.show .modal-dialog {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+
 </style>
+
+
 
 <div id="notification-area"></div>
 
@@ -360,6 +447,7 @@
                                                             data-bs-toggle="modal" data-bs-target="#CheckXoaBaiViet_@i.Id" title="Xóa">
                                                         <i class="fas fa-trash-alt"></i>
                                                     </button>
+
                                                 </div>
 
                                                 <!-- Delete Confirmation Modal -->
@@ -547,6 +635,7 @@
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                                        <a href="/TimNguoi/ChiTietBaiTimNguoi/@i.Id" class="btn btn-secondary">Chi tiết</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -591,84 +680,187 @@
     </div>
 </div>
 
+
+<!-- Professional Loading Modal -->
+<div class="modal fade" id="proLoadingModal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="background: transparent; border: none; box-shadow: none;">
+            <div class="modal-body text-center">
+                <div class="pro-spinner">
+                    <div class="spinner-inner"></div>
+                </div>
+                <p class="text-white mt-3 mb-0" style="font-size: 1.1rem; font-weight: 500;">Đang xử lý, vui lòng chờ...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
+        // Hàm hiển thị loading
+        function showLoading() {
+            console.log('Hiển thị modal loading');
+            const $modal = $('#proLoadingModal');
+            if ($modal.length) {
+                $modal.modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+                $modal.modal('show');
+            } else {
+                console.error('Không tìm thấy phần tử #proLoadingModal trong DOM');
+            }
+        }
+
+        // Hàm ẩn loading
+        function hideLoading() {
+            console.log('Ẩn modal loading');
+            const $modal = $('#proLoadingModal');
+            if ($modal.length) {
+                $modal.modal('hide');
+                // Dọn dẹp backdrop và trạng thái modal
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open').css('padding-right', '');
+                // Đảm bảo modal được ẩn hoàn toàn
+                $modal.removeClass('show').css('display', 'none');
+            } else {
+                console.warn('Không tìm thấy phần tử #proLoadingModal khi ẩn');
+            }
+        }
+
+        // Lưu trữ request AJAX hiện tại
+        let currentAjax = null;
+
+        // Xóa bài viết
         function XoaBaiViet(id) {
-            $.ajax({
+            if (currentAjax) {
+                console.log('Hủy AJAX request trước đó');
+                currentAjax.abort();
+            }
+            showLoading();
+            currentAjax = $.ajax({
                 type: "POST",
                 url: "/Admin/BaiViet/Delete",
                 data: { id: id },
+                timeout: 10000, // Timeout 10 giây
                 success: function(rs) {
-                    if(rs.success){
-                        $("#Dong_ID_"+id).remove();
-                        showNotification('success', 'Đã xóa bài viết thành công');
-                    }
-                    else {
+                    console.log('Xóa bài viết thành công:', rs);
+                    if (rs.success) {
+                        $("#Dong_ID_" + id).fadeOut(300, function() {
+                            $(this).remove();
+                            showNotification('success', 'Đã xóa bài viết thành công');
+                        });
+                    } else {
                         showNotification('error', 'Lỗi: ' + rs.message);
                     }
                 },
-                error: function() {
-                    showNotification('error', 'Lỗi hệ thống khi xóa bài viết');
+                error: function(xhr, status, error) {
+                    if (status !== 'abort') {
+                        console.error('Lỗi AJAX XoaBaiViet:', { status, error, response: xhr.responseText });
+                        showNotification('error', 'Lỗi hệ thống khi xóa bài viết: ' + error);
+                    }
+                },
+                complete: function() {
+                    console.log('Hoàn tất AJAX XoaBaiViet');
+                    hideLoading();
+                    currentAjax = null;
                 }
             });
         }
 
+        // Thay đổi trạng thái hoạt động
         $(document).on("dblclick", ".hoatdong", function() {
             let id = $(this).attr("data-id");
-            $.ajax({
+            // if (currentAjax) {
+            //     console.log('Hủy AJAX request trước đó');
+            //     currentAjax.abort();
+            // }
+            // showLoading();
+            currentAjax = $.ajax({
                 type: "POST",
                 url: "/Admin/BaiViet/HoatDong",
                 data: { id: id },
+                // timeout: 10000, Timeout 10 giây
                 success: function(rs) {
-                    if(rs.success){
-                        let trangthai = $("#logo_"+id).attr("data-check");
-                        let s = ``;
-                        if(trangthai === 'x') {
+                    console.log('Thay đổi trạng thái thành công:', rs);
+                    if (rs.success) {
+                        let trangthai = $("#logo_" + id).attr("data-check");
+                        let s = '';
+                        if (trangthai === 'x') {
                             s = `<i class="fas fa-check-circle text-success hoatdong fs-4"
                                    id="logo_${id}" data-check="v" data-id="${id}"
                                    style="cursor: pointer;" title="Nhấn đúp để thay đổi trạng thái"></i>`;
-                            $("#logo_"+id).remove();
                             showNotification('success', rs.message);
                         } else {
                             s = `<i class="fas fa-times-circle text-danger hoatdong fs-4"
                                    id="logo_${id}" data-check="x" data-id="${id}"
                                    style="cursor: pointer;" title="Nhấn đúp để thay đổi trạng thái"></i>`;
-                            $("#logo_"+id).remove();
                             showNotification('warning', rs.message);
                         }
-                        $("#active_id_"+id).append(s);
+                        $("#logo_" + id).remove();
+                        $("#active_id_" + id).append(s);
                     } else {
-                        showNotification('error', "Lỗi: " + rs.message);
+                        showNotification('error', 'Lỗi: ' + rs.message);
                     }
+                    hideLoading();
                 },
-                error: function() {
-                    showNotification('error', "Lỗi hệ thống khi thay đổi trạng thái");
+                error: function(xhr, status, error) {
+                    if (status !== 'abort') {
+                        console.error('Lỗi AJAX HoatDong:', { status, error, response: xhr.responseText });
+                        showNotification('error', 'Lỗi hệ thống khi thay đổi trạng thái: ' + error);
+                    }
+                    hideLoading();
+                },
+                complete: function() {
+                    console.log('Hoàn tất AJAX HoatDong');
+                    hideLoading();
+                    currentAjax = null;
                 }
             });
         });
 
+        // Xuất file Word
         function XuatDon(id) {
-            $.ajax({
+            if (currentAjax) {
+                console.log('Hủy AJAX request trước đó');
+                currentAjax.abort();
+            }
+            showLoading();
+            currentAjax = $.ajax({
                 type: "POST",
                 url: "/Admin/BaiViet/ExportToWord",
                 data: { id: id },
-                success: function(response) {
-                    // Create download link
-                    var link = document.createElement('a');
-                    link.href = window.URL.createObjectURL(new Blob([response]));
-                    link.download = `DonTrinhBao_${id}_${new Date().toISOString().slice(0,10)}.docx`;
+                xhrFields: {
+                    responseType: 'blob' // Xử lý phản hồi dạng file
+                },
+                timeout: 10000, // Timeout 10 giây
+                success: function(response, status, xhr) {
+                    console.log('Xuất file Word thành công');
+                    const filename = `DonTrinhBao_${id}_${new Date().toISOString().slice(0,10)}.docx`;
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(response);
+                    link.download = filename;
                     link.click();
-
+                    window.URL.revokeObjectURL(link.href); // Dọn dẹp
                     showNotification('success', 'Đã xuất file đơn trình báo thành công');
                 },
-                error: function() {
-                    showNotification('error', 'Lỗi khi xuất file đơn trình báo');
+                error: function(xhr, status, error) {
+                    if (status !== 'abort') {
+                        console.error('Lỗi AJAX XuatDon:', { status, error, response: xhr.responseText });
+                        showNotification('error', 'Lỗi khi xuất file đơn trình báo: ' + error);
+                    }
+                },
+                complete: function() {
+                    console.log('Hoàn tất AJAX XuatDon');
+                    hideLoading();
+                    currentAjax = null;
                 }
             });
         }
 
-        // Notification function
+        // Hàm hiển thị thông báo
         function showNotification(type, message) {
+            console.log(`Thông báo: ${type} - ${message}`);
             const notificationArea = document.getElementById('notification-area');
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
@@ -676,20 +868,19 @@
                 <i class="fas ${getIconForType(type)} me-2"></i>
                 ${message}
             `;
-
             notificationArea.appendChild(notification);
 
-            // Auto remove after 5 seconds
+            // Tự động xóa sau 5 giây
             setTimeout(() => {
                 notification.remove();
             }, 5000);
 
-            // Remove on click
+            // Xóa khi nhấp chuột
             notification.addEventListener('click', () => {
                 notification.remove();
             });
 
-            // Add hover effects
+            // Hiệu ứng hover
             notification.addEventListener('mouseover', () => {
                 notification.style.transform = 'translateY(-5px)';
                 notification.style.boxShadow = '0 6px 15px rgba(0,0,0,0.2)';
@@ -699,14 +890,14 @@
                 notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
             });
 
-            // Add slide-in effect
+            // Hiệu ứng slide-in
             notification.style.transform = 'translateX(100%)';
             setTimeout(() => {
                 notification.style.transform = 'translateX(0)';
             }, 10);
         }
 
-        // Get icon for notification type
+        // Lấy biểu tượng cho loại thông báo
         function getIconForType(type) {
             switch(type) {
                 case 'success': return 'fa-check-circle';
@@ -717,7 +908,7 @@
             }
         }
 
-        // Show notifications from TempData
+        // Hiển thị thông báo từ TempData
         document.addEventListener('DOMContentLoaded', function() {
         @if (TempData["SuccessMessage"] != null)
         {

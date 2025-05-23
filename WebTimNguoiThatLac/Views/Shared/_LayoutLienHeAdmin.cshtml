@@ -8,16 +8,24 @@
 
 <div class="hotline-group">
     <!-- Nút để nhân chứng điền thông tin -->
-    @if(idAdmin != "")
+    @if (idAdmin != "")
     {
         <div class="hotline-phone-ring">
             <div class="hotline-phone-ring-img-circle">
-                <a href="@Url.Action("BatDauChat", "Chat", new { nguoiNhanId = idAdmin , area = ""})" title="Liên Hệ Với Admin"
-                   >
+                <a href="@Url.Action("BatDauChat", "Chat", new { nguoiNhanId = idAdmin , area = ""})" title="Liên Hệ Với Admin">
                     <i class="fas fa-headset"></i>
                 </a>
             </div>
         </div>
+        
     }
-   
+    <div class="hotline-call-ring">
+        <div class="hotline-phone-ring-circle"></div>
+        <div class="hotline-phone-ring-circle-fill"></div>
+        <div class="hotline-phone-ring-img-container">
+            <a href="/TimNguoi/ThemNguoiCanTim" title="Thêm Bài Viết" class="hotline-phone-ring-img-circle">
+                <i class="fa-solid fa-user-plus"></i>
+            </a>
+        </div>
+    </div>
 </div>

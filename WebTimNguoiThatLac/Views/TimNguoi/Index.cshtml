@@ -292,6 +292,13 @@
         text-align: center;
     }
 
+    #TinhThanhInput {
+        background-color: #f3faff; /* nền xanh nhạt */
+        color: #003366; /* chữ xanh đậm */
+        border: 2px solid #007bff; /* viền xanh */
+        border-radius: 6px;
+    }
+
 </style>
 
 <!-- Search Section - Redesigned -->
@@ -327,12 +334,12 @@
                         <label for="TinhThanhInput" class="form-label fw-bold text-primary">Tỉnh/Thành</label>
 
                         <input type="text"
-                        id="TinhThanhInput"
-                        class="form-control"
-                        list="ListTinhThanh"
-                        placeholder="Nhập hoặc chọn tỉnh..."
-                        value="@ViewBag.SelectedNameTinhThanh"
-                        oninput="handleTinhThanhChange(this.value)" />
+                                        id="TinhThanhInput"
+                                        class="form-control"
+                                        list="ListTinhThanh"
+                                        placeholder="Nhập hoặc chọn tỉnh..."
+                                        value="@ViewBag.SelectedNameTinhThanh"
+                                        oninput="handleTinhThanhChange(this.value)" />
 
                         <datalist id="ListTinhThanh">
                             @foreach (var tinh in ViewBag.TinhThanhList as List<WebTimNguoiThatLac.Models.TinhThanh>)
@@ -393,7 +400,7 @@
                             <i class="fas fa-sliders-h me-2"></i> Nâng cao
                         </a>
                         <a asp-action="TimKiemBangHinhAnh" class="btn btn-outline-primary px-4 py-2">
-                            <i class="fas fa-sliders-h me-2"></i> hình ảnh
+                            <i class="fa-solid fa-image-portrait"></i> Hình ảnh
                         </a>
                     </div>
                 </div>

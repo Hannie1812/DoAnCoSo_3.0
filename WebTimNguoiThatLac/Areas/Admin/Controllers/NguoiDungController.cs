@@ -26,7 +26,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         private RoleManager<IdentityRole> roleManager;
         private readonly IWebHostEnvironment _env;
 
-        public NguoiDungController(IWebHostEnvironment env,ApplicationDbContext db, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public NguoiDungController(IWebHostEnvironment env, ApplicationDbContext db, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             this.db = db;
             this.userManager = userManager;
@@ -34,7 +34,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             _env = env;
 
         }
-       
+
         public async Task<IActionResult> Index(string TimKiem = "", string Role = "", int Page = 1)
         {
             IEnumerable<ApplicationUser> ds = await db.Users.ToListAsync();
@@ -72,7 +72,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                         dsTimKiem.Add(i);
                         continue;
                     }
-                    if(i.PhoneNumber != null )
+                    if (i.PhoneNumber != null)
                     {
                         string r3 = i.PhoneNumber;
                         if (r3.ToUpper().Contains(TimKiem.ToUpper()))
@@ -81,7 +81,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                             continue;
                         }
                     }
-                    
+
                 }
                 var dsTrang = dsTimKiem.ToPagedList(Page, sodongtren1trang);
                 return View(dsTrang);
@@ -93,7 +93,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             //return RedirectToAction("Register", "Account", new { area = "Identity" });
             return RedirectToPage("/Identity/Account/Manage/Email");
         }
-       
+
         public async Task<string> SaveImage(IFormFile ImageURL, string subFolder)
         {
             if (ImageURL == null || ImageURL.Length == 0)
@@ -132,7 +132,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             {
                 return; // Không làm gì nếu không có ảnh
             }
-          
+
 
             // Lấy đường dẫn tuyệt đối của ảnh trong thư mục wwwroot/uploads/
             string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", subFolder);
@@ -298,7 +298,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
 
                     user.SoLanViPham = 0;
                 }
-                
+
 
                 // Handle image upload
                 if (HinhAnhCapNhat != null && HinhAnhCapNhat.Length > 0)
@@ -408,7 +408,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             }
         }
 
-        
+
 
         [HttpPost]
         public async Task<IActionResult> Delete(string id)
@@ -422,7 +422,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 }
 
                 ApplicationUser hientai = await userManager.GetUserAsync(User);
-                if(hientai == null || y.Id == hientai.Id)
+                if (hientai == null || y.Id == hientai.Id)
                 {
                     return Json(new { success = false, message = "Ko xóa Bản Thân Mình" });
                 }
@@ -445,33 +445,13 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 var dsBCBLUS = await db.BaoCaoBinhLuans
                                  .Where(m => m.MaNguoiBaoCao == y.Id)
                                  .ToListAsync();
-                db.BaoCaoBinhLuans.RemoveRange(dsBCBLUS);
-
-                //// Xóa bình luận của us
-                var dsBLus = await db.BinhLuans
-                                   .Where(m => m.UserId == y.Id)
-                                   .ToListAsync();
-
-
-
-
-                foreach (var d in dsBLus)
+                if (dsBCBLUS != null && dsBCBLUS.Any())
                 {
-                    //List<BaoCaoBinhLuan> dsBCBLCUAUS = db.BaoCaoBinhLuans.Where(i => i.MaBinhLuan == d.Id).ToList();
-                    //db.BaoCaoBinhLuans.RemoveRange(dsBCBLCUAUS);
-
-                    await DeleteCommentAndReplies(d);
+                    db.BaoCaoBinhLuans.RemoveRange(dsBCBLUS);
                 }
 
 
-
-                //foreach (var d in dsBLus)
-                //{
-                //    DeleteImage(d.HinhAnh, "BinhLuan");
-                //}
-                //db.BinhLuans.RemoveRange(dsBLus);
-
-                
+                Console.WriteLine("Xóa Báo Cáo Bình Luận");
 
                 // xóa người dùng báo cáo bài viết
                 var dsBCBVUS = await db.BaoCaoBaiViets
@@ -481,7 +461,24 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 {
                     DeleteImage(d.HinhAnh, "AnhMinhTrungBaoCaoBaiViet");
                 }
-                db.BaoCaoBaiViets.RemoveRange(dsBCBVUS);
+
+                if (dsBCBVUS != null && dsBCBVUS.Any())
+                {
+                    db.BaoCaoBaiViets.RemoveRange(dsBCBVUS);
+                }
+                Console.WriteLine("xóa người dùng báo cáo bài viết");
+
+
+                //// Xóa bình luận của us
+                var dsBLus = await db.BinhLuans
+                                   .Include(v => v.ParentBinhLuan)
+                                   .Where(m => m.UserId == y.Id)
+                                   .ToListAsync();
+                foreach (var d in dsBLus)
+                {
+                    await DeleteCommentAndReplies(d);
+                }
+                Console.WriteLine("Xóa bình luận của us");
 
 
                 // Xóa Tìm Thấy Thất Lạc
@@ -492,7 +489,11 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 {
                     DeleteImage(d.AnhMinhChung, "AnhMinhChungTimThay");
                 }
-                db.TimThayNguoiThatLacs.RemoveRange(dsTimThayUS);
+                if (dsTimThayUS != null && dsTimThayUS.Any())
+                {
+                    db.TimThayNguoiThatLacs.RemoveRange(dsTimThayUS);
+                }
+                Console.WriteLine("Xóa Tìm Thấy Thất Lạc");
 
 
                 foreach (TimNguoi i in ds)
@@ -501,14 +502,15 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     var dsHA = await db.AnhTimNguois
                                        .Where(m => m.IdNguoiCanTim == i.Id)
                                        .ToListAsync();
-                    foreach(var d in dsHA)
+                    foreach (var d in dsHA)
                     {
                         DeleteImage(d.HinhAnh, "AnhNguoiCanTim");
                     }
-                    db.AnhTimNguois.RemoveRange(dsHA);
-
-
-                   
+                    if (dsHA != null && dsHA.Any())
+                    {
+                        db.AnhTimNguois.RemoveRange(dsHA);
+                    }
+                    Console.WriteLine("Xóa ảnh liên quan đến bài tìm người : id -> " + i.Id);
 
                     // Xóa bình luận của bài viết
                     var dsBLBV = await db.BinhLuans
@@ -516,16 +518,9 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                                        .ToListAsync();
                     foreach (var d in dsBLBV)
                     {
-                        // Xóa Báo Cáo Bình Luận Trong Bài viết
-                        var dsBCBL = await db.BaoCaoBinhLuans
-                                         .Where(m => m.MaBinhLuan == d.Id)
-                                         .ToListAsync();
-                        db.BaoCaoBinhLuans.RemoveRange(dsBCBL);
-                        DeleteImage(d.HinhAnh, "BinhLuan");
-
+                        await DeleteCommentAndReplies(d);
                     }
-                    db.BinhLuans.RemoveRange(dsBLBV);
-
+                    Console.WriteLine("Xóa bình luận của bài viết : id -> " + i.Id);
 
 
                     // Xóa Nhân Chứng
@@ -536,10 +531,12 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     {
                         DeleteImage(d.FileDinhKem, "AnhNhanChung");
                     }
-                    db.NhanChungs.RemoveRange(dsNhanChung);
+                    if (dsNhanChung != null && dsNhanChung.Any())
+                    {
+                        db.NhanChungs.RemoveRange(dsNhanChung);
+                    }
+                    Console.WriteLine("Xóa Nhân Chứng : id -> " + i.Id);
 
-
-                    
 
                     // Xóa Báo Cáo Bài viết
 
@@ -550,7 +547,11 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     {
                         DeleteImage(d.HinhAnh, "AnhMinhTrungBaoCaoBaiViet");
                     }
-                    db.BaoCaoBaiViets.RemoveRange(dsBCBV);
+                    if (dsBCBV != null && dsBCBV.Any())
+                    {
+                        db.BaoCaoBaiViets.RemoveRange(dsBCBV);
+                    }
+                    Console.WriteLine("Xóa Báo Cáo Bài viết : id -> " + i.Id);
 
 
                     // Xóa Tìm Thấy Thất Lạc
@@ -561,47 +562,83 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     {
                         DeleteImage(d.AnhMinhChung, "AnhMinhChungTimThay");
                     }
-                    db.TimThayNguoiThatLacs.RemoveRange(dsTimThay);
+                    if (dsTimThay != null && dsTimThay.Any())
+                    {
+                        db.TimThayNguoiThatLacs.RemoveRange(dsTimThay);
+                    }
+                    Console.WriteLine("Xóa Tìm Thấy Thất Lạc : id -> " + i.Id);
 
                     // Xóa bài tìm người
                     db.TimNguois.Remove(i);
+                    Console.WriteLine("Xóa bài tìm người : id -> " + i.Id);
                 }
 
                 // xóa tin nhắn
 
-                var dsNguoiThamGia = db.NguoiThamGias.Where(m => m.MaNguoiThamGia == y.Id);
+                List<NguoiThamGia> dsNguoiThamGia = db.NguoiThamGias
+                        .Where(m => m.MaNguoiThamGia == y.Id)
+                        .ToList();
 
                 List<HopThoaiTinNhan> hopThoaiTinNhans = new List<HopThoaiTinNhan>();
-                foreach(var d in dsNguoiThamGia)
+                foreach (var d in dsNguoiThamGia)
                 {
                     HopThoaiTinNhan ht = db.HopThoaiTinNhans.FirstOrDefault(u => u.Id == d.MaHopThoaiTinNhan);
-                    hopThoaiTinNhans.Add(ht);
+                    if (ht != null)
+                    {
+                        hopThoaiTinNhans.Add(ht);
+                    }
+
                 }
 
-                foreach(var d in hopThoaiTinNhans)
+                foreach (var d in hopThoaiTinNhans)
                 {
                     // xóa tin nhắn trong họp thoại
                     List<TinNhan> tinnhan = db.TinNhans.Where(z => z.MaHopThoaiTinNhan == d.Id).ToList();
-                    foreach(var t in tinnhan)
+                    foreach (var t in tinnhan)
                     {
                         DeleteImage(t.HinhAnh, "AnhTinNhan");
                     }
-                    db.TinNhans.RemoveRange(tinnhan);
+
+                    if (tinnhan != null && tinnhan.Any())
+                    {
+                        db.TinNhans.RemoveRange(tinnhan);
+                    }
+                    Console.WriteLine("xóa tin nhắn trong họp thoại : id -> " + d.Id);
+
+
 
                     // xóa nguòi tham gia 
                     List<NguoiThamGia> nguoiThamGias = db.NguoiThamGias.Where(u => u.MaHopThoaiTinNhan == d.Id).ToList();
-                    db.NguoiThamGias.RemoveRange(nguoiThamGias);
+                    if (nguoiThamGias != null && nguoiThamGias.Any())
+                    {
+                        db.NguoiThamGias.RemoveRange(nguoiThamGias);
+                    }
+                    Console.WriteLine("xóa nguòi tham gia  : id -> " + d.Id);
+
                 }
                 // xóa họp thoại
-                db.HopThoaiTinNhans.RemoveRange(hopThoaiTinNhans);
+                if (hopThoaiTinNhans.Any()) // ✅ tránh null khi gọi RemoveRange
+                {
+                    db.HopThoaiTinNhans.RemoveRange(hopThoaiTinNhans);
+                }
+                Console.WriteLine("xóa họp thoại ");
 
-                // Xóa Lí Tim Kiếm
-                var lstimkiem = db.LichSuTimKiems.Where(i=> i.IdNguoiDung == y.Id).ToList();
-                db.LichSuTimKiems.RemoveRange(lstimkiem);
+                // Xóa Ls Tim Kiếm
+                var lstimkiem = db.LichSuTimKiems.Where(i => i.IdNguoiDung == y.Id).ToList();
+                if (lstimkiem != null && lstimkiem.Any())
+                {
+                    db.LichSuTimKiems.RemoveRange(lstimkiem);
+                }
+                Console.WriteLine("Xóa Ls Tim Kiếm");
 
-                // 
+                // xóa hành vi đáng ngờ
                 var hanhvidangngo = db.HanhViDangNgos.Where(i => i.NguoiDungId == y.Id).ToList();
-                db.HanhViDangNgos.RemoveRange(hanhvidangngo);
+                if (hanhvidangngo != null && hanhvidangngo.Any())
+                {
+                    db.HanhViDangNgos.RemoveRange(hanhvidangngo);
+                }
+
+                Console.WriteLine("xóa hành vi đáng ngờ");
 
 
                 // Xóa vai trò của user
@@ -611,13 +648,17 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     await userManager.RemoveFromRolesAsync(y, usrole);
                 }
 
-                if(y.HinhAnh != "/uploads/avatars/default-avatar.png" || y.HinhAnh != null || y.HinhAnh != "/uploads/avatars/default-avatar.svg")
+                Console.WriteLine("Xóa vai trò của user");
+
+                if (y.HinhAnh != "/uploads/avatars/default-avatar.png" && y.HinhAnh != null && y.HinhAnh != "/uploads/avatars/default-avatar.svg")
                 {
                     DeleteImage(y.HinhAnh, "avatars");
                 }
 
                 // Xóa user
                 db.Users.Remove(y);
+                Console.WriteLine("Xóa user");
+
 
                 // Lưu thay đổi chỉ một lần
                 await db.SaveChangesAsync();
@@ -626,7 +667,8 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Lỗi: " + ex.Message });
+                string innerMessage = ex.InnerException?.Message ?? "No inner exception";
+                return Json(new { success = false, message = $"Lỗi: {ex.Message} | Inner: {innerMessage}" });
             }
 
         }
@@ -639,21 +681,27 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             {
                 DeleteImage(comment.HinhAnh, "BinhLuan");
             }
+            List<BinhLuan> dsTL = db.BinhLuans.Where(x => x.ParentId == comment.Id).ToList();
 
             // Xóa đệ quy các reply
-            if (comment.TraLois != null && comment.TraLois.Any())
+            if (dsTL != null)
             {
-                foreach (var reply in comment.TraLois.ToList())
+                foreach (BinhLuan reply in dsTL)
                 {
                     await DeleteCommentAndReplies(reply);
                 }
             }
             List<BaoCaoBinhLuan> ds = db.BaoCaoBinhLuans.Where(x => x.MaBinhLuan == comment.Id).ToList();
-            db.BaoCaoBinhLuans.RemoveRange(ds);
+            if (ds != null && ds.Any())
+            {
+                db.BaoCaoBinhLuans.RemoveRange(ds);
+            }
+
 
             db.BinhLuans.Remove(comment);
         }
 
-
+       
     }
+
 }

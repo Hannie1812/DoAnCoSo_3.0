@@ -1039,6 +1039,9 @@
                                data-bs-toggle="tooltip" title="Liên hệ với người đăng">
                                 <i class="fas fa-comment-dots me-1"></i> Liên hệ
                             </a>
+                            <a asp-action="Create" asp-controller="NhanChung" asp-route-id="@Model.Id" class="btn btn-info">
+                                <i class="fas fa-user-friends me-1"></i> Nhân chứng
+                            </a>
                         }
 
                         @if (idAdmin != null && user != null && user.IsAdmin == false)
@@ -1443,7 +1446,7 @@
 @if (isAuthor == false)
 {
     @* Nút báo tin và gọi khẩn cấp *@
-    @await Html.PartialAsync("_LayoutStickyCallButton", Model.Id)
+    @* @await Html.PartialAsync("_LayoutStickyCallButton", Model.Id) *@
 }
 
 @section Scripts {
@@ -1557,45 +1560,75 @@
                 submitBtn.disabled = true;
 
                 // Sử dụng AJAX thay vì Fetch API
-                $.ajax({
-                    url: '/TimNguoi/ReplyComment',
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        if (response.success) {
-                            // Thêm comment mới vào UI
-                            // addNewCommentToUI(response.comment);
+                // $.ajax({
+                //     url: '/TimNguoi/ReplyComment',
+                //     type: 'POST',
+                //     data: formData,
+                //     processData: false,
+                //     contentType: false,
+                //     success: function(response) {
+                //         if (response.success) {
+                //             //Thêm comment mới vào UI
+                //             addNewCommentToUI(response.comment);
 
-                            // Reset form
-                            // form.reset();
-                            // clearCommentImage();
+                //             Reset form
+                //             form.reset();
+                //             clearCommentImage();
                             
-                            showNotification('success', 'Trả lời đã được đăng thành công! 123');
-                            // location.reload();
+                //             showNotification('success', 'Trả lời đã được đăng thành công! 123');
+                //             location.reload();
 
-                            setTimeout(function() {
-                                                        window.location.reload();
-                                                    }, 2000); // 3000 milliseconds = 3 seconds
+                //             //setTimeout(function() {
+                //                                         window.location.reload();
+                //                                     }, 2000); 3000 milliseconds = 3 seconds
 
-                        } else {
-                            showNotification('error', response.message);
+                //         } else {
+                //             showNotification('error', response.message);
 
-                            // Hiển thị chi tiết lỗi nếu có
-                            if (response.errors) {
-                                console.error('Validation errors:', response.errors);
-                            }
-                        }
-                    },
-                    error: function(xhr) {
-                        showNotification('error', 'Lỗi kết nối đến server');
-                        console.error('Error:', xhr.responseText);
-                    }
-                });
+                //             //Hiển thị chi tiết lỗi nếu có
+                //             if (response.errors) {
+                //                 console.error('Validation errors:', response.errors);
+                //             }
+                //         }
+                //     },
+                //     error: function(xhr) {
+                //         showNotification('error', 'Lỗi kết nối đến server');
+                //         console.error('Error:', xhr.responseText);
+                //     }
+                // });
+                        // Thay thế phần AJAX hiện tại bằng đoạn code này
+        $.ajax({
+            url: '/TimNguoi/ReplyComment',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                if (response.success) {
+                    // Thêm comment mới vào UI
+                    addNewCommentToUI1(response.comment);
+
+                    // Reset form
+                    form.reset();
+                    clearCommentImage();
+
+                    showNotification('success', 'Trả lời đã được đăng thành công!');
+                } else {
+                    showNotification('error', response.message);
+                }
+            },
+            error: function(xhr) {
+                showNotification('error', 'Lỗi kết nối đến server');
+                console.error('Error:', xhr.responseText);
+            },
+            complete: function() {
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.disabled = false;
             }
         });
-        function addNewCommentToUI(commentData) {
+            }
+        });
+        function addNewCommentToUI1(commentData) {
             // 1. Tạo HTML cho comment mới
             const newCommentHtml = `
                 <div class="reply-item py-2" id="reply-${commentData.id}">
@@ -1689,6 +1722,101 @@
             // 3. Cuộn đến comment mới
             setTimeout(() => {
                 $(`#reply-${commentData.id}`)[0]?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest'
+                });
+            }, 100);
+        }
+
+
+        // test
+                function addNewCommentToUI(commentData) {
+            // Tạo HTML cho comment mới
+            const newCommentHtml = `
+                <div class="reply-item py-2" id="comment-${commentData.id}">
+                    <div class="d-flex">
+                        <!-- Avatar -->
+                        <div class="me-2">
+                            <div class="comment-avatar bg-secondary text-white d-flex align-items-center justify-content-center rounded-circle"
+                                 style="width: 36px; height: 36px; font-size: 0.9rem;">
+                                ${commentData.userImage ?
+                                    `<img src="${commentData.userImage}" alt="Ảnh đại diện" class="rounded-circle border" width="36" height="36" style="object-fit: cover; border: 2px solid #ddd;">` :
+                                    `<i class="fas fa-user"></i>`}
+                            </div>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <div>
+                                    <div class="d-flex align-items-center">
+                                        <h6 class="comment-author mb-0 fw-semibold me-2" style="font-size: 0.9rem;">
+                                            ${commentData.userName || 'Ẩn danh'}
+                                        </h6>
+                                        ${commentData.isAuthor ? `<span class="badge bg-info" style="font-size: 0.7rem;">Tác giả</span>` : ''}
+                                    </div>
+                                    <small class="text-muted" style="font-size: 0.8rem;">
+                                        <i class="far fa-clock me-1"></i>
+                                        ${commentData.date}
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="comment-content mb-2" style="font-size: 0.9rem;">
+                                ${commentData.content}
+                            </div>
+
+                            ${commentData.image ? `
+                            <div class="mt-1">
+                                <img src="${commentData.image}"
+                                     class="comment-image rounded-3 shadow-sm"
+                                     onclick="showImageModal('${commentData.image}')"
+                                     alt="Ảnh bình luận"
+                                     style="max-width: 200px; max-height: 200px; cursor: pointer;"
+                                     loading="lazy">
+                            </div>` : ''}
+
+                            <!-- Các nút hành động -->
+                            <div class="d-flex gap-2 mt-2">
+                                <button class="btn btn-sm btn-outline-primary reply-btn"
+                                        data-comment-id="${commentData.id}">
+                                    <i class="fas fa-reply me-1"></i> Trả lời
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Thêm vào vị trí phù hợp
+            if (commentData.parentId) {
+                // Nếu là reply của một comment khác
+                const repliesContainer = $(`#replies-${commentData.parentId}`);
+
+                if (repliesContainer.length) {
+                    // Nếu container replies đã tồn tại
+                    repliesContainer.append(newCommentHtml);
+                    repliesContainer.removeClass('d-none');
+                } else {
+                    // Nếu container replies chưa tồn tại, tạo mới
+                    const commentElement = $(`#comment-${commentData.parentId}`);
+                    if (commentElement.length) {
+                        const newRepliesContainer = $(
+                            `<div id="replies-${commentData.parentId}" class="replies-container mt-3 ps-4 border-start border-2 border-light">
+                                ${newCommentHtml}
+                            </div>`
+                        );
+                        commentElement.append(newRepliesContainer);
+                    }
+                }
+            } else {
+                // Nếu là comment gốc, thêm vào cuối danh sách
+                $('#commentSection').prepend(newCommentHtml);
+            }
+
+            // Cuộn đến comment mới
+            setTimeout(() => {
+                $(`#comment-${commentData.id}`)[0]?.scrollIntoView({
                     behavior: 'smooth',
                     block: 'nearest'
                 });

@@ -52,7 +52,20 @@
 
 
     @await RenderSectionAsync("Styles", required: false)
+    <style>
+        /* Thêm vào phần style */
+        .tooltip-inner {
+            max-width: 300px;
+            padding: 8px 12px;
+            font-size: 0.875rem;
+            background-color: rgba(0,0,0,0.9);
+        }
 
+        .bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before,
+        .bs-tooltip-top .tooltip-arrow::before {
+            border-top-color: rgba(0,0,0,0.9);
+        }
+    </style>
 
     
 </head>
@@ -120,6 +133,10 @@
         <!-- /.control-sidebar -->
     </div>
     <!-- ./wrapper -->
+
+
+   
+
 
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -293,5 +310,22 @@
 
     
     @await RenderSectionAsync("Scripts", required: false)
+
+    @* tooltip *@
+    <script>
+                // Thêm vào phần script
+        $(document).ready(function() {
+            // Khởi tạo tooltip
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl, {
+                    trigger: 'hover',
+                    delay: { "show": 300, "hide": 100 }
+                });
+            });
+        });
+    </script>
+
+    @* end tooltip *@
 </body>
 </html>

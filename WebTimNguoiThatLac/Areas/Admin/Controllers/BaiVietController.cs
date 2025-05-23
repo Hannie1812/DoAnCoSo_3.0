@@ -176,6 +176,13 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         public async Task<IActionResult> Create()
         {
             await LoadSelectListsAsync();
+            IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
+            IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
+
+
+            ViewBag.DanhSachTinhThanh = tinhThanhs;
+            ViewBag.DanhSachQuanHuyen = quanHuyens;
+
             return View();
         }
 
@@ -186,7 +193,17 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                                                 string faceDescriptorsJson)
         {
             await LoadSelectListsAsync();
+            IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
+            IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
 
+
+            ViewBag.DanhSachTinhThanh = tinhThanhs;
+            ViewBag.DanhSachQuanHuyen = quanHuyens;
+
+            ViewBag.SelectedTinhThanh = x.IdTinhThanh;
+            ViewBag.SelectedQuanHuyen = x.IdQuanHuyen;
+            string tt = db.TinhThanhs.FirstOrDefault(i => i.Id == x.IdTinhThanh).TenTinhThanh ?? "";
+            ViewBag.SelectedNameTinhThanh = tt;
             if (ModelState.IsValid)
             {
                 ApplicationUser us = await userManager.FindByEmailAsync(EmailNguoiDung);
@@ -353,6 +370,17 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 return RedirectToAction("Index");
             }
             await LoadSelectListsAsync();
+            IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
+            IEnumerable<QuanHuyen> quanHuyens = await db.QuanHuyens.ToListAsync();
+
+
+            ViewBag.DanhSachTinhThanh = tinhThanhs;
+            ViewBag.DanhSachQuanHuyen = quanHuyens;
+
+            ViewBag.SelectedTinhThanh = x.IdTinhThanh;
+            ViewBag.SelectedQuanHuyen = x.IdQuanHuyen;
+            string tt = db.TinhThanhs.FirstOrDefault(i => i.Id == x.IdTinhThanh).TenTinhThanh ?? "";
+            ViewBag.SelectedNameTinhThanh = tt;
             ViewBag.DanhSachHinhAnh = db.AnhTimNguois.Where(i => i.IdNguoiCanTim == id).ToList();
 
             return View(x);

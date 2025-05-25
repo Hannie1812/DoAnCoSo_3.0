@@ -3,7 +3,12 @@
 @{
     ViewData["Title"] = "Đăng ký tài khoản";
 }
-
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
 
 <div class="container py-5">
     <div class="row justify-content-center">
@@ -102,7 +107,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-8 mt-4">
+        @* <div class="col-lg-8 mt-4">
             <section>
                 <div class="card shadow">
                     <div class="card-header bg-primary text-white">
@@ -152,7 +157,7 @@
                     </div>
                 </div>
             </section>
-        </div>
+        </div> *@
     </div>
 </div>
 

@@ -4,11 +4,10 @@
 @{
     CacAdmin cacAdmin = new CacAdmin(dbContext);
     string idAdmin = cacAdmin.IdAdmin();
+    bool isCurrentUserAdmin = User.IsInRole("Admin");
 }
-
 <div class="hotline-group">
-    <!-- Nút để nhân chứng điền thông tin -->
-    @if (idAdmin != "")
+    @if (idAdmin != "" && !isCurrentUserAdmin)
     {
         <div class="hotline-phone-ring">
             <div class="hotline-phone-ring-img-circle">
@@ -17,15 +16,45 @@
                 </a>
             </div>
         </div>
-        
     }
-    <div class="hotline-call-ring">
+
+    <div class="hotline-phone-ring">
         <div class="hotline-phone-ring-circle"></div>
         <div class="hotline-phone-ring-circle-fill"></div>
-        <div class="hotline-phone-ring-img-container">
-            <a href="/TimNguoi/ThemNguoiCanTim" title="Thêm Bài Viết" class="hotline-phone-ring-img-circle">
+        <div class="hotline-phone-ring-img-circle">
+            <a href="/TimNguoi/ThemNguoiCanTim" title="Thêm Bài Viết">
                 <i class="fa-solid fa-user-plus"></i>
             </a>
         </div>
     </div>
+    <!-- Back to Top Button -->
+    <div class="hotline-phone-ring" id="backToTop" style="display: none;">
+        <div class="hotline-phone-ring-img-circle">
+            <a href="#" title="Về đầu trang">
+                <i class="fas fa-arrow-up"></i>
+            </a>
+        </div>
+    </div>
 </div>
+<!-- Add this JavaScript at the bottom of the file -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var backToTopBtn = document.getElementById('backToTop');
+        
+        window.onscroll = function() {
+            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+                backToTopBtn.style.display = "block";
+            } else {
+                backToTopBtn.style.display = "none";
+            }
+        };
+
+        backToTopBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    });
+</script>chihr sư

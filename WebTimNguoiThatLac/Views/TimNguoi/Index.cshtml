@@ -499,25 +499,25 @@
                                     string s = "";
                                     int d = 0;
                                     if (item.IdTinhThanh != null)
-                                {
-                                    s = s + item.TinhThanh.TenTinhThanh;
-                                    d++;
-                                }
-                                if (item.IdQuanHuyen != null)
-                                {
-                                    s = s + (d == 0 ? "" : ", ") + item.QuanHuyen.TenQuanHuyen;
-                                    d++;
-                                }
+                                    {
+                                        s = s + item.TinhThanh.TenTinhThanh;
+                                        d++;
+                                    }
+                                    if (item.IdQuanHuyen != null)
+                                    {
+                                        s = s + (d == 0 ? "" : ", ") + item.QuanHuyen.TenQuanHuyen;
+                                        d++;
+                                    }
 
-                                if (!string.IsNullOrEmpty(item.KhuVuc))
-                                {
-                                    s = s + (d == 0 ? "" : ", ") + item.KhuVuc;
-                                }
+                                    if (!string.IsNullOrEmpty(item.KhuVuc))
+                                    {
+                                        s = s + (d == 0 ? "" : ", ") + item.KhuVuc;
+                                    }
 
-                                if (d == 0)
-                                {
-                                    s = "Chưa xác định";
-                                }
+                                    if (d == 0)
+                                    {
+                                        s = "Chưa xác định";
+                                    }
                                 }
                                 <p class="card-text location-text" data-full-text="@s">
                                     <strong>Khu vực:</strong> @s

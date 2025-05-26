@@ -72,21 +72,13 @@
         }
 
     /* Result cards */
-    .person-card {
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-        margin-bottom: 25px;
-        border: none;
-    }
-
-        .person-card:hover {
+    .person-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 12px 20px rgba(0,0,0,0.15);
         }
 
-        .person-card .card-img-top {
+        .person-card .card-img-top,
+        .person-card .bg-light {
             height: 250px;
             object-fit: cover;
             width: 100%;
@@ -94,12 +86,22 @@
 
         .person-card .card-body {
             padding: 20px;
+            
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1.25rem;
         }
 
         .person-card .card-title {
             font-weight: 700;
             color: #343a40;
             margin-bottom: 15px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            line-height: 1.2;
         }
 
         .person-card .card-text {
@@ -115,6 +117,48 @@
             border-radius: 20px;
             font-weight: 600;
             font-size: 0.8rem;
+        }
+        /* Thêm tooltip để hiện đầy đủ nội dung khi hover */
+        .person-card .card-title:hover {
+            position: relative;
+        }
+
+        .person-card .card-title[title]:hover:after {
+            content: attr(title);
+            position: absolute;
+            left: 0;
+            top: 100%;
+            z-index: 1000;
+            background-color: rgba(0,0,0,0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            white-space: normal;
+            max-width: 300px;
+        }
+        .person-card .location-text {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 48px;
+            position: relative;
+        }
+
+        .person-card .location-text:hover::after {
+            content: attr(data-full-text);
+            position: absolute;
+            left: 0;
+            top: 100%;
+            background-color: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            z-index: 1000;
+            white-space: normal;
+            max-width: 300px;
         }
 
     .status-searching {
@@ -174,14 +218,14 @@
     }
 
     .page-item.active .page-link {
-        background-color: #28a745;
-        border-color: #28a745;
+        background-color: #ff8f00;
+        border-color: #ff8f00;
         color: white;
     }
 
     .page-item:not(.active) .page-link:hover {
         background-color: #e9ecef;
-        color: #28a745;
+        color: #ff8f00;
     }
 
     /* Empty state */
@@ -413,72 +457,85 @@
                 .ToList();
 
                 <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card person-card h-100">
-                        @if (mainImage != null)
-                        {
-                            <a href="/TimNguoi/ChiTietBaiTimNguoi/@item.Id">
-                                <img src="@mainImage.HinhAnh" class="card-img-top" alt="@item.HoTen">
-                            </a>
-
-                        }
-                        else
-                        {
-                            <a href="/TimNguoi/ChiTietBaiTimNguoi/@item.Id">
-                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:250px;">
-                                    <i class="fas fa-user-slash fa-4x text-secondary"></i>
-                                </div>
-                            </a>
-                        }
-
-                        <div class="card-body">
-                            <span class="status-badge @(item.TrangThai == "Đã tìm thấy" ? "status-found" : "status-searching")">
-                                @item.TrangThai
-                            </span>
-
-                            <h5 class="card-title">@item.TieuDe</h5>
-                            <p class="card-text"><strong>Họ tên:</strong> @item.HoTen</p>
-                            @{
-                                string khuvuc = "";
-                                if (item.IdTinhThanh != null)
-                                {
-                                    khuvuc = khuvuc + item.TinhThanh.TenTinhThanh + ", ";
-                                }
-                                if (item.IdQuanHuyen != null)
-                                {
-                                    khuvuc = khuvuc + item.QuanHuyen.TenQuanHuyen + ", ";
-                                }
-                                if (item.KhuVuc != null)
-                                {
-                                    khuvuc = khuvuc + item.KhuVuc;
-                                }
-                            }
-                            <p class="card-text"><strong>Khu vực:</strong>   @khuvuc</p>
-                            <p class="card-text"><strong>Ngày đăng:</strong> @item.NgayDang.ToString("dd/MM/yyyy")</p>
-
-                            @if (dacDiemItems != null && dacDiemItems.Any())
+                    <a href="@Url.Action("ChiTietBaiTimNguoi", "TimNguoi", new { id = item.Id })" class="text-decoration-none">
+                        <div class="card person-card h-100">
+                            @if (mainImage != null)
                             {
-                                <div class="tag-container">
-                                    <strong>Đặc điểm:</strong><br>
-                                    @foreach (var tag in dacDiemItems)
-                                    {
-                                        var isHighlight = !string.IsNullOrEmpty(dacDiemFilter) &&
-                                        dacDiemFilter.Split(',')
-                                        .Select(x => x.Trim())
-                                        .Any(keyword => tag.Contains(keyword, StringComparison.OrdinalIgnoreCase));
-
-                                        <span class="tag @(isHighlight ? "tag-highlight" : "")" data-toggle="tooltip" title="@tag">
-                                            @tag
-                                        </span>
-                                    }
-                                </div>
+                                <a href="/TimNguoi/ChiTietBaiTimNguoi/@item.Id">
+                                    <img src="@mainImage.HinhAnh" class="card-img-top" alt="@item.HoTen">
+                                </a>
+    
                             }
+                            else
+                            {
+                                <a href="/TimNguoi/ChiTietBaiTimNguoi/@item.Id">
+                                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:250px;">
+                                        <i class="fas fa-user-slash fa-4x text-secondary"></i>
+                                    </div>
+                                </a>
+                            }
+    
+                            <div class="card-body">
+                                <span class="status-badge @(item.TrangThai == "Đã tìm thấy" ? "status-found" : "status-searching")">
+                                    @item.TrangThai
+                                </span>
+    
+                                <h5 class="card-title" title="@item.TieuDe">@item.TieuDe</h5>
+                                <p class="card-text"><strong>Họ tên:</strong> @item.HoTen</p>
+                                @{
+                                    string s = "";
+                                    int d = 0;
+                                    if (item.IdTinhThanh != null)
+                                    {
+                                        s = s + item.TinhThanh.TenTinhThanh;
+                                        d++;
+                                    }
+                                    if (item.IdQuanHuyen != null)
+                                    {
+                                        s = s + (d == 0 ? "" : ", ") + item.QuanHuyen.TenQuanHuyen;
+                                        d++;
+                                    }
 
-                            <a href="@Url.Action("ChiTietBaiTimNguoi", "TimNguoi", new { id = item.Id })"
-                               class="btn btn-outline-primary btn-sm mt-2">
-                                <i class="fas fa-info-circle me-1"></i> Xem chi tiết
-                            </a>
+                                    if (!string.IsNullOrEmpty(item.KhuVuc))
+                                    {
+                                        s = s + (d == 0 ? "" : ", ") + item.KhuVuc;
+                                    }
+
+                                    if (d == 0)
+                                    {
+                                        s = "Chưa xác định";
+                                    }
+                                }
+                                <p class="card-text location-text" data-full-text="@s">
+                                    <strong>Khu vực:</strong> @s
+                                </p>
+                                <p class="card-text"><strong>Ngày đăng:</strong> @item.NgayDang.ToString("dd/MM/yyyy")</p>
+
+                                @if (dacDiemItems != null && dacDiemItems.Any())
+                                {
+                                    <div class="tag-container">
+                                        <strong>Đặc điểm:</strong><br>
+                                        @foreach (var tag in dacDiemItems)
+                                        {
+                                            var isHighlight = !string.IsNullOrEmpty(dacDiemFilter) &&
+                                            dacDiemFilter.Split(',')
+                                            .Select(x => x.Trim())
+                                            .Any(keyword => tag.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+    
+                                            <span class="tag @(isHighlight ? "tag-highlight" : "")" data-toggle="tooltip" title="@tag">
+                                                @tag
+                                            </span>
+                                        }
+                                    </div>
+                                }
+    
+                                @* <a href="@Url.Action("ChiTietBaiTimNguoi", "TimNguoi", new { id = item.Id })"
+                                   class="btn btn-outline-primary btn-sm mt-2">
+                                    <i class="fas fa-info-circle me-1"></i> Xem chi tiết
+                                </a> *@
+                            </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
             }
         </div>

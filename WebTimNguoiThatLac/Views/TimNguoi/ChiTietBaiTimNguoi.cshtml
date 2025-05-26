@@ -281,89 +281,125 @@
     /* Action Buttons */
     .action-buttons {
         display: flex;
-        gap: 0.75rem;
         flex-wrap: wrap;
+        gap: 0.75rem;
         margin-top: 1.5rem;
+        justify-content: flex-start;
     }
 
     .btn {
-        padding: 0.6rem 1.25rem;
+        padding: 0.6rem 1rem;
         border-radius: 8px;
         font-weight: 500;
-        transition: var(--transition);
+        transition: all 0.3s ease;
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        flex: 1 1 calc(33.333% - 0.75rem); /* Chia đều thành 3 cột, trừ đi khoảng gap */
+        min-width: 160px;
+        height: 42px;
+        white-space: nowrap;
         border: none;
-        min-width: 150px;
     }
 
-        .btn i {
-            margin-right: 8px;
-        }
+    .btn i {
+        margin-right: 8px;
+        font-size: 1rem;
+        width: 16px; /* Cố định chiều rộng icon */
+        text-align: center;
+    }    
 
+    /* --- BUTTON COLOR SYSTEM --- */
     .btn-primary {
-        background-color: var(--primary-color);
-        color: white;
+        background-color: #ff8f00;
+        color: #fff;
+        border: none;
     }
-
-        .btn-primary:hover {
-            background-color: var(--secondary-color);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-    .btn-outline-primary {
-        border: 1px solid var(--primary-color);
-        color: var(--primary-color);
-        background: transparent;
+    .btn-primary:hover, .btn-primary:focus {
+        background-color: #f08500;
+        color: #fff;
     }
-
-        .btn-outline-primary:hover {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-    .btn-outline-danger {
-        border: 1px solid var(--danger-color);
-        color: var(--danger-color);
-        background: transparent;
-    }
-
-        .btn-outline-danger:hover {
-            background-color: var(--danger-color);
-            color: white;
-        }
 
     .btn-success {
-        background-color: #25D366;
-        color: white;
+        background-color: #43a047;
+        color: #fff;
+        border: none;
     }
-
-        .btn-success:hover {
-            background-color: #128C7E;
-            color: white;
-        }
+    .btn-success:hover, .btn-success:focus {
+        background-color: #388e3c;
+        color: #fff;
+    }
 
     .btn-info {
-        background-color: #17a2b8;
-        color: white;
+        background-color: #1976d2;
+        color: #fff;
+        border: none;
+    }
+    .btn-info:hover, .btn-info:focus {
+        background-color: #125ea2;
+        color: #fff;
     }
 
-        .btn-info:hover {
-            background-color: #138496;
-            color: white;
-        }
+    .btn-warning {
+        background-color: #ffc107;
+        color: #212529;
+        border: none;
+    }
+    .btn-warning:hover, .btn-warning:focus {
+        background-color: #e0a800;
+        color: #212529;
+    }
 
     .btn-danger {
         background-color: #dc3545;
-        color: white;
+        color: #fff;
+        border: none;
+    }
+    .btn-danger:hover, .btn-danger:focus {
+        background-color: #b52a37;
+        color: #fff;
     }
 
-        .btn-danger:hover {
-            background-color: #c82333;
-            color: white;
-        }
+    .btn-outline-primary {
+        background: #fff;
+        color: #ff8f00;
+        border: 2px solid #ff8f00;
+    }
+    .btn-outline-primary:hover, .btn-outline-primary:focus {
+        background: #ff8f00;
+        color: #fff;
+    }
+
+    .btn-orange {
+        background-color: #ff5722;
+        color: #fff;
+        border: none;
+    }
+    .btn-orange:hover, .btn-orange:focus {
+        background-color: #e64a19;
+        color: #fff;
+    }
+
+    /* Sắp xếp lại bố cục các nút trong .action-buttons */
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+        justify-content: flex-start;
+    }
+    
+
+    /* Đảm bảo nút nhỏ gọn trên mobile */
+    .action-buttons .btn {
+        min-width: 140px;
+        flex: 1 1 180px;
+    }
+
+    /* Đảm bảo icon luôn cùng màu chữ */
+    .btn i {
+        color: inherit;
+    }
 
     /* Comments Section */
     .comments-card {
@@ -1000,55 +1036,40 @@
                     <div class="action-buttons">
                         @if (isAuthor || user.IsAdmin)
                         {
-                            <a href="/TimNguoi/CapNhatBaiViet?id=@Model.Id" class="btn btn-primary">
+                            <a href="/TimNguoi/CapNhatBaiViet?id=@Model.Id" class="btn btn-primary" data-bs-toggle="tooltip" title="Chỉnh sửa bài viết">
                                 <i class="fas fa-edit me-1"></i> Chỉnh sửa
                             </a>
-
-                            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmFoundModal"
-                                    data-bs-toggle="tooltip" title="Xác nhận đã tìm thấy">
+                            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmFoundModal" data-bs-toggle="tooltip" title="Xác nhận đã tìm thấy">
                                 <i class="fas fa-check-circle me-1"></i> Xác nhận
                             </button>
-
-                            <a asp-action="Index" asp-controller="NhanChung" asp-route-id="@Model.Id" class="btn btn-info">
+                            <a asp-action="Index" asp-controller="NhanChung" asp-route-id="@Model.Id" class="btn btn-info" data-bs-toggle="tooltip" title="Xem nhân chứng">
                                 <i class="fas fa-user-friends me-1"></i> Nhân chứng
                             </a>
-
-                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#removePostModal"
-                                    data-bs-toggle="tooltip" title="Xóa bài viết">
+                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#removePostModal" data-bs-toggle="tooltip" title="Xóa bài viết">
                                 <i class="fas fa-trash-alt me-1"></i> Xóa bài
                             </button>
-
-                            if (Model.active == true)
+                            @if (Model.active == true)
                             {
-                                <button class="btn btn-warning text-white" data-bs-toggle="modal" data-bs-target="#XuatFileModal"
-                                        data-bs-toggle="tooltip" title="Xuất file đơn trình báo">
+                                <button class="btn btn-warning text-dark" data-bs-toggle="modal" data-bs-target="#XuatFileModal" data-bs-toggle="tooltip" title="Xuất file đơn trình báo">
                                     <i class="fas fa-file-word me-1"></i> Xuất file
                                 </button>
                             }
                         }
-
                         @if (!isAuthor && user != null)
                         {
-                            <button class="btn btn-orange" data-bs-toggle="modal" data-bs-target="#reportPostModal"
-                                    data-bs-toggle="tooltip" title="Báo cáo bài viết">
+                            <button class="btn btn-orange" data-bs-toggle="modal" data-bs-target="#reportPostModal" data-bs-toggle="tooltip" title="Báo cáo bài viết">
                                 <i class="fas fa-flag me-1"></i> Báo cáo
                             </button>
-
-                            <a href="@Url.Action("BatDauChat", "Chat", new { nguoiNhanId = Model.IdNguoiDung })"
-                               class="btn btn-success"
-                               data-bs-toggle="tooltip" title="Liên hệ với người đăng">
+                            <a href="@Url.Action("BatDauChat", "Chat", new { nguoiNhanId = Model.IdNguoiDung })" class="btn btn-success" data-bs-toggle="tooltip" title="Liên hệ với người đăng">
                                 <i class="fas fa-comment-dots me-1"></i> Liên hệ
                             </a>
-                            <a asp-action="Create" asp-controller="NhanChung" asp-route-id="@Model.Id" class="btn btn-info">
+                            <a asp-action="Create" asp-controller="NhanChung" asp-route-id="@Model.Id" class="btn btn-info" data-bs-toggle="tooltip" title="Thêm nhân chứng">
                                 <i class="fas fa-user-friends me-1"></i> Nhân chứng
                             </a>
                         }
-
                         @if (idAdmin != null && user != null && user.IsAdmin == false)
                         {
-                            <a href="@Url.Action("BatDauChat", "Chat", new { nguoiNhanId = idAdmin })"
-                               class="btn btn-outline-primary"
-                               data-bs-toggle="tooltip" title="Liên hệ với quản trị viên">
+                            <a href="@Url.Action("BatDauChat", "Chat", new { nguoiNhanId = idAdmin })" class="btn btn-outline-primary" data-bs-toggle="tooltip" title="Liên hệ với quản trị viên">
                                 <i class="fas fa-headset me-1"></i> Hỗ trợ
                             </a>
                         }
@@ -1980,12 +2001,6 @@
             }
         }
 
-        function showImageModal(src) {
-            const modal = new bootstrap.Modal(document.getElementById('imageModal'));
-            document.getElementById('modalImage').src = src;
-            modal.show();
-        }
-
         // Comments Toggle
         document.getElementById('toggleCommentsBtn')?.addEventListener('click', function() {
             const commentSection = document.getElementById('commentSection');
@@ -2003,6 +2018,7 @@
             document.getElementById('submitReportPost')?.addEventListener('click', submitPostReport);
             document.getElementById('submitReportComment')?.addEventListener('click', submitCommentReport);
             document.getElementById('submitRemovePost')?.addEventListener('click', submitPostRemove);
+
             document.getElementById('submitXuatFile')?.addEventListener('click', submitXuatFileBaiViet);
 
 

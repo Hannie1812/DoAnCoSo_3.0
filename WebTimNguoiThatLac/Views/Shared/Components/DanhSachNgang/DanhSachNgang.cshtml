@@ -1,5 +1,35 @@
 ﻿@model IEnumerable<WebTimNguoiThatLac.Models.TimNguoi>
 
+<style>
+    .dac-diem, .tieu-de {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        position: relative;
+        cursor: help;
+    }
+
+    .dac-diem:hover, .tieu-de:hover {
+        overflow: visible;
+        white-space: normal;
+        min-height: 24px;
+        z-index: 1;
+    }
+
+    .tieu-de {
+        display: block;
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: inherit;
+        text-decoration: none;
+        margin-bottom: 10px;
+    }
+
+    .tieu-de:hover {
+        color: #007bff;
+    }
+</style>
+
 @if(!Model.Any() && Model.Count() > 0)
 {
     <h2 class="text-center">Chưa có Bài Viết</h2>
@@ -33,14 +63,12 @@ else
                                             </a>
                                         }
                                     }
-                                       
-                                    
-                                    <div class="text p-3 p-md-4">
-                                        <h3><a asp-controller="TimNguoi" asp-action="ChiTietBaiTimNguoi" asp-route-id="@i.Id">@i.TieuDe</a></h3>
+                                           <div class="text p-3 p-md-4">
+                                        <h3 class="heading mt-3"><a asp-controller="TimNguoi" asp-action="ChiTietBaiTimNguoi" asp-route-id="@i.Id" class="tieu-de" title="@(i.TieuDe ?? "")">@(i.TieuDe ?? "")</a></h3>
                                         <p>@i.HoTen</p>
-                                        <p>@i.DaciemNhanDang</p>
+                                        <p class="dac-diem text-truncate" title="@i.DaciemNhanDang">@i.DaciemNhanDang</p>
                                         <span class="donation-time mb-3 d-block">@i.KhuVuc</span>
-                                        <span class="donation-time mb-3 d-block">@i.NgayDang.ToString()</span>
+                                        <span class="donation-time mb-3 d-block">@(i.NgayDang.ToString("dd/MM/yyyy") ?? "")</span>
                                         
                                     </div>
                                 </div>

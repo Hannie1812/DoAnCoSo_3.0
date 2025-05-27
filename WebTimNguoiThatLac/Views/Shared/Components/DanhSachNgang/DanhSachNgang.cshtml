@@ -1,5 +1,47 @@
 ﻿@model IEnumerable<WebTimNguoiThatLac.Models.TimNguoi>
 
+<style>
+    .dac-diem {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        position: relative;
+        cursor: help;
+    }
+
+    .dac-diem:hover {
+        overflow: visible;
+        white-space: normal;
+        min-height: 24px;
+        z-index: 1;
+    }    .tieu-de {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+        min-height: 78px; /* 2 dòng x 39px */
+        line-height: 39px;
+        font-size: 30px;
+        font-weight: 700;
+        color: #333;
+        text-decoration: none;
+        margin-bottom: 15px;
+        text-shadow: 1px 1px 1px rgba(0,0,0,0.05);
+    }
+
+    .tieu-de:hover {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    /* Làm các thông tin khác nhẹ hơn */
+    .text p:not(.dac-diem), .donation-time {
+        font-size: 14px;
+        color: #666;
+        font-weight: normal;
+    }
+</style>
+
 @if(!Model.Any() && Model.Count() > 0)
 {
     <h2 class="text-center">Chưa có Bài Viết</h2>
@@ -33,14 +75,12 @@ else
                                             </a>
                                         }
                                     }
-                                       
-                                    
-                                    <div class="text p-3 p-md-4">
-                                        <h3><a asp-controller="TimNguoi" asp-action="ChiTietBaiTimNguoi" asp-route-id="@i.Id">@i.TieuDe</a></h3>
+                                           <div class="text p-3 p-md-4">
+                                        <h3 class="heading mt-3"><a asp-controller="TimNguoi" asp-action="ChiTietBaiTimNguoi" asp-route-id="@i.Id" class="tieu-de" title="@(i.TieuDe ?? "")">@(i.TieuDe ?? "")</a></h3>
                                         <p>@i.HoTen</p>
-                                        <p>@i.DaciemNhanDang</p>
-                                        <span class="donation-time mb-3 d-block">@i.KhuVuc</span>
-                                        <span class="donation-time mb-3 d-block">@i.NgayDang.ToString()</span>
+                                        <p class="dac-diem text-truncate" title="@i.DaciemNhanDang">@i.DaciemNhanDang</p>
+                                        <span class="donation-time mb-3 d-block">@i.KhuVuc, @i.QuanHuyen, @i.TinhThanh</span>
+                                        <span class="donation-time mb-3 d-block">@(i.NgayDang.ToString("dd/MM/yyyy") ?? "")</span>
                                         
                                     </div>
                                 </div>

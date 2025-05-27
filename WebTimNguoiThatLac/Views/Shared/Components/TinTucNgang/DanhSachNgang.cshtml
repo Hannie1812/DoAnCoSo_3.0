@@ -1,5 +1,50 @@
 ﻿@model IEnumerable<TinTuc>
 
+<style>
+    .blog-entry .heading {
+        min-height: 48px;
+        margin-bottom: 15px;
+    }
+
+    .blog-entry .heading a {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+        line-height: 24px;
+        font-size: 18px;
+        color: #000;
+        text-decoration: none;
+        height: 48px;
+    }
+
+    .blog-entry .heading a:hover {
+        color: #007bff;
+    }
+
+    .mo-ta {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        overflow: hidden;
+        line-height: 24px;
+        height: 72px; /* 3 dòng x 24px */
+        margin: 0;
+        color: #666;
+        font-size: 16px;
+    }
+
+    .mo-ta:hover {
+        overflow: visible;
+        position: relative;
+        z-index: 1;
+        background: white;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        border-radius: 4px;
+        padding: 5px;
+    }
+</style>
+
 <section class="ftco-section">
     <div class="container">
         <div class="row justify-content-center mb-5 pb-3">
@@ -25,9 +70,10 @@
                                             <div><a href="/TinTuc/Details?id=@i.Id">@i.NgayDang</a></div>
                                             <div><a href="/TinTuc/Details?id=@i.Id" class="meta-chat"><span class="icon-chat"></span></a></div>
                                             <div><a href="/TinTuc/Details?id=@i.Id">@i.TacGia</a></div>
-                                        </div>
-                                        <h3 class="heading mt-3"><a href="/TinTuc/Details?id=@i.Id">@i.TieuDe</a></h3>
-                                        <p>@i.MoTaNgan</p>
+                                            </div>                                        
+                                                <h3 class="heading mt-3"><a href="/TinTuc/Details?id=@i.Id" title="@i.TieuDe">@i.TieuDe</a>
+                                            </h3>
+                                        <p class="mo-ta" title="@i.MoTaNgan">@i.MoTaNgan</p>
                                     </div>
                                 </div>
                             </div>

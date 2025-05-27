@@ -132,6 +132,15 @@
         </aside>
         <!-- /.control-sidebar -->
     </div>
+    <div class="hotline-group"><!-- Back to Top Button -->
+      <div class="hotline-phone-ring" id="backToTop" style="display: none;">
+          <div class="hotline-phone-ring-img-circle">
+              <a href="#" title="Về đầu trang">
+                  <i class="fas fa-arrow-up"></i>
+              </a>
+          </div>
+      </div>
+    </div>
     <!-- ./wrapper -->
 
 
@@ -321,6 +330,26 @@
                 return new bootstrap.Tooltip(tooltipTriggerEl, {
                     trigger: 'hover',
                     delay: { "show": 300, "hide": 100 }
+                });
+            });
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            var backToTopBtn = document.getElementById('backToTop');
+            
+            window.onscroll = function() {
+                if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+                    backToTopBtn.style.display = "block";
+                } else {
+                    backToTopBtn.style.display = "none";
+                }
+            };
+
+            backToTopBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
                 });
             });
         });

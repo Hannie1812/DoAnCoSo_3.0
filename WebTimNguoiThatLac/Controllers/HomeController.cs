@@ -50,9 +50,36 @@ namespace WebTimNguoiThatLac.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    if(lh.TenNguoiDungLienHe == null)
+                    {
+                        ModelState.AddModelError("", "Hãy Nhập Đủ Thông Tin");
+                        TempData["ErrorMessage"] = "Vui Lòng Nhập Đủ Thông Tin";
+                        return View(lh);
+                    }
+                    if(lh.VanDeLienHe == null)
+                    {
+                        ModelState.AddModelError("", "Hãy Nhập Đủ Thông Tin");
+                        TempData["ErrorMessage"] = "Vui Lòng Nhập Đủ Thông Tin";
+                        return View(lh);
+                    }
+                    if(lh.EmailNguoiDungLienHe == null)
+                    {
+                        ModelState.AddModelError("", "Hãy Nhập Đủ Thông Tin");
+                        TempData["ErrorMessage"] = "Vui Lòng Nhập Đủ Thông Tin";
+                        return View(lh);
+                    }
+                    if (lh.PhoneNguoiDungLienHe == null)
+                    {
+                        ModelState.AddModelError("", "Hãy Nhập Đủ Thông Tin");
+                        TempData["ErrorMessage"] = "Vui Lòng Nhập Đủ Thông Tin";
+                        return View(lh);
+                    }
+
                     lh.NgayLienHe = DateTime.Now;
                     db.NguoiDungLienHes.Add(lh);
                     await db.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = "Đã Gửi Thành Công";
                     return RedirectToAction("Index");
                 }
                 else
@@ -65,6 +92,7 @@ namespace WebTimNguoiThatLac.Controllers
             catch (Exception ex)
             {
                 ModelState.AddModelError("", "Có lỗi xảy ra, vui lòng thử lại sau" + ex.Message);
+                TempData["ErrorMessage"] = "Có lỗi xảy ra, vui lòng thử lại sau: "+ ex.Message;
                 return View(lh);
             }
         }
@@ -80,9 +108,5 @@ namespace WebTimNguoiThatLac.Controllers
             return View(errorModel);
         }
 
-        public IActionResult test()
-        {
-            return View();
-        }
     }
 }

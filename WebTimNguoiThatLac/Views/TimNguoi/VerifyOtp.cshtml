@@ -3,6 +3,9 @@
     ViewData["Title"] = "Xác thực email";
 }
 
+<!-- Notification Area -->
+<div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -63,14 +66,18 @@
                 if (email) {
                     $.post(url, { email: email })
                         .done(function () {
-                            alert("Mã OTP đã được gửi đến email của bạn.");
+                            // alert("Mã OTP đã được gửi đến email của bạn.");
+                            showNotification('success', 'Mã OTP đã được gửi đến email của bạn.');
                             showOtpInputAndButtons();
+                          
                         })
                         .fail(function () {
-                            alert("Có lỗi xảy ra khi gửi mã OTP. Vui lòng thử lại.");
+                            // alert("Có lỗi xảy ra khi gửi mã OTP. Vui lòng thử lại.");
+                            showNotification('error', 'Có lỗi xảy ra khi gửi mã OTP. Vui lòng thử lại.');
                         });
                 } else {
-                    alert("Vui lòng nhập địa chỉ email.");
+                    // alert("Vui lòng nhập địa chỉ email.");
+                    showNotification('error', 'Vui lòng nhập địa chỉ email.');
                 }
             }
             // Ẩn các nút và input OTP ban đầu nếu chưa có mã

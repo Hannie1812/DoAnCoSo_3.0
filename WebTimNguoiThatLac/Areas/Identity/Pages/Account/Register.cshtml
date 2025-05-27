@@ -10,6 +10,11 @@
     </div>
 }
 
+
+
+<!-- Notification Area -->
+<div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
@@ -222,7 +227,8 @@
         document.getElementById('registerForm').addEventListener('submit', function (e) {
             if (!isCCCDVerified) {
                 e.preventDefault();
-                alert('Bạn cần xác thực CCCD thành công trước khi đăng ký!');
+                // alert('Bạn cần xác thực CCCD thành công trước khi đăng ký!');
+                    showNotification('warning', "'Bạn cần xác thực CCCD thành công trước khi đăng ký! ");
             }
         });
         $(document).ready(function () {
@@ -230,7 +236,8 @@
                 var fileInput = $("#imageUpload")[0].files[0];
 
                 if (!fileInput) {
-                    alert("Vui lòng chọn một ảnh CCCD.");
+                    // alert("Vui lòng chọn một ảnh CCCD.");
+                    showNotification('info', 'Vui lòng chọn một ảnh CCCD.');
                     return;
                 }
 
@@ -246,10 +253,12 @@
                     success: function (response) {
                         $("#cccdInput").val(response.cccd);
                         $("#fullNameInput").val(response.hoTen);
-                        alert("Trích xuất thành công!");
+                        // alert("Trích xuất thành công!");
+                         showNotification('success', 'Trích xuất thành công!');
                     },
                     error: function (xhr) {
-                        alert("Lỗi OCR: " + xhr.responseText);
+                        // alert("Lỗi OCR: " + xhr.responseText);
+                        showNotification('warning', "Lỗi OCR: " + xhr.responseText);
                     }
                 });
             });

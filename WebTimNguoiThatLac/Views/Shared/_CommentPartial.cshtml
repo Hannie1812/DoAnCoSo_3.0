@@ -189,15 +189,15 @@
                     @foreach (var reply in comment.TraLois.OrderBy(r => r.NgayBinhLuan))
                     {
                         <div class="reply-item py-2" id="reply-@reply.Id">
-                            @await Html.PartialAsync("_CommentPartial", new CommentViewModel
-           {
-               Comment = reply,
-               Model = Model.Model,
-               UserId = Model.UserId,
-               IsAuthor = Model.IsAuthor,
-               CurrentUser = Model.CurrentUser,
-               Depth = depth + 1
-           })
+                           @await Html.PartialAsync("_CommentPartial", new CommentViewModel
+                           {
+                               Comment = reply,
+                               Model = Model.Model,
+                               UserId = Model.UserId,
+                               IsAuthor = Model.IsAuthor,
+                               CurrentUser = Model.CurrentUser,
+                               Depth = depth + 1
+                           })
                         </div>
                     }
                 </div>

@@ -122,6 +122,7 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
                     if (x.Active == true)
                     {
                         _logger.LogInformation("User logged in.");
+                        TempData["SuccessMessage"] = "Đăng Nhập Thành Công";
                         return LocalRedirect(returnUrl); // đang test
 
                     }

@@ -88,6 +88,7 @@ namespace WebTimNguoiThatLac.Controllers
                 // Gửi mã OTP mới
                 await _otpService.GenerateAndSendOtpAsync(model.Email);
                 model.IsVerified = false;
+                TempData["SuccessMessage"] = "Đã Gửi Mã OTP Thành Công Vui Lòng Kiểm Tra Email Của Bạn";
                 return View(model);
             }
 
@@ -97,6 +98,7 @@ namespace WebTimNguoiThatLac.Controllers
             {
                 ModelState.AddModelError(string.Empty, "Mã OTP không hợp lệ hoặc đã hết hạn");
                 model.IsVerified = false;
+                TempData["ErrorMessage"] = "Mã OTP không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.";
                 return View(model);
             }
 
@@ -348,12 +350,12 @@ namespace WebTimNguoiThatLac.Controllers
                     }
                     else
                     {
-                        //return RedirectToAction("VerifyOtp");
+                        return RedirectToAction("VerifyOtp");
                     }
                 }
                 else
                 {
-                    //return RedirectToAction("VerifyOtp");
+                    return RedirectToAction("VerifyOtp");
                 }
             }
             if (User.Identity.IsAuthenticated)
@@ -1079,7 +1081,7 @@ namespace WebTimNguoiThatLac.Controllers
 
             // Lưu các thay đổi khác (luôn thực hiện)
             await db.SaveChangesAsync();
-
+            TempData["SuccessMessage"] = "Cập nhật bài viết thành công!";
             return RedirectToAction("ChiTietBaiTimNguoi", new { id = x.Id });
         }
 

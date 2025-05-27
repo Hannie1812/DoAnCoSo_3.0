@@ -4,331 +4,57 @@
 @{
     CacAdmin cacAdmin = new CacAdmin(dbContext);
     string idAdmin = cacAdmin.IdAdmin();
+    bool isCurrentUserAdmin = User.IsInRole("Admin");
 }
-
-
-<style>
-
-    .hotline-group {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 99;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    /* Sticky call button */
-    .hotline-group {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 99;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    /* Nút gọi khẩn cấp */
-    .hotline-call-ring {
-        width: 60px;
-        height: 60px;
-        background-color: #e53935;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        animation: phonering-alo-circle-img-anim 1s infinite ease-in-out;
-    }
-
-        .hotline-call-ring a {
-            color: #fff;
-            font-size: 24px;
-        }
-
-    /* Nút gọi khẩn cấp */
-    .hotline-nhanchung-ring {
-        width: 60px;
-        height: 60px;
-        background-color: #e53935;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        animation: phonering-alo-circle-img-anim 1s infinite ease-in-out;
-    }
-
-        .hotline-nhanchung-ring a {
-            color: #fff;
-            font-size: 24px;
-        }
-
-    /* Nút báo tin nhân chứng */
-    .hotline-phone-ring {
-        width: 60px;
-        height: 60px;
-        background-color: #ffa000;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        animation: phonering-alo-circle-img-anim 1s infinite ease-in-out;
-    }
-
-        .hotline-phone-ring a {
-            color: #fff;
-            font-size: 22px;
-        }
-
-    /* Animation */
-    @@keyframes phonering-alo-circle-anim {
-        0%
-
-    {
-        transform: rotate(0deg) scale(0.5) skew(1deg);
-        opacity: 0.1;
-    }
-
-    30% {
-        transform: rotate(0deg) scale(0.7) skew(1deg);
-        opacity: 0.5;
-    }
-
-    100% {
-        transform: rotate(0deg) scale(1) skew(1deg);
-        opacity: 0.1;
-    }
-
-    }
-
-    @@keyframes phonering-alo-circle-fill-anim {
-        0%, 100%
-
-    {
-        transform: scale(1);
-        opacity: 0.75;
-    }
-
-    50% {
-        transform: scale(1.1);
-        opacity: 1;
-    }
-
-    }
-
-    @@keyframes phonering-alo-circle-img-anim {
-        0%, 100%
-
-    {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.1);
-    }
-
-    }
-
-    .btn-facebook {
-        background-color: #1877F2;
-        color: white;
-        border: none;
-    }
-
-        .btn-facebook:hover {
-            background-color: #155dbd;
-            color: white;
-        }
-
-    /* Floating Action Button Styles */
-    .hotline-phone-ring {
-        position: fixed;
-        bottom: 100px;
-        right: 20px;
-        z-index: 9999;
-        cursor: pointer;
-    }
-
-    .hotline-phone-ring-circle {
-        width: 70px;
-        height: 70px;
-        background: rgba(255, 160, 0, 0.4);
-        border-radius: 100%;
-        position: absolute;
-        animation: phonering-alo-circle-anim 1.2s infinite ease-in-out;
-        transition: all 0.5s;
-        transform-origin: center center;
-    }
-
-    .hotline-phone-ring-circle-fill {
-        width: 50px;
-        height: 50px;
-        background: rgba(255, 160, 0, 0.5);
-        border-radius: 100%;
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        animation: phonering-alo-circle-fill-anim 2.3s infinite ease-in-out;
-        transition: all 0.5s;
-        transform-origin: center center;
-    }
-
-    .hotline-phone-ring-img-container {
-        width: 60px;
-        height: 60px;
-        background: linear-gradient(135deg, #ffa000, #ff8f00);
-        border-radius: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: absolute;
-        top: 5px;
-        left: 5px;
-        box-shadow: 0 4px 15px rgba(255, 160, 0, 0.4);
-        transition: all 0.5s;
-        transform-origin: center center;
-    }
-
-    .hotline-phone-ring-img-circle {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 54px;
-        height: 54px;
-        background: #ffa000;
-        border-radius: 100%;
-        color: white;
-        font-size: 24px;
-        text-decoration: none;
-        transition: all 0.5s;
-    }
-
-    .hotline-phone-ring-img-container:hover {
-        transform: scale(1.1);
-        box-shadow: 0 6px 20px rgba(255, 160, 0, 0.6);
-    }
-
-        .hotline-phone-ring-img-container:hover .hotline-phone-ring-img-circle {
-            background: #ff8f00;
-        }
-
-   
-
-    /* Animations */
-    @@keyframes phonering-alo-circle-anim {
-        0%
-
-    {
-        transform: scale(0.5);
-        opacity: 0;
-    }
-
-    50% {
-        opacity: 0.4;
-    }
-
-    100% {
-        transform: scale(1.2);
-        opacity: 0;
-    }
-
-    }
-
-    @@keyframes phonering-alo-circle-fill-anim {
-        0%
-
-    {
-        transform: scale(0.7);
-        opacity: 0.6;
-    }
-
-    50% {
-        transform: scale(1);
-        opacity: 0.3;
-    }
-
-    100% {
-        transform: scale(0.7);
-        opacity: 0.6;
-    }
-
-    }
-
-    @@keyframes phonering-alo-circle-img-anim {
-        0%
-
-    {
-        transform: rotate(0deg) scale(1);
-    }
-
-    10% {
-        transform: rotate(-15deg) scale(1);
-    }
-
-    20% {
-        transform: rotate(15deg) scale(1);
-    }
-
-    30% {
-        transform: rotate(-15deg) scale(1);
-    }
-
-    40% {
-        transform: rotate(15deg) scale(1);
-    }
-
-    50% {
-        transform: rotate(0deg) scale(1);
-    }
-
-    100% {
-        transform: rotate(0deg) scale(1);
-    }
-
-    }
-</style>
-
-
 <div class="hotline-group">
-    <!-- Nút để nhân chứng điền thông tin -->
-    @* @if (idAdmin != "")  *@
-    @*  {  *@
-    @*      <div class="hotline-phone-ring">  *@
-    @*          <div class="hotline-phone-ring-img-circle">  *@
-    @*              <a href="@Url.Action("BatDauChat", "Chat", new { nguoiNhanId = idAdmin , area = ""})" title="Liên Hệ Với Admin">  *@
-    @*                  <i class="fas fa-headset"></i>  *@
-    @*              </a>  *@
-    @*          </div>  *@
-    @*      </div>  *@
-        
-    @*  }  *@
-    @*  <div class="hotline-nhanchung-ring">  *@
-    @*      <div class="hotline-nhanchung-ring-circle"></div>  *@
-    @*      <div class="hotline-nhanchung-ring-circle-fill"></div>  *@
-    @*      <div class="hotline-nhanchung-ring-img-container">  *@
-    @*          <a href="/TimNguoi/ThemNguoiCanTim" title="Thêm Bài Viết" class="hotline-nhanchung-ring-img-circle">  *@
-    @*              <i class="fa-solid fa-user-plus"></i>  *@
-    @*          </a>  *@
-    @*      </div>  *@
-    @*  </div> *@
-         @if (idAdmin != "") 
-         { 
-             <div class="hotline-button hotline-phone-ring">
-                 <a href="@Url.Action("BatDauChat", "Chat", new { nguoiNhanId = idAdmin , area = ""})" 
-                    title="Liên Hệ Với Admin"> 
-                     <i class="fas fa-headset"></i> 
-                 </a> 
-             </div> 
-         } 
-         <div class="hotline-button hotline-nhanchung-ring"> 
-             <a href="/TimNguoi/ThemNguoiCanTim" title="Thêm Bài Viết"> 
-                 <i class="fa-solid fa-user-plus"></i> 
-             </a> 
-         </div> 
+    @if (idAdmin != "" && !isCurrentUserAdmin)
+    {
+        <div class="hotline-phone-ring">
+            <div class="hotline-phone-ring-img-circle">
+                <a href="@Url.Action("BatDauChat", "Chat", new { nguoiNhanId = idAdmin , area = ""})" title="Liên Hệ Với Admin">
+                    <i class="fas fa-headset"></i>
+                </a>
+            </div>
+        </div>
+    }
 
+    <div class="hotline-phone-ring">
+        <div class="hotline-phone-ring-circle"></div>
+        <div class="hotline-phone-ring-circle-fill"></div>
+        <div class="hotline-phone-ring-img-circle">
+            <a href="/TimNguoi/ThemNguoiCanTim" title="Thêm Bài Viết">
+                <i class="fa-solid fa-user-plus"></i>
+            </a>
+        </div>
+    </div>
+    <!-- Back to Top Button -->
+    <div class="hotline-phone-ring" id="backToTop" style="display: none;">
+        <div class="hotline-phone-ring-img-circle">
+            <a href="#" title="Về đầu trang">
+                <i class="fas fa-arrow-up"></i>
+            </a>
+        </div>
+    </div>
 </div>
+<!-- Add this JavaScript at the bottom of the file -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var backToTopBtn = document.getElementById('backToTop');
+        
+        window.onscroll = function() {
+            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+                backToTopBtn.style.display = "block";
+            } else {
+                backToTopBtn.style.display = "none";
+            }
+        };
 
+        backToTopBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    });
+</script>chihr sư

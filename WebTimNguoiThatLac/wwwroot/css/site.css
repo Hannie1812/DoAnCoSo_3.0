@@ -1,136 +1,238 @@
-﻿/* ===== BASE STYLES ===== */
+/* ===== BASE STYLES ===== */
 html {
-    font-size: 14px;
-    position: relative;
-    min-height: 100%;
-}
-
-body {
-    margin-bottom: 60px;
+  font-size: 14px;
 }
 
 @media (min-width: 768px) {
-    html {
-        font-size: 16px;
-    }
+  html {
+    font-size: 16px;
+  }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus,
-.form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+/* Xóa các định nghĩa cũ và thay thế bằng code mới */
+
+.hotline-group {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Giảm khoảng cách giữa các nút từ 80px xuống 20px */
+  z-index: 9999;
+}
+
+.hotline-phone-ring {
+  position: relative; /* Thay đổi từ fixed thành relative */
+  width: 60px;
+  height: 60px;
+}
+
+.hotline-call-ring {
+  position: relative; /* Thay đổi từ fixed thành relative */
+  width: 60px;
+  height: 60px;
+}
+
+.hotline-phone-ring-img-circle {
+  width: 50px;
+  height: 50px;
+  position: relative;
+  border-radius: 50%;
+  background-color: #ff8f00; /* Thay đổi màu từ #0d6efd sang #ff8f00 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.hotline-phone-ring-img-circle a {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+  text-decoration: none;
+}
+
+.hotline-phone-ring-circle,
+.hotline-phone-ring-circle-fill {
+  width: 70px;
+  height: 70px;
+  position: absolute;
+  border-radius: 50%;
+  left: -10px;
+  top: -10px;
+  opacity: 0.1;
+  transform-origin: 50% 50%;
+}
+
+.hotline-phone-ring-circle {
+  border: 2px solid #ff8f00; /* Thay đổi màu viền */
+  animation: phone-ring-circle 1.2s infinite ease-in-out;
+}
+
+.hotline-phone-ring-circle-fill {
+  background-color: #ff8f00; /* Thay đổi màu nền */
+  animation: phone-ring-circle-fill 2.3s infinite ease-in-out;
+}
+
+/* Giữ lại các animation keyframes hiện có */
+@keyframes phone-ring-circle {
+  0% {
+    transform: rotate(0) scale(0.5);
+    opacity: 0.1;
+  }
+  100% {
+    transform: rotate(360deg) scale(0.9);
+    opacity: 0.1;
+  }
+}
+
+@keyframes phone-ring-circle-fill {
+  0% {
+    transform: rotate(0) scale(0.7);
+    opacity: 0.2;
+  }
+  50% {
+    transform: rotate(180deg) scale(1);
+    opacity: 0.2;
+  }
+  100% {
+    transform: rotate(360deg) scale(0.7);
+    opacity: 0.2;
+  }
+}
+/* Animation */
+@keyframes phonering-alo-circle-anim {
+  0% {
+    transform: rotate(0deg) scale(0.5) skew(1deg);
+    opacity: 0.1;
+  }
+
+  30% {
+    transform: rotate(0deg) scale(0.7) skew(1deg);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: rotate(0deg) scale(1) skew(1deg);
+    opacity: 0.1;
+  }
+}
+
+@keyframes phonering-alo-circle-fill-anim {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+@keyframes phonering-alo-circle-img-anim {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 .btn-facebook {
-    background-color: #1877F2;
-    color: white;
-    border: none;
+  background-color: #1877f2;
+  color: white;
+  border: none;
 }
 
-    .btn-facebook:hover {
-        background-color: #155dbd;
-        color: white;
-    }
-
-/* ===== FLOATING BUTTONS GROUP ===== */
-/*.hotline-group {
-    position: fixed;
-    bottom: 100px;
-    right: 20px;
-    z-index: 99;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}*/
-
-/* ===== COMMON BUTTON STYLES ===== */
-/*.hotline-button {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    position: relative;
-    cursor: pointer;
-    animation: pulse-animation 1.5s infinite ease-in-out;
+.btn-facebook:hover {
+  background-color: #155dbd;
+  color: white;
 }
 
-    .hotline-button a {
-        color: #fff;
-        font-size: 22px;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-    }*/
+/* Animations */
+@keyframes phonering-alo-circle-anim {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
 
-/* Admin Chat Button */
-/*.hotline-phone-ring {
-    background-color: #ffa000;
-}*/
+  50% {
+    opacity: 0.4;
+  }
 
-/* Witness Button */
-/*.hotline-nhanchung-ring {
-    background-color: #00FA9A;
-}*/
-
-/* Emergency Call Button */
-/*.hotline-call-ring {
-    background-color: #e53935;
-}*/
-
-/* Button Effects */
-/*.hotline-button::before {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    animation: ripple-animation 2s infinite ease-out;
-    z-index: -1;
+  100% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
 }
 
-.hotline-phone-ring::before {
-    background-color: rgba(255, 160, 0, 0.4);
+@keyframes phonering-alo-circle-fill-anim {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+
+  100% {
+    transform: scale(0.7);
+    opacity: 0.6;
+  }
 }
 
-.hotline-nhanchung-ring::before {
-    background-color: rgba(0, 250, 154, 0.4);
+@keyframes phonering-alo-circle-img-anim {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  10% {
+    transform: rotate(-15deg) scale(1);
+  }
+
+  20% {
+    transform: rotate(15deg) scale(1);
+  }
+
+  30% {
+    transform: rotate(-15deg) scale(1);
+  }
+
+  40% {
+    transform: rotate(15deg) scale(1);
+  }
+
+  50% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
 }
-
-.hotline-call-ring::before {
-    background-color: rgba(229, 57, 53, 0.4);
-}*/
-
-/* Hover Effects */
-/*.hotline-button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-    animation: none;
-}*/
-
-/* ===== ANIMATIONS ===== */
-/*@keyframes pulse-animation {
-    0%, 100% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.05);
-    }
-}
-
-@keyframes ripple-animation {
-    0% {
-        transform: scale(0.8);
-        opacity: 0.7;
-    }
-
-    100% {
-        transform: scale(1.3);
-        opacity: 0;
-    }
-}*/

@@ -20,7 +20,7 @@ using WebTimNguoiThatLac.Extensions;
 using WebTimNguoiThatLac.ThuMucTimKiem;
 using WebTimNguoiThatLac.Helpers;
 using System.Threading.Tasks;
-using WebTimNguoiThatLac.Migrations;
+
 using Microsoft.Extensions.Hosting;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.InkML;

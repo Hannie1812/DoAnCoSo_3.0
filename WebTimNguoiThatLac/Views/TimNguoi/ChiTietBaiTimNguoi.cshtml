@@ -1118,18 +1118,29 @@
 
         
         <!-- Comments Section -->
-        <!-- Comments Section -->
         <div class="comments-card bg-white rounded-3 shadow-sm mb-4 border">
             <div class="comments-header p-4 border-bottom bg-light rounded-top">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h3 class="comments-title mb-0 text-primary">
-                        <i class="far fa-comments me-2"></i>Bình luận
-                        <span class="badge bg-primary ms-2">@dsBinhLuan.Count</span>
-                    </h3>
-                    <button id="toggleCommentsBtn" class="btn btn-outline-primary btn-sm">
-                        <i class="fas fa-comment me-1"></i> Xem bình luận
-                    </button>
-                </div>
+                @* <div class="d-flex justify-content-between align-items-center"> *@
+                    <div class="row">
+                        <div class="col-md-10">
+                            <div>
+                                <h3 class="comments-title mb-0 text-primary">
+                                    <i class="far fa-comments me-2"></i>Bình luận
+                                    <span class="badge bg-primary ms-2">@dsBinhLuan.Count</span>
+                                </h3>
+                            </div>
+                            
+                        </div>
+						<div class="col-md-2 text-end">
+                            <button id="toggleCommentsBtn" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-comment me-1"></i> Xem bình luận
+                            </button>
+                        </div>
+
+                    </div>
+                    
+                    
+                @* </div> *@
             </div>
 
             @* <!-- Comment Form --> *@
@@ -1137,32 +1148,38 @@
                 <form id="commentForm" asp-action="ThemBinhLuan" asp-controller="TimNguoi" method="post" enctype="multipart/form-data">
                     <input type="hidden" name="IdBaiViet" value="@Model.Id" />
                     <input type="hidden" name="UserId" value="@userId" />
-
-                    <div class="form-floating mb-3">
-                        <textarea name="NoiDung" class="form-control" placeholder="Nhập bình luận của bạn" style="min-height: 100px" required></textarea>
-                        <label><i class="far fa-comment-dots me-2"></i>Viết bình luận...</label>
-                    </div>
-
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="flex-grow-1 me-3">
-                            <div class="input-group">
-                                <span class="input-group-text bg-light"><i class="fas fa-camera text-muted"></i></span>
-                                <input type="file" name="HinhAnh" id="commentImageInput" class="form-control border-start-0 bg-light" accept="image/*">
-                            </div>
-                            <small class="text-muted mt-1 d-block">Hỗ trợ ảnh JPEG, PNG (tối đa 5MB)</small>
-
-                            <!-- Image Preview Container -->
-                            <div class="image-preview-container mt-2" id="commentImagePreviewContainer" style="display: none;">
-                                <img id="commentImagePreview" class="image-preview rounded" style="max-height: 150px;">
-                                <button type="button" class="btn btn-sm btn-danger mt-2" onclick="clearCommentImage()">
-                                    <i class="fas fa-times me-1"></i> Xóa ảnh
-                                </button>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                <textarea name="NoiDung" class="form-control" placeholder="Nhập bình luận của bạn" style="min-height: 100px" required></textarea>
+                                <label><i class="far fa-comment-dots me-2"></i>Viết bình luận...</label>
                             </div>
                         </div>
+                        
+                    </div>
 
-                        <button type="submit" class="btn btn-primary px-4 py-2">
-                            <i class="fas fa-paper-plane me-1"></i> Gửi
-                        </button>
+
+                    @* <div class="d-flex justify-content-between align-items-center  me-3"> *@
+                        <div class="row">
+                            <div class="col-md-10">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="fas fa-camera text-muted"></i></span>
+                                    <input type="file" name="HinhAnh" id="commentImageInput" class="form-control border-start-0 bg-light" accept="image/*">
+                                </div>
+                                <small class="text-muted mt-1 d-block">Hỗ trợ ảnh JPEG, PNG (tối đa 5MB)</small>
+                                <div class="image-preview-container mt-2" id="commentImagePreviewContainer" style="display: none;">
+                                    <img id="commentImagePreview" class="image-preview rounded" style="max-height: 150px;">
+                                    <button type="button" class="btn btn-sm btn-danger mt-2" onclick="clearCommentImage()">
+                                        <i class="fas fa-times me-1"></i> Xóa ảnh
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary px-4 py-2">
+                                    <i class="fas fa-paper-plane me-1"></i> Gửi
+                                </button>
+                            </div>
+                       
                     </div>
                 </form>
             </div>

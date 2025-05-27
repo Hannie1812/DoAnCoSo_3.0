@@ -38,8 +38,6 @@
                     </div>
                     <div class="form-group">
                         <textarea name="NoiBungLienHe" id="compose-textarea" class="form-control border-0 bg-light px-4 py-3" rows="5" placeholder="Mô Tả Vấn Đề"></textarea>
- 
-
                     </div>
                     <button type="submit" class="btn btn-white btn-send">
                         <i class="fas fa-paper-plane mr-2"></i> Gửi Tin Nhắn
@@ -50,4 +48,9 @@
     </div>
 </section>
 
+<script>
+    $('#compose-textarea').summernote({
+              height: 300
+          });
+</script>
 

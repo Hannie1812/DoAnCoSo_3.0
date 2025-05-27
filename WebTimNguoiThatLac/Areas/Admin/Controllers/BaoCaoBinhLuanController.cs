@@ -342,6 +342,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         }
 
         // Hàm đệ quy xóa bình luận và các reply
+        // Hàm đệ quy xóa bình luận và các reply
         private async Task DeleteCommentAndReplies(BinhLuan comment)
         {
             // Xóa hình ảnh nếu có
@@ -349,20 +350,26 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             {
                 DeleteImage(comment.HinhAnh, "BinhLuan");
             }
+            List<BinhLuan> dsTL = _context.BinhLuans.Where(x => x.ParentId == comment.Id).ToList();
 
             // Xóa đệ quy các reply
-            if (comment.TraLois != null && comment.TraLois.Any())
+            if (dsTL != null)
             {
-                foreach (var reply in comment.TraLois.ToList())
+                foreach (BinhLuan reply in dsTL)
                 {
                     await DeleteCommentAndReplies(reply);
                 }
             }
             List<BaoCaoBinhLuan> ds = _context.BaoCaoBinhLuans.Where(x => x.MaBinhLuan == comment.Id).ToList();
-            _context.BaoCaoBinhLuans.RemoveRange(ds);
+            if (ds != null && ds.Any())
+            {
+                _context.BaoCaoBinhLuans.RemoveRange(ds);
+            }
+
 
             _context.BinhLuans.Remove(comment);
         }
+
 
         private void DeleteImage(string imageUrl, string subFolder) // Xóa hình ảnh
         {

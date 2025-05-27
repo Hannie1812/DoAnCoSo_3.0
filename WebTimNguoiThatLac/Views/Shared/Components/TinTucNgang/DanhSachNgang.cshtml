@@ -1,4 +1,4 @@
-﻿@model IEnumerable<WebTimNguoiThatLac.Models.TinTuc>
+﻿@model IEnumerable<TinTuc>
 
 <section class="ftco-section">
     <div class="container">
@@ -13,7 +13,7 @@
             @if (Model != null)
             {
                 <div class="owl-carousel" id="carouselTinTuc">
-                    @foreach (var i in Model)
+                    @foreach (TinTuc i in Model)
                     {
                         <div class="item">
                             <div class=" d-flex ftco-animate">
@@ -37,7 +37,7 @@
             }
             else
             {
-                <h2>Không có Tin Tức nào để hiển thị.</h2>
+                <h2 class="text-center">Không có Tin Tức nào để hiển thị.</h2>
             }
            
         </div>

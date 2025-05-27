@@ -16,7 +16,7 @@ namespace WebTimNguoiThatLac.Components
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            IEnumerable<TinTuc> ds = await db.TinTucs.Where(i => i.Active == true).ToListAsync();
+            List<TinTuc> ds = await db.TinTucs.Where(i => i.Active == true).ToListAsync();
 
             return View("DanhSachNgang", ds);
         }

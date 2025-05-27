@@ -16,6 +16,7 @@ using Microsoft.Build.Framework;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using Newtonsoft.Json;
+using WebTimNguoiThatLac.Helpers;
 
 namespace WebTimNguoiThatLac.Areas.Admin.Controllers
 {
@@ -190,7 +191,7 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
         public async Task<IActionResult> Create(TimNguoi x, 
                                                 List<IFormFile>? DSHinhAnhCapNhat, 
                                                 string EmailNguoiDung,
-                                                string faceDescriptorsJson)
+                                                string? faceDescriptorsJson)
         {
             await LoadSelectListsAsync();
             IEnumerable<TinhThanh> tinhThanhs = await db.TinhThanhs.ToListAsync();
@@ -280,7 +281,15 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     db.AnhTimNguois.Add(anhTimNguoi);
                 }
 
+                
                 await db.SaveChangesAsync();
+
+                TimNguoi z = db.TimNguois.FirstOrDefault(i => i.Id == x.Id);
+                var request = HttpContext.Request;
+                var baseUrl = $"{request.Scheme}://{request.Host}/TimNguoi/ChiTietBaiTimNguoi/{z.Id}";
+                z.QRCodeImage = QRCodeHelper.GenerateQRCode(baseUrl);
+                await db.SaveChangesAsync();
+
                 ModelState.AddModelError("", "Vui Lòng Nhập Đủ Thông Tin ");
                 return RedirectToAction("Index");
             }
@@ -592,16 +601,19 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 // bình luận
                 List<BinhLuan> dsBinhLuan = db.BinhLuans
                     .Include(u => u.BaoCaoBinhLuans)
-                    .Where(i => i.IdBaiViet == tn.Id).ToList();
+                    .Where(i => i.IdBaiViet == tn.Id)
+                    
+                    .ToList();
                 // xóa các báo cáo bình luận trong dsBinhLuan
                 foreach (BinhLuan i in dsBinhLuan)
                 {
-                    List<BaoCaoBinhLuan> bc = db.BaoCaoBinhLuans.Where(m => m.MaBinhLuan == i.Id).ToList();
-                    if (bc.Count() > 0)
-                    {
-                        db.BaoCaoBinhLuans.RemoveRange(bc);
-                    }
-                    DeleteImage(i.HinhAnh, "BinhLuan");
+                    //List<BaoCaoBinhLuan> bc = db.BaoCaoBinhLuans.Where(m => m.MaBinhLuan == i.Id).ToList();
+                    //if (bc.Count() > 0)
+                    //{
+                    //    db.BaoCaoBinhLuans.RemoveRange(bc);
+                    //}
+                    //DeleteImage(i.HinhAnh, "BinhLuan");
+                    DeleteCommentAndReplies(i);
                 }
 
 
@@ -653,6 +665,33 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
             }
         }
 
+        // Hàm đệ quy xóa bình luận và các reply
+        private async Task DeleteCommentAndReplies(BinhLuan comment)
+        {
+            // Xóa hình ảnh nếu có
+            if (!string.IsNullOrEmpty(comment.HinhAnh))
+            {
+                DeleteImage(comment.HinhAnh, "BinhLuan");
+            }
+            List<BinhLuan> dsTL = db.BinhLuans.Where(x => x.ParentId == comment.Id).ToList();
+
+            // Xóa đệ quy các reply
+            if (dsTL != null)
+            {
+                foreach (BinhLuan reply in dsTL)
+                {
+                    await DeleteCommentAndReplies(reply);
+                }
+            }
+            List<BaoCaoBinhLuan> ds = db.BaoCaoBinhLuans.Where(x => x.MaBinhLuan == comment.Id).ToList();
+            if (ds != null && ds.Any())
+            {
+                db.BaoCaoBinhLuans.RemoveRange(ds);
+            }
+
+
+            db.BinhLuans.Remove(comment);
+        }
 
         [HttpPost]
         public async Task<IActionResult> ExportToWord(int id)

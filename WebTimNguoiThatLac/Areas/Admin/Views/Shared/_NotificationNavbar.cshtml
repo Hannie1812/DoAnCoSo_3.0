@@ -1,121 +1,37 @@
 @using Microsoft.AspNetCore.Identity
 @inject UserManager<ApplicationUser> UserManager
 @inject RoleManager<IdentityRole> RoleManager
+@using Microsoft.EntityFrameworkCore
+@using WebTimNguoiThatLac.Data;
+@inject ApplicationDbContext db
 @{
-    var dsTinNhanMoi = ViewData["DSTinNhanMoi"] as List<HopThoaiTinNhan> ?? new List<HopThoaiTinNhan>();
-    var messageCount = dsTinNhanMoi.Count;
-    int DemBaoCaoBinhLuan = (ViewData["DemBaoCaoBinhLuan"] as int?) ?? 0;
-    int DemBaoCaoBaiViet = (ViewData["DemBaoCaoBaiViet"] as int?) ?? 0;
-    int DemLienHeNguoiDung = (ViewData["DemLienHeNguoiDung"] as int?) ?? 0;
+
+    ApplicationUser user = UserManager.GetUserAsync(User).Result;
+    
+
+    int DemBaoCaoBinhLuan =  db.BaoCaoBinhLuans
+                                                .Include(b => b.BinhLuan)
+                                                .Where(b => b.DaDoc == false)
+                                                .Count();
+
+    int DemBaoCaoBaiViet = db.BaoCaoBaiViets
+                                               .Include(b => b.TimNguoi)
+                                               .Where(b => b.DaDoc == false)
+                                               .Count();
+    int DemLienHeNguoiDung = db.NguoiDungLienHes
+                                                .Where(b => b.isRead == false).Count();
     int TongThongBao = DemBaoCaoBinhLuan + DemBaoCaoBaiViet + DemLienHeNguoiDung;
 }
 
 <ul class="navbar-nav ml-auto">
-        <!-- new -->
-        <!-- Messages Dropdown Menu -->
-        <li class="nav-item dropdown">
-            <a class="nav-link position-relative" data-toggle="dropdown" href="#" aria-expanded="false">
-                <i class="far fa-comments fs-5"></i>                @if (messageCount > 0)
-                {
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-danger"
-                          style="width: 18px; height: 18px; font-size: 0.6rem; padding: 0.25rem;">
-                        @messageCount
-                        <span class="visually-hidden">unread messages</span>
-                    </span>
-                }
-            </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end border-0 shadow-lg" style="width: 320px;">
-                <!-- Header -->
-                <div class="px-4 py-3 bg-light border-bottom">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0 fw-semibold">Tin nhắn mới</h6>
-                        <span class="badge bg-primary rounded-pill">@messageCount</span>
-                    </div>
-                </div>
+    <!-- new -->
+    <!-- Messages Dropdown Menu -->
+        @await Component.InvokeAsync("DanhSachTinNhanMoi")
+    <!-- End Messages Dropdown Menu -->
 
-                <!-- Message List -->
-                <div class="list-group list-group-flush" style="max-height: 350px; overflow-y: auto;">                    @if (dsTinNhanMoi.Any())
-                    {
-                        @foreach (var hopThoai in dsTinNhanMoi)
-                        {
-                            var user = await UserManager.GetUserAsync(User);
-                            var lastMessage = hopThoai?.TinNhans?.FirstOrDefault();
-                            var otherUser = hopThoai?.NguoiThamGias?
-                                .FirstOrDefault(tv => tv?.MaNguoiThamGia != user?.Id)?
-                                .ApplicationUser;
-
-                            <a asp-action="Index" asp-area="" asp-controller="Chat" asp-route-hopThoaiId="@hopThoai.Id"
-                               class="list-group-item list-group-item-action border-0 py-3 px-4">
-                                <div class="d-flex align-items-start">
-                                    <!-- Avatar -->
-                                    <div class="flex-shrink-0 me-3">
-                                        @if (!string.IsNullOrEmpty(otherUser?.HinhAnh))
-                                        {
-                                            <img src="@otherUser.HinhAnh" class="rounded-circle"
-                                                 style="width: 40px; height: 40px; object-fit: cover;" alt="@otherUser.UserName">
-                                        }
-                                        else
-                                        {
-                                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
-                                                 style="width: 40px; height: 40px;">
-                                                @otherUser?.UserName?.Substring(0, 1).ToUpper()
-                                            </div>
-                                        }
-                                    </div>
-
-                                    <!-- Message Content -->
-                                    <div class="flex-grow-1 overflow-hidden">
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <h6 class="mb-0 fw-semibold text-truncate" style="max-width: 150px;">
-                                                @otherUser?.UserName
-                                            </h6>
-                                            <small class="text-muted">
-                                                @if (lastMessage != null)
-                                                {
-                                                    @FormatTime(lastMessage.NgayGui)
-                                                }
-                                            </small>
-                                        </div>
-
-                                        @if (lastMessage != null)
-                                        {
-                                            <p class="mb-0 text-muted small text-truncate">
-                                                @if (!string.IsNullOrEmpty(lastMessage.HinhAnh))
-                                                {
-                                                    <i class="fas fa-image me-1"></i>
-                                                    <span>Hình ảnh</span>
-                                                }
-                                                else
-                                                {
-                                                    @lastMessage.NoiDung
-                                                }
-                                            </p>
-                                        }
-                                    </div>
-                                </div>
-                            </a>
-                        }
-                    }
-                    else
-                    {
-                        <div class="text-center py-4">
-                            <i class="far fa-comments fs-4 text-muted mb-2"></i>
-                            <p class="mb-0 text-muted">Không có tin nhắn mới</p>
-                        </div>
-                    }
-                </div>
-
-                <!-- Footer -->
-                <div class="px-4 py-2 bg-light border-top text-center">
-                    <a asp-action="Index" asp-area="" asp-controller="Chat"
-                       class="text-decoration-none small fw-semibold text-primary">
-                        <i class="fas fa-envelope me-1"></i> Xem tất cả tin nhắn
-                    </a>
-                </div>
-            </div>
-        </li>
     <!-- Notifications Dropdown Menu -->
-    <li class="nav-item dropdown">
+    
+     <li class="nav-item dropdown">
         <a class="nav-link position-relative" data-toggle="dropdown" href="#" aria-expanded="false">
             <i class="far fa-bell"></i>
             @if (TongThongBao > 0)
@@ -127,93 +43,93 @@
                 </span>
             }
         </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end border-0 shadow" style="width: 320px;">
-                <!-- Header -->
-                <div class="px-4 py-3 bg-light border-bottom">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0 fw-semibold">Thông báo mới</h6>
-                        <span class="badge bg-primary rounded-pill">@TongThongBao</span>
-                    </div>
-                </div>
-
-                <!-- Notification Items -->
-                <div class="list-group list-group-flush">
-                    <!-- User Contact -->
-                    <a asp-area="Admin" asp-action="Index" asp-controller="NguoiDungLienHe"
-                       class="list-group-item list-group-item-action border-0 py-3 px-4">
-                        <div class="d-flex align-items-center">
-                            <div class="flex-shrink-0 me-3">
-                                <div class="bg-info bg-opacity-10 p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-envelope text-white"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1">
-                                <h6 class="mb-1 fw-semibold">Người dùng liên hệ</h6>
-                                <p class="mb-0 text-muted small">Có @ViewBag.DemLienHeNguoiDung yêu cầu mới</p>
-                            </div>
-                            <div class="text-muted small">
-                                <i class="fas fa-chevron-right"></i>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- Reported Posts -->
-                    <a asp-area="Admin" asp-action="Index" asp-controller="BaoCaoBaiViet"
-                       class="list-group-item list-group-item-action border-0 py-3 px-4">
-                        <div class="d-flex align-items-center">
-                            <div class="flex-shrink-0 me-3">
-                                <div class="bg-warning bg-opacity-10 p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-newspaper text-white"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1">
-                                <h6 class="mb-1 fw-semibold">Báo cáo bài viết</h6>
-                                <p class="mb-0 text-muted small">@ViewBag.DemBaoCaoBaiViet bài viết bị báo cáo</p>
-                            </div>
-                            <div class="text-muted small">
-                                <i class="fas fa-chevron-right"></i>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- Reported Comments -->
-                    <a asp-area="Admin" asp-action="Index" asp-controller="BaoCaoBinhLuan"
-                       class="list-group-item list-group-item-action border-0 py-3 px-4">
-                        <div class="d-flex align-items-center">
-                            <div class="flex-shrink-0 me-3">
-                                <div class="bg-danger bg-opacity-10 p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-comment-alt text-white"></i>
-                                </div>
-                            </div>
-                            <div class="flex-grow-1">
-                                <h6 class="mb-1 fw-semibold">Báo cáo bình luận</h6>
-                                <p class="mb-0 text-muted small">@ViewBag.DemBaoCaoBinhLuan bình luận bị báo cáo</p>
-                            </div>
-                            <div class="text-muted small">
-                                <i class="fas fa-chevron-right"></i>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-                <!-- Footer -->
-                <div class="px-4 py-2 bg-light border-top text-center">
-                    <a href="#" class="text-decoration-none small fw-semibold text-primary">Xem tất cả thông báo</a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end border-0 shadow" style="width: 320px;">
+            <!-- Header -->
+            <div class="px-4 py-3 bg-light border-bottom">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-semibold">Thông báo mới</h6>
+                    <span class="badge bg-primary rounded-pill">@TongThongBao</span>
                 </div>
             </div>
-        </li>
 
-        <li class="nav-item">
-            <a class="nav-link" data-widget="fullscreen" href="#" role="button">
-                <i class="fas fa-expand-arrows-alt"></i>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/Home">
-                <i class="fas fa-th-large"></i>
-            </a>
-        </li>
-    </ul> 
+            <!-- Notification Items -->
+            <div class="list-group list-group-flush">
+                <!-- User Contact -->
+                <a asp-area="Admin" asp-action="Index" asp-controller="NguoiDungLienHe"
+                    class="list-group-item list-group-item-action border-0 py-3 px-4">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="bg-info bg-opacity-10 p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="fas fa-envelope text-white"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1 fw-semibold">Người dùng liên hệ</h6>
+                            <p class="mb-0 text-muted small">Có @DemLienHeNguoiDung yêu cầu mới</p>
+                        </div>
+                        <div class="text-muted small">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Reported Posts -->
+                <a asp-area="Admin" asp-action="Index" asp-controller="BaoCaoBaiViet"
+                    class="list-group-item list-group-item-action border-0 py-3 px-4">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="bg-warning bg-opacity-10 p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="fas fa-newspaper text-white"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1 fw-semibold">Báo cáo bài viết</h6>
+                            <p class="mb-0 text-muted small">@DemBaoCaoBaiViet bài viết bị báo cáo</p>
+                        </div>
+                        <div class="text-muted small">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Reported Comments -->
+                <a asp-area="Admin" asp-action="Index" asp-controller="BaoCaoBinhLuan"
+                    class="list-group-item list-group-item-action border-0 py-3 px-4">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="bg-danger bg-opacity-10 p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="fas fa-comment-alt text-white"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1 fw-semibold">Báo cáo bình luận</h6>
+                            <p class="mb-0 text-muted small">@DemBaoCaoBinhLuan bình luận bị báo cáo</p>
+                        </div>
+                        <div class="text-muted small">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-4 py-2 bg-light border-top text-center">
+                <a href="#" class="text-decoration-none small fw-semibold text-primary">Xem tất cả thông báo</a>
+            </div>
+        </div>
+    </li>
+        
+    <li class="nav-item">
+        <a class="nav-link" data-widget="fullscreen" href="#" role="button">
+            <i class="fas fa-expand-arrows-alt"></i>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/Home">
+            <i class="fas fa-th-large"></i>
+        </a>
+    </li>
+</ul> 
 
 @functions {
     string FormatTime(DateTime date)

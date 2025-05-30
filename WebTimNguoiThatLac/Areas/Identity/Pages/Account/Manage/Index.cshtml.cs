@@ -167,6 +167,13 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account.Manage
 
             await _userManager.UpdateAsync(user);
 
+            ApplicationUser nd = _context.Users.FirstOrDefault(i => i.PhoneNumber.Contains(Input.PhoneNumber) == true);
+            if (nd != null)
+            {
+                StatusMessage = "Cập nhật thông tin không thành công do số diện thoại đã tồn tại";
+                return RedirectToPage();
+            }
+
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
             if (Input.PhoneNumber != phoneNumber)
             {

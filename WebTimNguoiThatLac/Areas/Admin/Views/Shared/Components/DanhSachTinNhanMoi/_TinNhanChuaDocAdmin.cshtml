@@ -1,0 +1,142 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+@model IEnumerable<HopThoaiTinNhan>
+@{
+    IEnumerable<HopThoaiTinNhan> DSTinNhanMoi = Model;
+
+}
+
+<!-- Messages Dropdown Menu -->
+<li class="nav-item dropdown">
+    <a class="nav-link position-relative" data-toggle="dropdown" href="#" aria-expanded="false">
+        <i class="far fa-comments fs-5"></i>
+        @if (DSTinNhanMoi?.Count() > 0)
+        {
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-danger"
+                  style="width: 18px; height: 18px; font-size: 0.6rem; padding: 0.25rem;">
+                @DSTinNhanMoi?.Count()
+                <span class="visually-hidden">unread messages</span>
+            </span>
+        }
+    </a>
+    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end border-0 shadow-lg" style="width: 320px;">
+        <!-- Header -->
+        <div class="px-4 py-3 bg-light border-bottom">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-semibold">Tin nhắn mới</h6>
+                <span class="badge bg-primary rounded-pill">@(DSTinNhanMoi?.Count() ?? 0)</span>
+            </div>
+        </div>
+
+        <!-- Message List -->
+        <div class="list-group list-group-flush" style="max-height: 350px; overflow-y: auto;">
+            @if (DSTinNhanMoi != null)
+            {
+                @foreach (var hopThoai in DSTinNhanMoi as List<HopThoaiTinNhan> ?? new List<HopThoaiTinNhan>())
+                {
+                    var user = await UserManager.GetUserAsync(User);
+                    var lastMessage = hopThoai.TinNhans?.FirstOrDefault();
+                    var otherUser = hopThoai.NguoiThamGias?
+                    .FirstOrDefault(tv => tv.MaNguoiThamGia != user.Id)?
+                    .ApplicationUser;
+
+                    <a asp-action="Index" asp-area="" asp-controller="Chat" asp-route-hopThoaiId="@hopThoai.Id"
+                       class="list-group-item list-group-item-action border-0 py-3 px-4">
+                        <div class="d-flex align-items-start">
+                            <!-- Avatar -->
+                            <div class="flex-shrink-0 me-3">
+                                @if (!string.IsNullOrEmpty(otherUser?.HinhAnh))
+                                {
+                                    <img src="@otherUser.HinhAnh" class="rounded-circle"
+                                         style="width: 40px; height: 40px; object-fit: cover;" alt="@@.UserName">
+                                }
+                                else
+                                {
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                                         style="width: 40px; height: 40px;">
+                                        @otherUser?.UserName?.Substring(0, 1).ToUpper()
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Message Content -->
+                            <div class="flex-grow-1 overflow-hidden">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <h6 class="mb-0 fw-semibold text-truncate" style="max-width: 150px;">
+                                        @otherUser?.UserName
+                                    </h6>
+                                    <small class="text-muted">
+                                        @if (lastMessage != null)
+                                        {
+                                            @FormatTime(lastMessage.NgayGui)
+                                        }
+                                    </small>
+                                </div>
+
+                                @if (lastMessage != null)
+                                {
+                                    <p class="mb-0 text-muted small text-truncate">
+                                        @if (!string.IsNullOrEmpty(lastMessage.HinhAnh))
+                                        {
+                                            <i class="fas fa-image me-1"></i>
+                                            <span>Hình ảnh</span>
+                                        }
+                                        else
+                                        {
+                                            @lastMessage.NoiDung
+                                        }
+                                    </p>
+                                }
+                            </div>
+                        </div>
+                    </a>
+                }
+            }
+            else
+            {
+                <div class="text-center py-4">
+                    <i class="far fa-comments fs-4 text-muted mb-2"></i>
+                    <p class="mb-0 text-muted">Không có tin nhắn mới</p>
+                </div>
+            }
+        </div>
+
+        <!-- Footer -->
+        <div class="px-4 py-2 bg-light border-top text-center">
+            <a asp-action="Index" asp-area="" asp-controller="Chat"
+               class="text-decoration-none small fw-semibold text-primary">
+                <i class="fas fa-envelope me-1"></i> Xem tất cả tin nhắn
+            </a>
+        </div>
+    </div>
+</li>
+
+@functions {
+    string FormatTime(DateTime date)
+    {
+        var now = DateTime.Now;
+        var diff = now - date;
+
+        if (diff.TotalMinutes < 1)
+        {
+            return "Vừa xong";
+        }
+        else if (diff.TotalMinutes < 60)
+        {
+            return $"{(int)diff.TotalMinutes} phút trước";
+        }
+        else if (diff.TotalHours < 24)
+        {
+            return $"{(int)diff.TotalHours} giờ trước";
+        }
+        else if (diff.TotalDays < 7)
+        {
+            return $"{(int)diff.TotalDays} ngày trước";
+        }
+        else
+        {
+            return date.ToString("dd/MM/yyyy");
+        }
+    }
+}

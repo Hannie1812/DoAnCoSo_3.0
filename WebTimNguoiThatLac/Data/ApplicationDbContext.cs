@@ -33,5 +33,15 @@ namespace WebTimNguoiThatLac.Data
 
         //public DbSet<FaceDescriptor> FaceDescriptors { get; set; } // Bảng lưu trữ FaceDescriptor
 
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            // Tạo index duy nhất cho PhoneNumber
+            builder.Entity<ApplicationUser>()
+                   .HasIndex(u => u.PhoneNumber)
+                   .IsUnique();
+        }
+
     }
 }

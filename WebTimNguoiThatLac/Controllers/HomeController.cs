@@ -37,6 +37,9 @@ namespace WebTimNguoiThatLac.Controllers
         public async Task<IActionResult> GioiThieu()
         {
             GioiThieu ds = await db.GioiThieus.FirstOrDefaultAsync(i => i.Active == true);
+
+            int sl = db.TimNguois.ToList().Count;
+            ViewBag.TongBaiVietTrong = sl;
             return View(ds);
         }
         public async Task<IActionResult> LienHe()

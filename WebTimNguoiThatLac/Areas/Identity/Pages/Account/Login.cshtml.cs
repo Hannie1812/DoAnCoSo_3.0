@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using WebTimNguoiThatLac.Models;
+using WebTimNguoiThatLac.Data;
 
 namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
 {
@@ -23,12 +24,14 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<LoginModel> _logger;
+        private ApplicationDbContext db;
 
-        public LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger, UserManager<ApplicationUser> userManager)
+        public LoginModel(ApplicationDbContext db, SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger, UserManager<ApplicationUser> userManager)
         {
             _signInManager = signInManager;
             _logger = logger;
             _userManager = userManager;
+            this.db = db;
         }
 
         /// <summary>
@@ -68,7 +71,7 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [Required]
-            [EmailAddress]
+            //[EmailAddress]
             public string Email { get; set; }
 
             /// <summary>
@@ -115,7 +118,27 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+
+                string email = Input.Email;
+
+                if (Input.Email.Contains('@') == false)
+                {
+                    ApplicationUser us = db.Users.FirstOrDefault(u => u.PhoneNumber.Contains(Input.Email));
+                    if (us == null)
+                    {
+                        ModelState.AddModelError(string.Empty, "Tài khoản bị khóa");
+                        TempData["WarningMessage"] = "Không có tài khoản này";
+                        //ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                        return Page();
+                    }
+                    email = us.Email;
+                }
+
+
+
+                //var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+
                 if (result.Succeeded)
                 {
                     ApplicationUser x = await _userManager.GetUserAsync(User);
@@ -132,7 +155,7 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
                         TempData["WarningMessage"] = "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
                         //return Page();// đang tets
 
-                        return RedirectToAction("Index", "LoiViPham", new {area =""});
+                        return RedirectToAction("Index", "LoiViPham", new { area = "" });
                     }
 
                 }
@@ -142,12 +165,12 @@ namespace WebTimNguoiThatLac.Areas.Identity.Pages.Account
                 }
                 if (result.IsLockedOut)
                 {
-                    _logger.LogWarning("User account locked out.");
+                    _logger.LogWarning("User account locked out. 1");
                     return RedirectToPage("./Lockout");
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt. 2");
                     return Page();
                 }
             }

@@ -35,31 +35,31 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 return RedirectToAction("Login", "Account", new { area = "Admin" });
             }
 
-            var conversations = await _context.NguoiThamGias
-               .Include(ng => ng.HopThoai)
-                   .ThenInclude(h => h.TinNhans.OrderByDescending(t => t.NgayGui).Take(1))
-               .Include(ng => ng.HopThoai)
-                   .ThenInclude(h => h.NguoiThamGias)
-                        .ThenInclude(tv => tv.ApplicationUser)
-               .Where(ng => ng.MaNguoiThamGia == user.Id && ng.HopThoai.TinNhans.Any(tn => tn.IsRead == false && tn.MaNguoiGui != user.Id))
-               .ToListAsync();
+            //var conversations = await _context.NguoiThamGias
+            //   .Include(ng => ng.HopThoai)
+            //       .ThenInclude(h => h.TinNhans.OrderByDescending(t => t.NgayGui).Take(1))
+            //   .Include(ng => ng.HopThoai)
+            //       .ThenInclude(h => h.NguoiThamGias)
+            //            .ThenInclude(tv => tv.ApplicationUser)
+            //   .Where(ng => ng.MaNguoiThamGia == user.Id && ng.HopThoai.TinNhans.Any(tn => tn.IsRead == false && tn.MaNguoiGui != user.Id))
+            //   .ToListAsync();
 
-            ViewBag.DSTinNhanMoi = conversations.Select(ng => ng.HopThoai).ToList() ?? new List<HopThoaiTinNhan>();
+            //ViewBag.DSTinNhanMoi = conversations.Select(ng => ng.HopThoai).ToList() ?? new List<HopThoaiTinNhan>();
 
-            ViewBag.DemBaoCaoBinhLuan = await _context.BaoCaoBinhLuans
-                .Include(b => b.BinhLuan)
-                .Where(b => b.DaDoc == false)
-                .CountAsync();
-
-
-            ViewBag.DemBaoCaoBaiViet = await _context.BaoCaoBaiViets
-                .Include(b => b.TimNguoi)
-                .Where(b => b.DaDoc == false)
-                .CountAsync();
+            //ViewBag.DemBaoCaoBinhLuan = await _context.BaoCaoBinhLuans
+            //    .Include(b => b.BinhLuan)
+            //    .Where(b => b.DaDoc == false)
+            //    .CountAsync();
 
 
-            ViewBag.DemLienHeNguoiDung = await _context.NguoiDungLienHes
-                .Where(b => b.isRead == false).CountAsync();
+            //ViewBag.DemBaoCaoBaiViet = await _context.BaoCaoBaiViets
+            //    .Include(b => b.TimNguoi)
+            //    .Where(b => b.DaDoc == false)
+            //    .CountAsync();
+
+
+            //ViewBag.DemLienHeNguoiDung = await _context.NguoiDungLienHes
+            //    .Where(b => b.isRead == false).CountAsync();
 
 
 

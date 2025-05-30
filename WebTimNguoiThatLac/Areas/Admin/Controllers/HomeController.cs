@@ -29,7 +29,6 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index(int? year, int? month, int? day, int? tinhThanhId, string trangThai, int? tuan)
         {
-
             ApplicationUser user = _us.GetUserAsync(User).Result;
             if (user == null)
             {

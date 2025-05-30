@@ -2,10 +2,11 @@
 @inject UserManager<ApplicationUser> UserManager
 @inject RoleManager<IdentityRole> RoleManager
 @{
-    var messageCount = ViewBag.DSTinNhanMoi?.Count ?? 0;
-    int DemBaoCaoBinhLuan = ViewBag.DemBaoCaoBinhLuan ?? 0;
-    int DemBaoCaoBaiViet = ViewBag.DemBaoCaoBaiViet ?? 0;
-    int DemLienHeNguoiDung = ViewBag.DemLienHeNguoiDung ?? 0;
+    var dsTinNhanMoi = ViewData["DSTinNhanMoi"] as List<HopThoaiTinNhan> ?? new List<HopThoaiTinNhan>();
+    var messageCount = dsTinNhanMoi.Count;
+    int DemBaoCaoBinhLuan = (ViewData["DemBaoCaoBinhLuan"] as int?) ?? 0;
+    int DemBaoCaoBaiViet = (ViewData["DemBaoCaoBaiViet"] as int?) ?? 0;
+    int DemLienHeNguoiDung = (ViewData["DemLienHeNguoiDung"] as int?) ?? 0;
     int TongThongBao = DemBaoCaoBinhLuan + DemBaoCaoBaiViet + DemLienHeNguoiDung;
 }
 
@@ -14,12 +15,11 @@
         <!-- Messages Dropdown Menu -->
         <li class="nav-item dropdown">
             <a class="nav-link position-relative" data-toggle="dropdown" href="#" aria-expanded="false">
-                <i class="far fa-comments fs-5"></i>
-                @if (ViewBag.DSTinNhanMoi?.Count > 0)
+                <i class="far fa-comments fs-5"></i>                @if (messageCount > 0)
                 {
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-danger"
                           style="width: 18px; height: 18px; font-size: 0.6rem; padding: 0.25rem;">
-                        @ViewBag.DSTinNhanMoi.Count
+                        @messageCount
                         <span class="visually-hidden">unread messages</span>
                     </span>
                 }
@@ -29,21 +29,20 @@
                 <div class="px-4 py-3 bg-light border-bottom">
                     <div class="d-flex justify-content-between align-items-center">
                         <h6 class="mb-0 fw-semibold">Tin nhắn mới</h6>
-                        <span class="badge bg-primary rounded-pill">@(ViewBag.DSTinNhanMoi?.Count ?? 0)</span>
+                        <span class="badge bg-primary rounded-pill">@messageCount</span>
                     </div>
                 </div>
 
                 <!-- Message List -->
-                <div class="list-group list-group-flush" style="max-height: 350px; overflow-y: auto;">
-                    @if (ViewBag.DSTinNhanMoi != null)
+                <div class="list-group list-group-flush" style="max-height: 350px; overflow-y: auto;">                    @if (dsTinNhanMoi.Any())
                     {
-                        @foreach (var hopThoai in ViewBag.DSTinNhanMoi as List<HopThoaiTinNhan> ?? new List<HopThoaiTinNhan>())
+                        @foreach (var hopThoai in dsTinNhanMoi)
                         {
                             var user = await UserManager.GetUserAsync(User);
-                            var lastMessage = hopThoai.TinNhans?.FirstOrDefault();
-                            var otherUser = hopThoai.NguoiThamGias?
-                            .FirstOrDefault(tv => tv.MaNguoiThamGia != user.Id)?
-                            .ApplicationUser;
+                            var lastMessage = hopThoai?.TinNhans?.FirstOrDefault();
+                            var otherUser = hopThoai?.NguoiThamGias?
+                                .FirstOrDefault(tv => tv?.MaNguoiThamGia != user?.Id)?
+                                .ApplicationUser;
 
                             <a asp-action="Index" asp-area="" asp-controller="Chat" asp-route-hopThoaiId="@hopThoai.Id"
                                class="list-group-item list-group-item-action border-0 py-3 px-4">

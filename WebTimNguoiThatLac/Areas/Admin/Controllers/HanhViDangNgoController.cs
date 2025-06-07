@@ -124,13 +124,13 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                     var applicationUser = _context.Users.FirstOrDefault(u => u.Id == hanhVi.NguoiDungId);
                     if (applicationUser != null)
                     {
-                        applicationUser.SoLanViPham--;
+                        applicationUser.SoLanViPham = applicationUser.SoLanViPham - 1 ;
                         if (applicationUser.SoLanViPham < 0)
                         {
                             applicationUser.SoLanViPham = 0;
                         }
 
-                        if(applicationUser.SoLanViPham <5)
+                        if(applicationUser.SoLanViPham <3)
                         {
                             applicationUser.Active = true;
                         }

@@ -75,6 +75,7 @@
     {
         switch (ViewBag.Tuan)
         {
+			case 0: label = "Tất cả"; break;
             case 1: label = "7 ngày trước"; break;
             case 2: label = "14 ngày trước"; break;
             case 3: label = "21 ngày trước"; break;
@@ -94,6 +95,93 @@
         label = $"Năm {ViewBag.Year}";
     }
 }
+
+<!--  Khối mới -->
+
+<style>
+    .info-box {
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        border-radius: 10px;
+        min-height: 120px;
+    }
+
+    .info-box-icon {
+        font-size: 2rem;
+        padding: 20px;
+    }
+
+    .info-box-number {
+        font-size: 1.8rem;
+        font-weight: bold;
+    }
+
+    .bg-gradient-info {
+        background: linear-gradient(135deg, #17a2b8 0%, #6cb2eb 100%);
+    }
+
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #28a745 0%, #7bd555 100%);
+    }
+
+    .bg-gradient-warning {
+        background: linear-gradient(135deg, #ffc107 0%, #ffd55a 100%);
+    }</style>
+
+<div class="row mb-4">
+    <!-- Khối 1: Tổng số bài viết -->
+    <div class="col-md-4">
+        <div class="info-box bg-gradient-info">
+            <span class="info-box-icon"><i class="far fa-file-alt"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Tổng bài viết</span>
+                <span class="info-box-number">@ViewBag.TongBaiViet</span>
+                <div class="progress">
+                    <div class="progress-bar" style="width: @ViewBag.PhanTramTangBaiViet%"></div>
+                </div>
+                <span class="progress-description">
+                    @ViewBag.TangGiamBaiViet so với trước
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Khối 2: Giới tính -->
+    <div class="col-md-4">
+        <div class="info-box bg-gradient-success">
+            <span class="info-box-icon"><i class="fas fa-venus-mars"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Phân bổ giới tính</span>
+                <span class="info-box-number">
+                    Nam: @ViewBag.SoLuongNam | Nữ: @ViewBag.SoLuongNu
+                </span>
+                <div class="progress">
+                    <div class="progress-bar" style="width: @ViewBag.PhanTramNam%"></div>
+                </div>
+                <span class="progress-description">
+                    Tỷ lệ Nam: @ViewBag.PhanTramNam% | Nữ: @ViewBag.PhanTramNu%
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Khối 3: Trạng thái -->
+    <div class="col-md-4">
+        <div class="info-box bg-gradient-warning">
+            <span class="info-box-icon"><i class="fas fa-info-circle"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Trạng thái phổ biến</span>
+                <span class="info-box-number">@ViewBag.TrangThaiPhoBien</span>
+                <div class="progress">
+                    <div class="progress-bar" style="width: @ViewBag.PhanTramTrangThaiPhoBien%"></div>
+                </div>
+                <span class="progress-description">
+                    Chiếm @ViewBag.PhanTramTrangThaiPhoBien% tổng bài viết
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+ <!-- end Khối mới -->
 
 <div class="container-fluid">
     <!-- Card lọc dữ liệu -->
@@ -178,6 +266,7 @@
                             <label><i class="fas fa-calendar-week"></i> Khoảng thời gian</label>
                             <select name="tuan" class="form-control select2">
                                 <option value="">-- Chọn --</option>
+                                <option value="0" selected="@(ViewBag.Tuan == 0)">Toàn bộ thời gian</option>
                                 <option value="1" selected="@(ViewBag.Tuan == 1)">7 ngày trước</option>
                                 <option value="2" selected="@(ViewBag.Tuan == 2)">14 ngày trước</option>
                                 <option value="3" selected="@(ViewBag.Tuan == 3)">21 ngày trước</option>

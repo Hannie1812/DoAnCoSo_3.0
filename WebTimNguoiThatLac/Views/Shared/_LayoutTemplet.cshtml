@@ -117,7 +117,7 @@
 
     @RenderBody()
 
-	@if (user != null )
+    @if (user != null && ViewData["Title"] != "Tin Nhắn")
     {
         @await Html.PartialAsync("_LayoutLienHeAdmin")
     }

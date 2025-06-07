@@ -216,7 +216,9 @@
                                     <div class="col-12 mb-3">
                                         <div class="alert alert-info">
                                             <i class="fas fa-info-circle me-2"></i>
-                                            Số lần vi phạm: <span class="fw-bold">@Model.SoLanViPham</span>
+                                            @* Số lần vi phạm: <span class="fw-bold">@Model.SoLanViPham</span> *@
+                                            Số lần vi phạm: 
+                                            <input asp-for="SoLanViPham" type="number" class="form-control" />
                                         </div>
                                     </div>
                                 </div>

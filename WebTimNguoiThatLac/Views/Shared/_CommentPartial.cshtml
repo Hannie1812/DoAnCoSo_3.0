@@ -1,4 +1,7 @@
-﻿@using WebTimNguoiThatLac.ViewModels
+﻿@using WebTimNguoiThatLac.BoTro
+@using WebTimNguoiThatLac.Data
+@using WebTimNguoiThatLac.ViewModels
+@inject ApplicationDbContext db
 @model CommentViewModel
 @{
     var comment = Model.Comment;
@@ -13,7 +16,8 @@
     var user = await UserManager.GetUserAsync(User);
     var userId = user?.Id;
 
-
+    CacAdmin a = new CacAdmin(db);
+    string idAdmin = a.IdAdmin();
 }
 
 @if (Model.Comment.Active == true && Model.Comment.NguoiDangBaiXoa == false)
@@ -25,13 +29,13 @@
             @if (comment.ApplicationUser.Id == userId)
             {
                 <div class="comment-avatar bg-primary text-white d-flex align-items-center justify-content-center rounded-circle"
-                     style="width: @(48 - depth*4)px; height: @(48 - depth*4)px; font-size: @(1.2 - depth*0.1)rem;">
+                style="width: @(48 - depth*4)px; height: @(48 - depth*4)px; font-size: @(1.2 - depth*0.1)rem;">
                     @if (!string.IsNullOrEmpty(comment.ApplicationUser?.HinhAnh))
                     {
                         <img src="@comment.ApplicationUser?.HinhAnh" alt="Ảnh đại diện"
-                             class="rounded-circle border"
-                             width="@(48 - depth*4)" height="@(48 - depth*4)"
-                             style="object-fit: cover; border: 2px solid #ddd;" />
+                        class="rounded-circle border"
+                        width="@(48 - depth*4)" height="@(48 - depth*4)"
+                        style="object-fit: cover; border: 2px solid #ddd;" />
                     }
                     else
                     {
@@ -44,13 +48,13 @@
             {
                 <a href="/Chat/BatDauChat?nguoiNhanId=@comment.ApplicationUser.Id">
                     <div class="comment-avatar bg-primary text-white d-flex align-items-center justify-content-center rounded-circle"
-                         style="width: @(48 - depth*4)px; height: @(48 - depth*4)px; font-size: @(1.2 - depth*0.1)rem;">
+                    style="width: @(48 - depth*4)px; height: @(48 - depth*4)px; font-size: @(1.2 - depth*0.1)rem;">
                         @if (!string.IsNullOrEmpty(comment.ApplicationUser?.HinhAnh))
                         {
                             <img src="@comment.ApplicationUser?.HinhAnh" alt="Ảnh đại diện"
-                                 class="rounded-circle border"
-                                 width="@(48 - depth*4)" height="@(48 - depth*4)"
-                                 style="object-fit: cover; border: 2px solid #ddd;" />
+                            class="rounded-circle border"
+                            width="@(48 - depth*4)" height="@(48 - depth*4)"
+                            style="object-fit: cover; border: 2px solid #ddd;" />
                         }
                         else
                         {
@@ -92,25 +96,27 @@
                         @comment.NgayBinhLuan.ToString("dd/MM/yyyy HH:mm")
                     </small>
                 </div>
+               
 
-                @if (comment.ApplicationUser?.Id != Model.UserId && Model.CurrentUser != null)
-                {
                     <div class="dropdown">
                         <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown" style="font-size: @(0.8 - depth*0.05)rem">
                             <i class="fas fa-ellipsis-v"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <button class="dropdown-item text-danger report-comment-btn"
-                                        data-comment-id="@comment.Id"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#reportCommentModal"
-                                        style="font-size: @(0.8 - depth*0.05)rem">
-                                    <i class="fas fa-flag me-2"></i> Báo cáo
-                                </button>
-                            </li>
-                            @if (Model.IsAuthor)
+                            @if (comment.ApplicationUser?.Id != Model.UserId && Model.CurrentUser != null)
                             {
+                                <li>
+                                    <button class="dropdown-item text-danger report-comment-btn"
+                                            data-comment-id="@comment.Id"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#reportCommentModal"
+                                            style="font-size: @(0.8 - depth*0.05)rem">
+                                        <i class="fas fa-flag me-2"></i> Báo cáo
+                                    </button>
+                                </li>
+                            }
+                            @if (Model.IsAuthor || comment.ApplicationUser.Id == userId || userId == idAdmin)
+                            { 
                                 <li>
                                     <button class="dropdown-item text-danger d-flex align-items-center"
                                             data-bs-toggle="modal"
@@ -120,10 +126,31 @@
                                         Xóa bình luận
                                     </button>
                                 </li>
+                                <li>
+                                    <button class="dropdown-item text-info d-flex align-items-center"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#EditBinhLuan-@comment.Id"
+                                            style="font-size: @(0.8 - depth*0.05)rem">
+                                        <i class="fa-solid fa-pen-to-square me-2"></i>
+                                        Chỉnh sửa bình luận
+                                    </button>
+                                </li>
                             }
+                            @* @if (comment.ApplicationUser.Id == userId)  *@
+                            @*  {  *@
+                                @* <li> *@
+                                @*     <button class="dropdown-item text-danger d-flex align-items-center" *@
+                                @*             data-bs-toggle="modal" *@
+                                @*             data-bs-target="#EditBinhLuan-@comment.Id" *@
+                                @*             style="font-size: @(0.8 - depth*0.05)rem"> *@
+                                @*         <i class="fas fa-trash-alt me-2"></i> *@
+                                @*         Chỉnh sửa Bình Luận *@
+                                @*     </button> *@
+                                @* </li> *@
+                             @* }  *@
                         </ul>
                     </div>
-                }
+                
             </div>
 
             <div class="comment-content mb-3" style="font-size: @(1 - depth*0.05)rem">
@@ -233,6 +260,61 @@
             </div>
         </div>
     </div>
+    <!-- Delete Comment Modal -->
+    <!-- Edit Comment Modal -->
+    <div class="modal fade" id="EditBinhLuan-@comment.Id" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header border-0">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary text-white bg-opacity-10 p-2 rounded-circle me-3 d-flex justify-content-center align-item-center">
+                            <i class="fas fa-edit"></i>
+                        </div>
+                        <h5 class="modal-title">Chỉnh sửa bình luận</h5>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <form id="editCommentForm-@comment.Id" class="edit-comment-form">
+                        <input type="hidden" name="commentId" value="@comment.Id" />
+                        <div class="form-floating mb-3">
+                            <textarea name="noiDung" class="form-control" placeholder="Nội dung bình luận"
+                                      style="min-height: 100px" required>@comment.NoiDung</textarea>
+                            <label><i class="far fa-comment me-2"></i>Nội dung bình luận</label>
+                        </div>
+                        @if (!string.IsNullOrEmpty(comment.HinhAnh))
+                        {
+                            <div class="mb-3">
+                                <label class="form-label">Ảnh hiện tại</label>
+                                <img src="@comment.HinhAnh" class="img-thumbnail" style="max-height: 150px;" />
+                                <div class="form-check mt-2">
+                                    <input class="form-check-input" type="checkbox" name="removeImage" id="removeImage-@comment.Id">
+                                    <label class="form-check-label" for="removeImage-@comment.Id">
+                                        Xóa ảnh này
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                        <div class="mb-3">
+                            <label class="form-label">Thay đổi ảnh (nếu muốn)</label>
+                            <input type="file" name="hinhAnh" class="form-control" accept="image/*">
+                            <small class="text-muted">Để trống nếu không muốn thay đổi ảnh</small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Hủy
+                    </button>
+                    <button type="button" onclick="submitEditComment('@comment.Id')"
+                            class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Lưu thay đổi
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 }
 else
 {

@@ -260,6 +260,7 @@ namespace WebTimNguoiThatLac.Controllers
                             ThoiGian = DateTime.UtcNow,
                             ChiTiet = $"Đã tìm kiếm {soLanTimTrong1Phut} lần trong vòng 1 phút, Nghi ngờ bạn đang có ý định xâm hại hệ thống"
                         };
+                        db.HanhViDangNgos.Add(hanhVi);
                         await db.SaveChangesAsync();
 
                         // 👉 Tăng số lần vi phạm của người dùng
@@ -269,7 +270,7 @@ namespace WebTimNguoiThatLac.Controllers
                             nguoiDungViPham.SoLanViPham++;
                             await db.SaveChangesAsync();
 
-                            if (nguoiDungViPham.SoLanViPham >= 5)
+                            if (nguoiDungViPham.SoLanViPham >= 3)
                             {
                                 nguoiDungViPham.Active = false;
                                 await db.SaveChangesAsync();
@@ -725,7 +726,69 @@ namespace WebTimNguoiThatLac.Controllers
             return RedirectToAction("ChiTietBaiTimNguoi", new { id = IdBaiViet }); // Quay lại trang chi tiết
         }
 
-       
+
+        [HttpPost]
+        public async Task<IActionResult> EditComment(int commentId, string noiDung, IFormFile hinhAnh, bool removeImage = false)
+        {
+            try
+            {
+                var comment = await db.BinhLuans.FirstOrDefaultAsync(i => i.Id == commentId);
+                if (comment == null)
+                {
+                    return Json(new { success = false, message = "Bình luận không tồn tại" });
+                }
+
+                // Kiểm tra quyền chỉnh sửa
+                var currentUserId = _userManager.GetUserId(User);
+                if (comment.UserId != currentUserId && !User.IsInRole("Admin"))
+                {
+                    return Json(new { success = false, message = "Bạn không có quyền chỉnh sửa bình luận này" });
+                }
+
+                // Cập nhật nội dung
+                comment.NoiDung = noiDung;
+                //comment.NgayChinhSua = DateTime.Now;
+
+                // Xử lý ảnh
+                string imagePath = null;
+                if (removeImage && !string.IsNullOrEmpty(comment.HinhAnh))
+                {
+                    // Xóa ảnh cũ
+                    DeleteImage(comment.HinhAnh , "BinhLuan");
+                    comment.HinhAnh = null;
+                }
+                else if (hinhAnh != null && hinhAnh.Length > 0)
+                {
+                    // Xóa ảnh cũ nếu có
+                    if (!string.IsNullOrEmpty(comment.HinhAnh))
+                    {
+                        DeleteImage(comment.HinhAnh, "BinhLuan");
+                    }
+
+                    // Lưu ảnh mới
+                   
+
+                    comment.HinhAnh = await SaveImage(hinhAnh, "BinhLuan");
+                    imagePath = comment.HinhAnh;
+                }
+
+                db.Update(comment);
+                await db.SaveChangesAsync();
+
+                return Json(new
+                {
+                    success = true,
+                    noiDung = comment.NoiDung,
+                    hinhAnh = imagePath,
+                    removeImage = removeImage && string.IsNullOrEmpty(imagePath)
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi: " + ex.Message });
+            }
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ReplyComment(ReplyViewModel model)
@@ -1305,18 +1368,20 @@ namespace WebTimNguoiThatLac.Controllers
                             .FirstOrDefaultAsync(u => u.Id == comment.ApplicationUser.Id);
                         if (applicationUser != null)
                         {
-                            applicationUser.SoLanViPham += 1;
+                            applicationUser.SoLanViPham++;
                             await db.SaveChangesAsync();
 
-
+                            TimNguoi bv = db.TimNguois.FirstOrDefault(z => z.Id == comment.IdBaiViet);
 
                             HanhViDangNgo hanhVi = new HanhViDangNgo
                             {
                                 NguoiDungId = applicationUser.Id,
-                                HanhDong = "Bình luận bị báo cáo nhiều lần",
+                                HanhDong = "Bình luận bị báo cáo nhiều lần, Nghi Ngời vi phạm tiêu chuẩn cộng đồng",
                                 ThoiGian = DateTime.Now,
                                 IdLoiViPham = comment.Id,
                                 LoaiViPham = "Bình Luận",
+                                ChiTiet = "Bình luận bị báo cáo nhiều lần, Nghi Ngờ vi phạm tiêu chuẩn cộng đồng " +
+                                "tại bình luận của bài viết : " + bv?.TieuDe
 
                             };
                             db.HanhViDangNgos.Add(hanhVi);
@@ -1397,6 +1462,7 @@ namespace WebTimNguoiThatLac.Controllers
                                 ThoiGian = DateTime.Now,
                                 IdLoiViPham = post.Id,
                                 LoaiViPham = "Bài Viết",
+                                ChiTiet = $"bài viết {post.TieuDe} bị báo cáo nhiều lần nghi ngời vi phạm tiêu chuẩn cộng đồng"
 
                             };
 
@@ -2135,7 +2201,7 @@ namespace WebTimNguoiThatLac.Controllers
                             nguoiDungViPham.SoLanViPham++;
                             await db.SaveChangesAsync();
 
-                            if (nguoiDungViPham.SoLanViPham >= 5)
+                            if (nguoiDungViPham.SoLanViPham >= 3)
                             {
                                 nguoiDungViPham.Active = false;
                                 await db.SaveChangesAsync();

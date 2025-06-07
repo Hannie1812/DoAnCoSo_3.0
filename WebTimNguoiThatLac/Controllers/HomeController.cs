@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -12,12 +13,15 @@ namespace WebTimNguoiThatLac.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private ApplicationDbContext db;
+        private UserManager<ApplicationUser> _userManager;
 
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext db)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext db, UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
             this.db = db;
+            _userManager = userManager;
         }
+
 
         public IActionResult Index()
         {
@@ -36,7 +40,15 @@ namespace WebTimNguoiThatLac.Controllers
 
         public async Task<IActionResult> GioiThieu()
         {
+            int sl = db.TimNguois.ToList().Count;
+            ViewBag.TongBaiVietTrong = sl;
             GioiThieu ds = await db.GioiThieus.FirstOrDefaultAsync(i => i.Active == true);
+
+            
+
+
+            List<ApplicationUser> dsAdmin = db.Users.Where(i => i.IsAdmin == true).ToList();
+            ViewBag.DsAdmin = dsAdmin;
             return View(ds);
         }
         public async Task<IActionResult> LienHe()

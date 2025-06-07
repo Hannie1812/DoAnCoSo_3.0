@@ -35,38 +35,46 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
                 return RedirectToAction("Login", "Account", new { area = "Admin" });
             }
 
-            //var conversations = await _context.NguoiThamGias
-            //   .Include(ng => ng.HopThoai)
-            //       .ThenInclude(h => h.TinNhans.OrderByDescending(t => t.NgayGui).Take(1))
-            //   .Include(ng => ng.HopThoai)
-            //       .ThenInclude(h => h.NguoiThamGias)
-            //            .ThenInclude(tv => tv.ApplicationUser)
-            //   .Where(ng => ng.MaNguoiThamGia == user.Id && ng.HopThoai.TinNhans.Any(tn => tn.IsRead == false && tn.MaNguoiGui != user.Id))
-            //   .ToListAsync();
 
-            //ViewBag.DSTinNhanMoi = conversations.Select(ng => ng.HopThoai).ToList() ?? new List<HopThoaiTinNhan>();
+            // Khối mới
+            // Tính toán các thống kê mới
+            var tongBaiViet = await _context.TimNguois.CountAsync();
+            var tongBaiVietTruoc = await _context.TimNguois
+                .Where(x => x.NgayDang < DateTime.Now.AddMonths(-1))
+                .CountAsync();
 
-            //ViewBag.DemBaoCaoBinhLuan = await _context.BaoCaoBinhLuans
-            //    .Include(b => b.BinhLuan)
-            //    .Where(b => b.DaDoc == false)
-            //    .CountAsync();
+            var soLuongNam = await _context.TimNguois.CountAsync(x => x.GioiTinh == 1);
+            var soLuongNu = await _context.TimNguois.CountAsync(x => x.GioiTinh == 2);
+
+            var trangThaiPhoBien = await _context.TimNguois
+                .GroupBy(x => x.TrangThai)
+                .Select(g => new { TrangThai = g.Key, Count = g.Count() })
+                .OrderByDescending(x => x.Count)
+                .FirstOrDefaultAsync();
+
+            // Truyền dữ liệu sang View
+            ViewBag.TongBaiViet = tongBaiViet;
+            ViewBag.PhanTramTangBaiViet = tongBaiVietTruoc > 0 ?
+                Math.Round((double)(tongBaiViet - tongBaiVietTruoc) / tongBaiVietTruoc * 100) : 100;
+            ViewBag.TangGiamBaiViet = tongBaiViet > tongBaiVietTruoc ?
+                $"Tăng {tongBaiViet - tongBaiVietTruoc}" : $"Giảm {tongBaiVietTruoc - tongBaiViet}";
+
+            ViewBag.SoLuongNam = soLuongNam;
+            ViewBag.SoLuongNu = soLuongNu;
+            ViewBag.PhanTramNam = tongBaiViet > 0 ? Math.Round((double)soLuongNam / tongBaiViet * 100) : 0;
+            ViewBag.PhanTramNu = tongBaiViet > 0 ? Math.Round((double)soLuongNu / tongBaiViet * 100) : 0;
+
+            ViewBag.TrangThaiPhoBien = trangThaiPhoBien?.TrangThai ?? "Không xác định";
+            ViewBag.PhanTramTrangThaiPhoBien = 
+                                tongBaiViet > 0
+                                ? Math.Round((trangThaiPhoBien?.Count ?? 0) / (double)tongBaiViet * 100)
+                                : 0;
 
 
-            //ViewBag.DemBaoCaoBaiViet = await _context.BaoCaoBaiViets
-            //    .Include(b => b.TimNguoi)
-            //    .Where(b => b.DaDoc == false)
-            //    .CountAsync();
 
 
-            //ViewBag.DemLienHeNguoiDung = await _context.NguoiDungLienHes
-            //    .Where(b => b.isRead == false).CountAsync();
+            // End Khối Mới
 
-
-
-
-
-            // Lấy dữ liệu từ database
-            // Lấy dữ liệu từ database với include TinhThanh
             var query = _context.TimNguois
                 .Include(x => x.TinhThanh)
                 .Include(x => x.QuanHuyen)
@@ -81,20 +89,63 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
 
             var baiViets = await query.ToListAsync();
 
+
+           
+
             // Xử lý dữ liệu thống kê
             var now = DateTime.Now;
-            int soNgay = tuan.HasValue ? tuan.Value * 7 : 7;
-            var ngayLabels = Enumerable.Range(0, soNgay)
-                .Select(i => now.AddDays(-i).Date)
-                .OrderBy(d => d)
-                .Select(d => d.ToString("dd/MM"))
-                .ToList();
 
-            var baiVietTheoNgay = Enumerable.Range(0, soNgay)
-                .Select(i => now.AddDays(-i).Date)
-                .OrderBy(d => d)
-                .Select(ngay => baiViets.Count(x => x.NgayDang.Date == ngay))
-                .ToList();
+            int soNgay = 7; // Mặc định 7 ngày
+            if (tuan.HasValue)
+            {
+                if (tuan.Value == 0) // Lấy toàn bộ thời gian
+                {
+                    var minDate = await _context.TimNguois.MinAsync(x => x.NgayDang);
+                    var maxDate = await _context.TimNguois.MaxAsync(x => x.NgayDang);
+                    var totalDays = (maxDate - minDate).Days + 1;
+                    soNgay = totalDays > 0 ? totalDays : 1;
+                }
+                else
+                {
+                    soNgay = tuan.Value * 7; // Xử lý như cũ
+                }
+            }
+
+            List<string> ngayLabels;
+            if (tuan.HasValue && tuan.Value == 0)
+            {
+                var minDate = await _context.TimNguois.MinAsync(x => x.NgayDang);
+                ngayLabels = Enumerable.Range(0, soNgay)
+                    .Select(i => minDate.AddDays(i).Date)
+                    .Select(d => d.ToString("dd/MM/yyyy"))
+                    .ToList();
+            }
+            else
+            {
+                ngayLabels = Enumerable.Range(0, soNgay)
+                    .Select(i => now.AddDays(-i).Date)
+                    .OrderBy(d => d)
+                    .Select(d => d.ToString("dd/MM"))
+                    .ToList();
+            }
+
+            List<int> baiVietTheoNgay;
+            if (tuan.HasValue && tuan.Value == 0)
+            {
+                var minDate = await _context.TimNguois.MinAsync(x => x.NgayDang);
+                baiVietTheoNgay = Enumerable.Range(0, soNgay)
+                    .Select(i => minDate.AddDays(i).Date)
+                    .Select(ngay => baiViets.Count(x => x.NgayDang.Date == ngay))
+                    .ToList();
+            }
+            else
+            {
+                baiVietTheoNgay = Enumerable.Range(0, soNgay)
+                    .Select(i => now.AddDays(-i).Date)
+                    .OrderBy(d => d)
+                    .Select(ngay => baiViets.Count(x => x.NgayDang.Date == ngay))
+                    .ToList();
+            }
 
             // Thống kê theo Tỉnh Thành (thay cho Khu Vực)
             var tinhThanhStats = await _context.TinhThanhs
@@ -176,6 +227,9 @@ namespace WebTimNguoiThatLac.Areas.Admin.Controllers
 
         private string GetTimeLabel(int? year, int? month, int? day, int? tuan)
         {
+            if (tuan.HasValue && tuan.Value == 0)
+                return "Toàn bộ thời gian";
+
             if (day.HasValue && month.HasValue && year.HasValue)
                 return $"{day.Value:D2}/{month.Value:D2}/{year.Value}";
             if (month.HasValue && year.HasValue)

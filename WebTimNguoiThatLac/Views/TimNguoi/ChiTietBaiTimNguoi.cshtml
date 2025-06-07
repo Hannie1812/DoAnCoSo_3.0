@@ -2166,6 +2166,8 @@
             });
         }
 
+
+
          function submitPostRemove() {
             const submitBtn = document.getElementById('submitRemovePost');
             const submitText = submitBtn.querySelector('.submit-text');
@@ -2267,6 +2269,61 @@
                 complete: function() {
                     submitText.classList.remove('d-none');
                     spinner.classList.add('d-none');
+                    submitBtn.disabled = false;
+                }
+            });
+        }
+
+                // Hàm xử lý submit chỉnh sửa bình luận
+        function submitEditComment(commentId) {
+            const form = document.getElementById(`editCommentForm-${commentId}`);
+            const formData = new FormData(form);
+            const submitBtn = form.closest('.modal-content').querySelector('.btn-primary');
+            const originalBtnText = submitBtn.innerHTML;
+
+            // Hiển thị trạng thái loading
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang lưu...';
+            submitBtn.disabled = true;
+
+            $.ajax({
+                url: '/TimNguoi/EditComment',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        // Cập nhật nội dung bình luận trên giao diện
+                        const commentContent = document.querySelector(`#comment-${commentId} .comment-content`);
+                        if (commentContent) {
+                            commentContent.innerHTML = response.noiDung;
+                        }
+
+                        // Cập nhật ảnh nếu có
+                        if (response.hinhAnh) {
+                            const commentImage = document.querySelector(`#comment-${commentId} .comment-image`);
+                            if (commentImage) {
+                                commentImage.src = response.hinhAnh;
+                            }
+                        } else if (response.removeImage) {
+                            const commentImageContainer = document.querySelector(`#comment-${commentId} .comment-image-container`);
+                            if (commentImageContainer) {
+                                commentImageContainer.remove();
+                            }
+                        }
+
+                        showNotification('success', 'Bình luận đã được cập nhật thành công!');
+                        $(`#EditBinhLuan-${commentId}`).modal('hide');
+                    } else {
+                        showNotification('error', response.message || 'Có lỗi xảy ra khi cập nhật bình luận');
+                    }
+                },
+                error: function(xhr) {
+                    showNotification('error', 'Lỗi kết nối đến server');
+                    console.error('Error:', xhr.responseText);
+                },
+                complete: function() {
+                    submitBtn.innerHTML = originalBtnText;
                     submitBtn.disabled = false;
                 }
             });

@@ -593,71 +593,79 @@ namespace WebTimNguoiThatLac.Controllers
             {
                 TempData["WarningMessage"] = "Bạn cần đăng nhập để thực hiện xem chi tiết để bảo vệ thông tin cá nhân chức năng này.";
                 return Redirect("/Identity/Account/login");
-
             }
+
             ApplicationUser x = await _userManager.GetUserAsync(User);
             if (x != null)
             {
-
                 if (x.Active == false)
                 {
-                    // Ghi log
                     _logger.LogWarning($"Tài khoản {x.Email} đã bị vô hiệu hóa do vi phạm quy định.");
                     TempData["WarningMessage"] = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.";
-                    //return Redirect("/Identity/Account/Login");
                     return RedirectToAction("Index", "LoiViPham", new { area = "" });
-
                 }
 
-                TimNguoi y = db.TimNguois
+                var timNguoi = await db.TimNguois
                     .Include(u => u.AnhTimNguois)
                     .Include(u => u.TimThayNguoiThatLacs)
                     .Include(u => u.QuanHuyen)
                     .Include(u => u.TinhThanh)
-                    .FirstOrDefault(i => i.Id == id);
-                ApplicationUser us = await _userManager.FindByIdAsync(y.IdNguoiDung);
+                    .FirstOrDefaultAsync(i => i.Id == id);
+
+                if (timNguoi == null)
+                {
+                    return NotFound();
+                }
+
+                ApplicationUser us = await _userManager.FindByIdAsync(timNguoi.IdNguoiDung);
                 ViewBag.NguoiTim = us;
                 ViewBag.DSHinhAnh = await db.AnhTimNguois
-                                                        .Where(i => i.IdNguoiCanTim == y.Id)
-                                                        .ToListAsync();
+                                            .Where(i => i.IdNguoiCanTim == timNguoi.Id)
+                                            .ToListAsync();
 
                 var nguoiDung = await _userManager.GetUserAsync(User);
-                if (y.active == false && y.ApplicationUser.Id != nguoiDung.Id)
+                if (timNguoi.active == false && timNguoi.ApplicationUser.Id != nguoiDung.Id)
                 {
                     TempData["ErrorMessage"] = "Bài Viết Chưa Được Duyệt Hoặc Đã Bị Khóa, Nếu Có Thắc Mắc Xin Liên Hệ Với Admin";
                     return RedirectToAction("Index");
                 }
-                if(y.active == false)
+                if (timNguoi.active == false)
                 {
                     TempData["ErrorMessage"] = "Bài Viết Chưa Được Duyệt Hoặc Đã Bị Khóa, Nếu Có Thắc Mắc Xin Liên Hệ Với Admin";
-                } 
-                List <BinhLuan> DSBinhLuan = db.BinhLuans
-                                                        .Include(u => u.ApplicationUser)
-                                                        .Include(m => m.TraLois)
-                                                        .Where(i => i.IdBaiViet == id && i.Active == true && i.NguoiDangBaiXoa == false)
-                                                        .OrderByDescending(z => z.NgayBinhLuan)
-                                                        .ToList();
-                List<NhanChung> DSHANC = db.NhanChungs
-                                                        .Where(i => i.TimNguoiId == id)
-                                                        .ToList();
+                }
+
+                List<BinhLuan> DSBinhLuan = await db.BinhLuans
+                                                .Include(u => u.ApplicationUser)
+                                                .Include(m => m.TraLois)
+                                                .Where(i => i.IdBaiViet == id && i.Active == true && i.NguoiDangBaiXoa == false)
+                                                .OrderByDescending(z => z.NgayBinhLuan)
+                                                .ToListAsync();
+
+                List<NhanChung> DSHANC = await db.NhanChungs
+                                            .Where(i => i.TimNguoiId == id)
+                                            .ToListAsync();
+
                 if (idBinhLuan != 0)
                 {
-                    BinhLuan xBinhLuan = db.BinhLuans.FirstOrDefault(i => i.Id == idBinhLuan);
+                    BinhLuan xBinhLuan = await db.BinhLuans.FirstOrDefaultAsync(i => i.Id == idBinhLuan);
                     if (xBinhLuan != null)
                     {
                         xBinhLuan.DaDoc = true;
                         await db.SaveChangesAsync();
                     }
                 }
-                ViewBag.KhuVuc = y.KhuVuc;
-                ViewBag.QuanHuyen = y.QuanHuyen?.TenQuanHuyen; // null check nếu cần
-                ViewBag.TinhThanh = y.QuanHuyen?.TinhThanh?.TenTinhThanh; // null check nếu cần
 
-                ViewBag.DaTimThay = y.TimThayNguoiThatLacs != null;
+                ViewBag.KhuVuc = timNguoi.KhuVuc;
+                ViewBag.QuanHuyen = timNguoi.QuanHuyen?.TenQuanHuyen;
+                ViewBag.TinhThanh = timNguoi.QuanHuyen?.TinhThanh?.TenTinhThanh;
+                ViewBag.DaTimThay = timNguoi.TimThayNguoiThatLacs != null;
                 ViewBag.DSBinhLuan = DSBinhLuan;
                 ViewBag.DSHANhanChung = DSHANC;
-                return View(y);
+                ViewData["TimNguoiId"] = id;
+
+                return View(timNguoi);
             }
+
             return RedirectToAction("ThongTinCaNhan", "NguoiDung");
         }
 

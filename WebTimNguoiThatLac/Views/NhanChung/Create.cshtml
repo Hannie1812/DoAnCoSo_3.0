@@ -178,10 +178,10 @@
                 <h2 class="mb-0">
                     <i class="fas fa-user-shield text-primary me-2"></i>@ViewData["Title"]
                 </h2>
-                <a href="@Url.Action("ChiTietBaiViet", "TimNguoi", new { id = timNguoi.Id })"
+                @* <a href="@Url.Action("ChiTietBaiViet", "TimNguoi", new { id = timNguoi.Id })"
                    class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-1"></i> Quay lại
-                </a>
+                </a> *@
             </div>
 
             <!-- Missing person info card -->
@@ -301,17 +301,17 @@
                                 </h5>
                                 <div class="row g-3">
                                     <div class="col-md-6">
-                                        <label asp-for="HoTen" class="form-label fw-bold"></label>
+                                        <label asp-for="HoTen" class="form-label fw-bold"> Họ tên </label>
                                         <input asp-for="HoTen" class="form-control" placeholder="Nhập họ tên đầy đủ" required />
                                         <span asp-validation-for="HoTen" class="text-danger small"></span>
                                     </div>
                                     <div class="col-md-6">
-                                        <label asp-for="SoDienThoai" class="form-label fw-bold"></label>
+                                        <label asp-for="SoDienThoai" class="form-label fw-bold"> Số điện thoại </label>
                                         <input asp-for="SoDienThoai" class="form-control" placeholder="Nhập số điện thoại" required />
                                         <span asp-validation-for="SoDienThoai" class="text-danger small"></span>
                                     </div>
                                     <div class="col-12">
-                                        <label asp-for="Email" class="form-label fw-bold"></label>
+                                        <label asp-for="Email" class="form-label fw-bold"> Email </label>
                                         <input asp-for="Email" class="form-control" type="email" placeholder="Nhập email (nếu có)" />
                                         <span asp-validation-for="Email" class="text-danger small"></span>
                                     </div>
@@ -326,12 +326,12 @@
                                 </h5>
                                 <div class="row g-3">
                                     <div class="col-md-6">
-                                        <label asp-for="ThoiGian" class="form-label fw-bold"></label>
+                                        <label asp-for="ThoiGian" class="form-label fw-bold"> Thời gian </label>
                                         <input asp-for="ThoiGian" type="datetime-local" class="form-control" required />
                                         <span asp-validation-for="ThoiGian" class="text-danger small"></span>
                                     </div>
                                     <div class="col-md-6">
-                                        <label asp-for="DiaDiem" class="form-label fw-bold"></label>
+                                        <label asp-for="DiaDiem" class="form-label fw-bold"> Địa điểm </label>
                                         <input asp-for="DiaDiem" class="form-control" placeholder="Địa điểm cụ thể" required />
                                         <span asp-validation-for="DiaDiem" class="text-danger small"></span>
                                     </div>
@@ -344,7 +344,7 @@
                                     <i class="fas fa-align-left text-primary me-2"></i>
                                     Mô tả chi tiết
                                 </h5>
-                                <label asp-for="MoTaManhMoi" class="form-label fw-bold"></label>
+                                <label asp-for="MoTaManhMoi" class="form-label fw-bold"> Mô tả manh mối </label>
                                 <textarea asp-for="MoTaManhMoi" class="form-control" rows="5"
                                           placeholder="Mô tả chi tiết về người được nhìn thấy (trang phục, tình trạng sức khỏe, hành động, phương tiện di chuyển...)" required></textarea>
                                 <div class="form-text">Vui lòng mô tả càng chi tiết càng tốt để hỗ trợ công tác tìm kiếm</div>
